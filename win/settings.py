@@ -1,26 +1,28 @@
 # Django settings for win project.
 
 import os
+#SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+DEBUG = False
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
- 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['RDS_DB_NAME'],
-        'USER': os.environ['RDS_USERNAME'],
-        'PASSWORD': os.environ['RDS_PASSWORD'],
-        'HOST': os.environ['RDS_HOSTNAME'],
-        'PORT': os.environ['RDS_PORT'],
-    }
-}
+
+if 'RDS_DB_NAME' in os.environ:
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.mysql',
+			'NAME': os.environ['RDS_DB_NAME'],
+			'USER': os.environ['RDS_USERNAME'],
+			'PASSWORD': os.environ['RDS_PASSWORD'],
+			'HOST': os.environ['RDS_HOSTNAME'],
+			'PORT': os.environ['RDS_PORT'],
+    	}
+	}
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -151,3 +153,8 @@ LOGGING = {
         },
     }
 }
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
