@@ -1,7 +1,6 @@
 # Django settings for win project.
 
 import os
-#SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 
 DEBUG = False
 
@@ -154,7 +153,7 @@ LOGGING = {
     }
 }
 
-try:
-    from local_settings import *
-except ImportError:
-    pass
+#try:
+#    from local_settings import *
+#except ImportError:
+#    pass
