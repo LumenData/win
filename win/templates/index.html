@@ -1,8 +1,9 @@
 {% extends "_layouts/base.html" %}
 {% block page_title %}Homepage{% endblock %}
+{% block nav_home_active %}active{% endblock %}
 
 {% block page_content %}
 <div class="row-fluid">
-	<h3><a href="{% url data:list %}">Data Manager</a></h3>
+	<h3>Getting Started: <a href="{% url data:list %}">Data Manager</a></h3>
 </div>
 {% endblock %}
