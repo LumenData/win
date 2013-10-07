@@ -1,7 +1,8 @@
 {% extends "_layouts/base.html" %}
+{% block page_title %}Homepage{% endblock %}
 
 {% block page_content %}
 <div class="row-fluid">
-	This is the homepage at win root
+	<h3>Start by uploading a file: <a href="{% url data:import %}">Import Data</a></h3>
 </div>
 {% endblock %}

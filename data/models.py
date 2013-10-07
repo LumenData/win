@@ -12,3 +12,8 @@ class DataFrame(models.Model):
 	def save(self, *args, **kwargs):
 		super(Post, self).save(*args, **kwargs)
 	
+	@models.permalink
+	def get_absolute_url(self):
+		return ("data:detail", (), {"slug": self.slug})
+		
+		
