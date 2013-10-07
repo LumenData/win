@@ -10,7 +10,7 @@ class DataFrame(models.Model):
 		return self.name
 	
 	def save(self, *args, **kwargs):
-		super(Post, self).save(*args, **kwargs)
+		super(DataFrame, self).save(*args, **kwargs)
 	
 	@models.permalink
 	def get_absolute_url(self):
