@@ -3,8 +3,8 @@ from .models import DataFrame
 
 class DataFrameAdmin(admin.ModelAdmin):
 	date_hierarchy = "created_at"
-	fields = ("name", "db_table_name")
-	list_display = ["name", "db_table_name", "updated_at"]
+	fields = ("name", "slug", "db_table_name")
+	list_display = ["name", "slug", "db_table_name", "updated_at"]
 	#list_display_links = ["title"]
 	#list_editable = ["published"]
 	#list_filter = ["published", "updated_at", "author"]

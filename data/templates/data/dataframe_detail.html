@@ -1,0 +1,16 @@
+{% extends "_layouts/base.html" %}
+{% block page_title %}Data Detail{% endblock %}
+{% block nav_data_active %}active{% endblock %}
+
+{% block page_content %}
+<div class="row-fluid">
+
+	<h3>Name: {{ object.name }}</h3>
+	<h4>Slug: {{ object.slug }}</h4>
+	<h4>Data Detail: {{ object.db_table_name }}</h4>
+
+	<br>
+	<a href="{% url data:list %}">&larr; Data List</a>
+</div>
+{% endblock %}
+

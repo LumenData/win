@@ -8,8 +8,7 @@
 	<h3>Create New: <a href="{% url data:import %}">Import File</a></h3>
 
 	{% for data_frame in object_list %}
-	{{ data_frame.title }}
-	<li><a href="{{ data_frame.name }}">{{ data_frame.name }}</a></li>
+	<li><a href="{{ data_frame.get_absolute_url }}">{{ data_frame.name }}</a></li>
 	{% empty %}
 	<li>Sorry, no posts yet. Check back soon!</li>
 	{% endfor %}

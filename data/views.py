@@ -1,15 +1,10 @@
-from django.views.generic import TemplateView
-from django.views.generic.edit import CreateView
-from django.views.generic.list import ListView
+from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 
 from .models import DataFrame
-from .forms import DataImportForm
-
-#class DataListView(TemplateView):
-#	template_name = "data_list.html"
+#from .forms import DataImportForm
 
 class DataFrameListView(ListView):
 	model = DataFrame
@@ -17,8 +12,8 @@ class DataFrameListView(ListView):
 		context = super(DataFrameListView, self).get_context_data(**kwargs)
 		return context
 
-#class DataImportView(TemplateView):
-#	template_name = "data_import.html"
+class DataFrameDetailView(DetailView):
+	model = DataFrame
 
 #def create(request):
 #	if request.POST:
@@ -36,4 +31,3 @@ class DataFrameListView(ListView):
 # Not yet finished, still using the above function based view
 class DataFrameCreate(CreateView):
 	model = DataFrame
-	fields = ['name']

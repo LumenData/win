@@ -7,12 +7,11 @@
 	<div class="well">
 		<h3>Get Data From File</h3>
 		<form action="" method="post">{% csrf_token %}
-    		{{ form.as_p }}
-    		<input type="submit" value="Create" />
-		</form>	
+			{{ form.as_p }}
+			<input type="submit" value="Create" />
+		</form>
 	</div>
 
-    <a href="{% url data:import %}"> Here Again </a><br>
 	<a href="{% url data:list %}">&larr; Data Manager</a>
 </div>
 {% endblock %}
