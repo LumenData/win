@@ -14,7 +14,6 @@ class Migration(SchemaMigration):
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
             ('slug', self.gf('django.db.models.fields.SlugField')(default='', max_length=255, blank=True)),
             ('db_table_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
@@ -31,7 +30,6 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'DataFrame'},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'db_table_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'slug': ('django.db.models.fields.SlugField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),

@@ -5,9 +5,7 @@ class DataFrame(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, editable=False)
 	updated_at = models.DateTimeField(auto_now=True, editable=False)
 	name = models.CharField(max_length=255)
-	description = models.TextField()
-	description2 = models.TextField()
-
+	desc = models.TextField()
 	slug = models.SlugField(max_length=255, blank=True, default='')
 	db_table_name = models.CharField(max_length=255)
 	
