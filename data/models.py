@@ -22,5 +22,3 @@ class DataFrame(models.Model):
 	@models.permalink
 	def get_absolute_url(self):
 		return ("data:detail", (), {"slug": self.slug})
-		
-		
