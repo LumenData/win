@@ -8,21 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'DataFrame'
-        db.create_table('data_dataframe', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(default='', max_length=255, blank=True)),
-            ('db_table_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('data', ['DataFrame'])
+        # Adding field 'DataFrame.description2'
+        db.add_column('data_dataframe', 'description2',
+                      self.gf('django.db.models.fields.TextField')(default='blank'),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'DataFrame'
-        db.delete_table('data_dataframe')
+        # Deleting field 'DataFrame.description2'
+        db.delete_column('data_dataframe', 'description2')
 
 
     models = {
@@ -30,6 +24,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'DataFrame'},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'db_table_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'description2': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'slug': ('django.db.models.fields.SlugField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
