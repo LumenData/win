@@ -1,18 +1,36 @@
 {% extends "_layouts/base.html" %}
 {% block page_title %}Data Import{% endblock %}
+{% block nav_data_active %}active{% endblock %}
 
 {% block page_content %}
 <div class="row-fluid">
-
 	<div class="well">
-		<h3>Get Data From File</h3>
-		<form action="" method="post">{% csrf_token %}
-			{{ form.as_p }}
-			<input type="submit" value="Create" />
+		<form action="{% url data:import %}" method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			
+				<p>
+					{{ form.name.errors }}
+					<input id="id_name" type="text" name="{{ form.name.html_name }}" class="form-control" maxlength="{{ form.name.max_length }}" placeholder="Name">				
+				<p>
+					{{ form.description.errors }}
+					<textarea id="id_description" type="text" name="{{ form.description.html_name }}" class="form-control" maxlength="255" placeholder="Description"></textarea>				
+				<p>
+					{{ form.docfile.errors }}
+					<input type="file" name="{{ form.docfile.html_name }}" id="id_docfile"/>				
+				<p>
+					{{ form.owner }}
+				<p>
+<!-- 					<input type="submit" class="btn btn-default" value="Create" /> -->
+					
+					
+				<button type="submit" class="btn btn-default btn-med">
+					<span class="glyphicon glyphicon-cloud-upload"></span> Upload
+				</button>
 		</form>
 	</div>
 
-	<a href="{% url data:list %}">&larr; Data Manager</a>
+	<ul class="pager">	
+		<li class="previous"><a href="{% url data:list %}">&larr; Data Manager</a></li>
+	</ul>
 </div>
 {% endblock %}
-

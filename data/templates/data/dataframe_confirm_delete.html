@@ -1,0 +1,13 @@
+{% extends "_layouts/base.html" %}
+{% block page_title %}Data Delete{% endblock %}
+{% block nav_data_active %}active{% endblock %}
+
+{% block page_content %}
+<div class="row-fluid">
+	<form action="" method="post">{% csrf_token %}
+		<p>Are you sure you want to delete "{{ object }}"?</p>
+		<input type="submit" value="Confirm" />
+	</form>
+	<a href="{% url data:list %}">&larr; Data List</a>
+</div>
+{% endblock %}

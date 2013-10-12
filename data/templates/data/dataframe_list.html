@@ -10,13 +10,13 @@
 	{% for data_frame in object_list %}
 	<li><a href="{{ data_frame.get_absolute_url }}">{{ data_frame.name }}</a></li>
 	{% empty %}
-	<li>Sorry, no posts yet. Check back soon!</li>
+	<li>No data yet.  Upload some!</li>
 	{% endfor %}
 	
-	
-	
 	<br>
-	<a href="{% url home %}">&larr; Home</a>
+
+	<ul class="pager">	
+		<li class="previous"><a href="{% url home %}">&larr; Home</a></li>
+	</ul>
 </div>
 {% endblock %}
-

@@ -2,3 +2,4 @@
 *.pyc
 win/settings/local.py
 win/local_settings.py
+uploads/*
