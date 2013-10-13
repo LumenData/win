@@ -1,7 +1,9 @@
 <!doctype html>
 <html>
 	<head>
-		<link rel="stylesheet" href="{{ STATIC_URL }}dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/dist/css/bootstrap.min.css">
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		{% block head_content %}{% endblock %}	
 		<title>Win Analytics</title>
 	</head>
 	<body>
@@ -19,7 +21,7 @@
 		</nav>
 		<div class="container">
 			<h1>Win | {% block page_title %}{% endblock %}</h1>
-			{% block page_content %}Some Content{% endblock %}
+			{% block page_content %}Empty Page Content{% endblock %}
 		</div>
 	</body>
 </html>

@@ -2,30 +2,57 @@
 {% block page_title %}Data Import{% endblock %}
 {% block nav_data_active %}active{% endblock %}
 
+{% block head_content %}
+<style>
+	.fileUpload {
+		position: relative;
+		overflow: hidden;
+		margin: 10px;
+	}
+
+	.fileUpload input {
+		position: absolute;
+		top: 0;
+		right: 0;
+		margin: 0;
+		padding: 0;
+		font-size: 20px;
+		cursor: pointer;
+		opacity: 0;
+		filter: alpha(opacity=0);
+	}
+</style>
+<script>
+	document.getElementById("uploadBtn").onchange = function () {
+		document.getElementById("uploadFile").value = this.value;
+	};
+</script>
+{% endblock %}
+
 {% block page_content %}
 <div class="row-fluid">
 	<div class="well">
-		<form action="{% url data:import %}" method="post" enctype="multipart/form-data">
+		<form action="{% url data:create %}" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			
-				<p>
-					{{ form.name.errors }}
-					<input id="id_name" type="text" name="{{ form.name.html_name }}" class="form-control" maxlength="{{ form.name.max_length }}" placeholder="Name">				
-				<p>
-					{{ form.description.errors }}
-					<textarea id="id_description" type="text" name="{{ form.description.html_name }}" class="form-control" maxlength="255" placeholder="Description"></textarea>				
-				<p>
-					{{ form.docfile.errors }}
-					<input type="file" name="{{ form.docfile.html_name }}" id="id_docfile"/>				
-				<p>
-					{{ form.owner }}
-				<p>
-<!-- 					<input type="submit" class="btn btn-default" value="Create" /> -->
-					
-					
-				<button type="submit" class="btn btn-default btn-med">
-					<span class="glyphicon glyphicon-cloud-upload"></span> Upload
-				</button>
+			<p> {{ form.name.errors }}
+			<input id="id_name" type="text" name="{{ form.name.html_name }}" class="form-control" maxlength="{{ form.name.max_length }}" placeholder="Name">				
+			<p> {{ form.description.errors }}
+			<textarea id="id_description" type="text" name="{{ form.description.html_name }}" class="form-control" maxlength="255" placeholder="Description"></textarea>				
+			<p> {{ form.owner }}
+			<p> {{ form.docfile.errors }}			<input type="file" name="{{ form.docfile.html_name }}" id="id_docfile"/>	
+
+<!-- 
+<div class="fileUpload btn btn-primary">
+    <input id="uploadFile" placeholder="Choose File" disabled="disabled" />
+    <span>Upload</span>
+    <input id="uploadBtn" type="file" class="upload" />
+</div>
+ -->
+			<p>				
+			<button type="submit" class="btn btn-default btn-med">
+				<span class="glyphicon glyphicon-cloud-upload"></span> Upload
+			</button>
 		</form>
 	</div>
 
