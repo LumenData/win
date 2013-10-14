@@ -1,0 +1,63 @@
+{% extends "_layouts/base.html" %}
+{% block page_title %}Data Import{% endblock %}
+{% block nav_data_active %}active{% endblock %}
+
+{% block head_content %}
+<style>
+	.fileUpload {
+		position: relative;
+		overflow: hidden;
+		margin: 10px;
+	}
+
+	.fileUpload input {
+		position: absolute;
+		top: 0;
+		right: 0;
+		margin: 0;
+		padding: 0;
+		font-size: 20px;
+		cursor: pointer;
+		opacity: 0;
+		filter: alpha(opacity=0);
+	}
+</style>
+<script>
+	document.getElementById("uploadBtn").onchange = function () {
+		document.getElementById("uploadFile").value = this.value;
+	};
+</script>
+{% endblock %}
+
+{% block page_content %}
+<div class="row-fluid">
+	<div class="well">
+		<form action="{% url data:create %}" method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			
+			<p> {{ form.name.errors }}
+			<input id="id_name" type="text" name="{{ form.name.html_name }}" class="form-control" maxlength="{{ form.name.max_length }}" placeholder="Name">				
+			<p> {{ form.description.errors }}
+			<textarea id="id_description" type="text" name="{{ form.description.html_name }}" class="form-control" maxlength="255" placeholder="Description"></textarea>				
+			<p> {{ form.owner }}
+			<p> {{ form.file.errors }}			<input type="file" name="{{ form.file.html_name }}" id="id_file"/>	
+
+<!-- 
+<div class="fileUpload btn btn-primary">
+    <input id="uploadFile" placeholder="Choose File" disabled="disabled" />
+    <span>Upload</span>
+    <input id="uploadBtn" type="file" class="upload" />
+</div>
+ -->
+			<p>				
+			<button type="submit" class="btn btn-default btn-med">
+				<span class="glyphicon glyphicon-cloud-upload"></span> Upload
+			</button>
+		</form>
+	</div>
+
+	<ul class="pager">	
+		<li class="previous"><a href="{% url data:list %}">&larr; Data Manager</a></li>
+	</ul>
+</div>
+{% endblock %}
