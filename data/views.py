@@ -5,47 +5,47 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 
-from .models import DataFrame
-from .forms import DataFrameForm
+from .models import DataFile
+from .forms import DataFileForm
 
-class DataFrameListView(ListView):
-	model = DataFrame
+class DataFileListView(ListView):
+	model = DataFile
 	def get_context_data(self, **kwargs):
-		context = super(DataFrameListView, self).get_context_data(**kwargs)
+		context = super(DataFileListView, self).get_context_data(**kwargs)
 		return context
 
-class DataFrameDetailView(DetailView):
-	model = DataFrame
+class DataFileDetailView(DetailView):
+	model = DataFile
 	
 
-class DataFrameCreateView(CreateView):
-    model = DataFrame
-    form_class = DataFrameForm
+class DataFileCreateView(CreateView):
+    model = DataFile
+    form_class = DataFileForm
 
     def get(self, request, *args, **kwargs):
-        return super(DataFrameCreateView, self).get(request, *args, **kwargs)
+        return super(DataFileCreateView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        return super(DataFrameCreateView, self).post(request, *args, **kwargs)
+        return super(DataFileCreateView, self).post(request, *args, **kwargs)
 
-class DataFrameDeleteView(DeleteView):
-	model = DataFrame
+class DataFileDeleteView(DeleteView):
+	model = DataFile	
+	def get_object(self, queryset=None):
+		obj = super(DataFileDeleteView, self).get_object()
+		if not obj.owner == self.request.user:
+			raise Http404
+		else:
+			obj.file.delete()
+		return obj	
 	success_url = '/data/'
 	
-	
-# 	def get_object(self, queryset=None):
-# 		obj = super(DataFrameDeleteView, self).get_object()
-# 		if not obj.owner == self.request.user:
-# 			raise Http404
-# 		return obj
-
 	
 # def list(request):
 # 	# Handle file upload
 # 	if request.method == 'POST':
-# 		form = DataFrameForm(request.POST, request.FILES)
+# 		form = DataFileForm(request.POST, request.FILES)
 # 		if form.is_valid():
-# 			newdoc = DataFrame(
+# 			newdoc = DataFile(
 # 				name = request.POST['name'],
 # 				description = request.POST['description'],
 # # 				owner = self.request.user,
@@ -59,10 +59,10 @@ class DataFrameDeleteView(DeleteView):
 # # 			return HttpResponseRedirect(reverse('data:import'))
 # 			return HttpResponseRedirect(newdoc.get_absolute_url())
 # 	else:
-# 		form = DataFrameForm() # A empty, unbound form
+# 		form = DataFileForm() # A empty, unbound form
 # 
 # 	# Load documents for the list page
-# 	documents = DataFrame.objects.all()
+# 	documents = DataFile.objects.all()
 # 
 # 	# Render list page with the documents and the form
 # 	return render_to_response(
