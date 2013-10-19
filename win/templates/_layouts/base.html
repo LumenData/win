@@ -1,18 +1,18 @@
 <!doctype html>
 <html>
 	<head>
-		<link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/dist/css/bootstrap.min.css">
-		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap.min.css">
+<!-- 		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> -->
 		{% block head_content %}{% endblock %}	
 		<title>Win Analytics</title>
 	</head>
 	<body>
 		<nav class="navbar navbar-default" role="navigation">
 			<div class="container">
-				<a class="navbar-brand" href="{% url data:list %}">Win Analytics</a>
+				<a class="navbar-brand" href="{% url data:filelist %}">Win Analytics</a>
 				<ul class="nav navbar-nav">
 					<li class="{% block nav_home_active %}{% endblock %}"><a href="{% url home %}">Home</a></li>
-					<li class="{% block nav_data_active %}{% endblock %}"><a href="{% url data:list %}">Data Manager</a></li>
+					<li class="{% block nav_data_active %}{% endblock %}"><a href="{% url data:filelist %}">Data Manager</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="/admin">Admin</a></li>

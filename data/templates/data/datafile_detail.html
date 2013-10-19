@@ -3,6 +3,7 @@
 {% block nav_data_active %}active{% endblock %}
 
 {% block page_content %}
+
 <div class="row-fluid">
 	<h3>Name: {{ object.name }}</h3>
 	<h4>Slug: {{ object.slug }}</h4>
@@ -12,16 +13,21 @@
 	<h4>File: <a href="{{ MEDIA_URL }}{{ object.file }}">{{ object.file }}</a></h4>
 	<br>
 	
-	<form action="{{ object.get_absolute_url }}delete" method="post">{% csrf_token %}
+	
+
+	
+	<form action="{{ object.get_absolute_delete_url }}" method="post">
+	{% csrf_token %}
+			<a href="{{ object.get_absolute_import_url }}" class="btn btn-primary">Import Data</a>
 		<input type="submit" class="btn btn-danger" value="Delete" />
 	</form>
+	
+	
 
 	<br>
-
 	<ul class="pager">	
-		<li class="previous"><a href="{% url data:list %}">&larr; Data Manager</a></li>
+		<li class="previous"><a href="{% url data:filelist %}">&larr; Data Manager</a></li>
 	</ul>
-
 
 </div>
 {% endblock %}

@@ -5,7 +5,7 @@
 {% block page_content %}
 <div class="row-fluid">
 
-	<h3>Create New: <a href="{% url data:create %}">Import File</a></h3>
+	<h3>Create New: <a href="{% url data:filecreate %}">Import File</a></h3>
 
 	{% for data_frame in object_list %}
 	<li><a href="{{ data_frame.get_absolute_url }}">{{ data_frame.name }}</a></li>
@@ -14,7 +14,6 @@
 	{% endfor %}
 	
 	<br>
-
 	<ul class="pager">	
 		<li class="previous"><a href="{% url home %}">&larr; Home</a></li>
 	</ul>

@@ -32,9 +32,9 @@
 {% block page_content %}
 <div class="row-fluid">
 	<div class="well">
-		<form action="{% url data:create %}" method="post" enctype="multipart/form-data">
+		<form action="{% url data:filecreate %}" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
-			
+
 			<p> {{ form.name.errors }}
 			<input id="id_name" type="text" name="{{ form.name.html_name }}" class="form-control" maxlength="{{ form.name.max_length }}" placeholder="Name">				
 			<p> {{ form.description.errors }}
@@ -57,7 +57,7 @@
 	</div>
 
 	<ul class="pager">	
-		<li class="previous"><a href="{% url data:list %}">&larr; Data Manager</a></li>
+		<li class="previous"><a href="{% url data:filelist %}">&larr; Data Manager</a></li>
 	</ul>
 </div>
 {% endblock %}
