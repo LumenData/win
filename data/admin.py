@@ -1,5 +1,5 @@
 from django.contrib import admin 
-from .models import DataFile, DataColumn
+from .models import DataFile, DataColumn, DataFrame
 
 class DataFileAdmin(admin.ModelAdmin):
 	date_hierarchy = "created_at"
@@ -10,8 +10,12 @@ class DataFileAdmin(admin.ModelAdmin):
 	#list_filter = ["published", "updated_at", "author"]
 	prepopulated_fields = {"slug": ("name",)}
 	#search_fields = ["title", "content"]
-	
+
+
 admin.site.register(DataFile, DataFileAdmin)
+
+admin.site.register(DataFrame, admin.ModelAdmin)
+
 
 class DataColumnAdmin(admin.ModelAdmin):
 	date_hierarchy = "created_at"

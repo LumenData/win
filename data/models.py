@@ -44,7 +44,8 @@ class DataFrame(models.Model):
 	name = models.CharField(max_length=255)
 	slug = models.SlugField(max_length=255, blank=True, default='')
 	owner = models.ForeignKey(User, related_name="data_frame", default=1)
-
+	db_table_name = models.CharField(max_length=255)
+	
 	def __unicode__(self):
 		return self.name
 
@@ -53,7 +54,9 @@ class DataFrame(models.Model):
 			self.name = self.file.name
 		if not self.slug:
 			self.slug = slugify(self.name)
-		super(DataFile, self).save(*args, **kwargs)
+		super(DataFrame, self).save(*args, **kwargs)
+		
+	
 
 	@models.permalink
 	def get_absolute_url(self):
@@ -75,7 +78,6 @@ class DataColumn(models.Model):
 	def save(self, *args, **kwargs):
 		if not self.slug:
 			self.slug = slugify(self.name)
-#		self.db_column_name = self.owner.username + "_" + self.parent_file.slug + "_" + self.slug
 		super(DataColumn, self).save(*args, **kwargs)
 
 	@models.permalink
