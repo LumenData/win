@@ -1,0 +1,14 @@
+{% extends "_layouts/base.html" %}
+{% block page_title %}DataFrame Delete{% endblock %}
+{% block nav_data_active %}active{% endblock %}
+
+{% block page_content %}
+<div class="row-fluid">
+	<form action="" method="post">{% csrf_token %}
+		<p>Are you sure you want to delete "{{ object }}"?</p>
+		<input type="submit" value="Confirm" />
+	</form>
+	<a href="{% url data:framelist %}">&larr; DataFrame List</a>
+</div>
+
+{% endblock %}

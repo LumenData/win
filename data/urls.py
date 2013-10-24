@@ -1,19 +1,28 @@
 from django.conf.urls import patterns, url
 from . import views
+from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView, DeleteView
+from .models import DataFile, DataFrame
+from .forms import DataFileForm
 
 # Importing for the list function-based views
 from django.conf.urls.defaults import include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.core.urlresolvers import reverse, reverse_lazy
 
 urlpatterns = patterns('',
-	url(r'^$', views.DataFileListView.as_view(), name="filelist"),
-	url(r'^create$', views.DataFileCreateView.as_view(), name="filecreate"),
+	url(r'^file$', ListView.as_view(model=DataFile), name="filelist"),
+	url(r'^file/create$', CreateView.as_view(model=DataFile, form_class = DataFileForm), name="filecreate"),
+	url(r'^file/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DetailView.as_view(model=DataFile), name="filedetail"),
+	url(r'^file/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/delete$', DeleteView.as_view(model = DataFile, success_url = reverse_lazy('data:filelist')), name="filedelete"),
+	url(r'^file/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/import$', views.DataFileImportView.as_view(), name="fileimport"),
+
+	url(r'^frame$', ListView.as_view(model=DataFrame), name="framelist"),
+ 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DetailView.as_view(model=DataFrame), name="framedetail"),
+	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/delete$', DeleteView.as_view(model = DataFrame, success_url = reverse_lazy('data:framelist')), name="framedelete"),
+	
+	
 	url(r'^pie$', 'data.views.pie', name="pie"),
 
- 	url(r'^(?P<slug>[\w-]+)$', views.DataFileDetailView.as_view(), name="filedetail"),
-	url(r'^(?P<slug>[\w-]+)/delete$', views.DataFileDeleteView.as_view(), name="filedelete"),
-
-	url(r'^(?P<slug>[\w-]+)/import$', views.DataFileImportView.as_view(), name="fileimport"),
 
 )
