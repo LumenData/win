@@ -74,12 +74,13 @@ class DataFrame(models.Model):
 		db_name = settings.DATABASES['default']['NAME']		
 		db_user = settings.DATABASES['default']['USER']	
 		db_password = settings.DATABASES['default']['PASSWORD']	
-		db_table = '_userdata' + '_U' + str(datafile.owner) + '_DF' + str(datafile.pk)
+		db_table = '_dataframe' + '_U' + str(datafile.owner) + '_DF' + str(self.id)	
 
 		import_string = "python data/includes/csv2mysql.py --table=%s --database=%s --user=%s --password=%s %s" % (db_table, db_name, db_user, db_password, datafile.file.path)
 		import_status = os.popen(import_string).read()
 		
 		self.db_table_name = db_table
+		super(DataFrame, self).save()
 		return import_status
 		
 	def delete(self):

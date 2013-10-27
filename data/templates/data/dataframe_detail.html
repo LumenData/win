@@ -1,11 +1,24 @@
 {% extends "_layouts/base.html" %}
+
+{% block head_content %}
+<script>
+	$(document).ready(function() {
+		$('.edit').editable('{{ object.get_absolute_url }}',
+		{
+			width:($(".edit").width() + 100) + "px",
+			height:($(".edit").height() + 10) + "px"
+		});
+	});
+</script>
+{% endblock %}
+
 {% block page_title %}DataFrame Detail{% endblock %}
 {% block nav_data_active %}active{% endblock %}
 
 {% block page_content %}
 
 <div class="row-fluid">
-	<h3>Name: {{ object.name }}</h3>
+	<h3>Name: <span style="display:inline-block" class="edit" id="name">{{ object.name }}</span></h3>
 	<h4>ID: {{ object.id }}</h4>
 	<h4>Slug: {{ object.slug }}</h4>
 	<h4>Database Table: {{ object.db_table_name }}</h4>
@@ -13,13 +26,14 @@
 	<br>
 
 	<form action="{{ object.get_absolute_delete_url }}" method="post">
-	{% csrf_token %}
+{#	{% csrf_token %} #}
 		<input type="submit" class="btn btn-danger" value="Delete" />
 	</form>
-	
+
 	<br>
 	<ul class="pager">	
 		<li class="previous"><a href="{% url data:framelist %}">&larr; Data Frames</a></li>
 	</ul>
 </div>
+
 {% endblock %}

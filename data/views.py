@@ -2,13 +2,11 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView,
 #All these imports for function based list view
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse, reverse_lazy
 
 from .models import DataFile, DataFrame
 from .forms import DataFileForm
-
-
 
 
 ##  Import a file
@@ -24,10 +22,9 @@ class DataFileImportView(TemplateView):
 
 		datafile = DataFile.objects.get(slug = slug)
 
-		new_dataframe_name = datafile.name
-		new_dataframe = DataFrame(name=new_dataframe_name)
-		import_status = new_dataframe.import_from_file(datafile)
-		new_dataframe.save()
+ 		new_dataframe = DataFrame(name = datafile.name)
+ 		new_dataframe.save()
+ 		import_status = new_dataframe.import_from_file(datafile)
 
 		context['testvar'] = import_status
 		context['object'] = new_dataframe
@@ -36,23 +33,26 @@ class DataFileImportView(TemplateView):
 def pie(request):
 	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
 	return render_to_response('data/piechart.html', context)
-
-
-# ## File Delete
-# class DataFileDeleteView(DeleteView):
-# 	model = DataFile	
-# 	success_url = reverse_lazy('data:filelist')
-# 
-
-
-## Frame Delete
-
-# class DataFrameDeleteView(DeleteView):
-# 	model = DataFrame
-# 	success_url = reverse_lazy('data:framelist')
-
-
-
-
 	
+class DataFrameDetailView(DetailView):
+	model = DataFrame
 	
+	def post(self, request, *args, **kwargs):
+		if(self.request.POST['id'] == 'name'):
+			dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])		
+			dataframe.name = self.request.POST['value']
+			dataframe.save()
+ 			return HttpResponse(dataframe.name)
+ 		else:
+ 			return HttpResponse('error')
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

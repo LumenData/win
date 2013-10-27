@@ -4,6 +4,8 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView,
 from .models import DataFile, DataFrame
 from .forms import DataFileForm
 
+from .views import *
+
 # Importing for the list function-based views
 from django.conf.urls.defaults import include
 from django.conf import settings
@@ -18,7 +20,8 @@ urlpatterns = patterns('',
 	url(r'^file/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/import$', views.DataFileImportView.as_view(), name="fileimport"),
 
 	url(r'^frame$', ListView.as_view(model=DataFrame), name="framelist"),
- 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DetailView.as_view(model=DataFrame), name="framedetail"),
+# 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DetailView.as_view(model=DataFrame), name="framedetail"),
+ 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DataFrameDetailView.as_view(), name="framedetail"),
 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/delete$', DeleteView.as_view(model = DataFrame, success_url = reverse_lazy('data:framelist')), name="framedelete"),
 	
 	
