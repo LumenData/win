@@ -67,6 +67,9 @@ class DataFrame(models.Model):
 
 	def __unicode__(self):
 		return self.name
+	
+	def get_db(self):
+		return MySQLdb.connect(host=self.db_host, user=self.db_user, passwd=self.db_password)
 
 	def save(self, *args, **kwargs):
 		if not self.name:
@@ -76,16 +79,15 @@ class DataFrame(models.Model):
 		super(DataFrame, self).save(*args, **kwargs)
 
 	def delete(self):
-
-		db = MySQLdb.connect(host=self.db_host, user=self.db_user, passwd=self.db_password)
+		db = self.get_db()
 		cursor = db.cursor()
 		db.select_db(self.db_name)
-		
+
 		try:
 			cursor.execute("DROP TABLE IF EXISTS %s" % (self.db_table_name,))
 		except MySQLdb.Warning:
 			pass
-		
+
 		super(DataFrame, self).delete()
 
 	def import_from_file(self, datafile):		

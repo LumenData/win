@@ -12,6 +12,7 @@
 	<h4>Database Table: {{ object.db_table_name }}</h4>
 	<h4>Owner: {{ object.owner }}</h4>
 	<h4>File: <a href="{{ MEDIA_URL }}{{ object.file }}">{{ object.file }}</a></h4>
+
 	<br>
 
 	<form action="{{ object.get_absolute_delete_url }}" method="post">

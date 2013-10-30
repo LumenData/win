@@ -11,12 +11,11 @@ PROJECT_ROOT = here("..")
 # folder(s) we pass it starting at the parent directory of the current file.
 root = lambda * x: os.path.join(os.path.abspath(PROJECT_ROOT), *x)
 
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Krishan Gupta', 'bkgupta+python@gmail.com'),
+	# ('Krishan Gupta', 'bkgupta+python@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -34,16 +33,16 @@ MANAGERS = ADMINS
 # 	}
 
 if 'RDS_HOSTNAME' in os.environ:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['RDS_DB_NAME'],
-            'USER': os.environ['RDS_USERNAME'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
-            'HOST': os.environ['RDS_HOSTNAME'],
-            'PORT': os.environ['RDS_PORT'],
-        }
-    }
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.mysql',
+			'NAME': os.environ['RDS_DB_NAME'],
+			'USER': os.environ['RDS_USERNAME'],
+			'PASSWORD': os.environ['RDS_PASSWORD'],
+			'HOST': os.environ['RDS_HOSTNAME'],
+			'PORT': os.environ['RDS_PORT'],
+		}
+	}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
