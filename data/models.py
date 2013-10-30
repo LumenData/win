@@ -90,7 +90,7 @@ class DataFrame(models.Model):
 	def import_from_file(self, datafile):		
 		db_table = '_dataframe' + '_U' + str(datafile.owner) + '_DF' + str(self.id)	
 
-		import_string = "python data/includes/csv2mysql.py --table=%s --database=%s --user=%s --password=%s %s" % (db_table, self.db_name, self.db_user, self.db_password, datafile.file.path)
+		import_string = "python data/includes/csv2mysql.py --table=%s --database=%s --user=%s --password=%s --host=%s %s" % (db_table, self.db_name, self.db_user, self.db_password, self.db_host, datafile.file.path)
 		import_status = {'command': '', 'output': ''}	
 		import_status['command'] = import_string
 		import_status['output'] = os.popen(import_string).read()
