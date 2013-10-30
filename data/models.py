@@ -91,7 +91,9 @@ class DataFrame(models.Model):
 		db_table = '_dataframe' + '_U' + str(datafile.owner) + '_DF' + str(self.id)	
 
 		import_string = "python data/includes/csv2mysql.py --table=%s --database=%s --user=%s --password=%s %s" % (db_table, self.db_name, self.db_user, self.db_password, datafile.file.path)
-		import_status = os.popen(import_string).read()
+		import_status = {'command': '', 'output': ''}	
+		import_status['command'] = import_string
+		import_status['output'] = os.popen(import_string).read()
 		
 		self.db_table_name = db_table
 		super(DataFrame, self).save()

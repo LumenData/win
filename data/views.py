@@ -26,7 +26,9 @@ class DataFileImportView(TemplateView):
 		new_dataframe.save()
 		import_status = new_dataframe.import_from_file(datafile)
 
-		context['testvar'] = import_status
+		context['output'] = import_status['output']
+		context['command'] = import_status['command']
+		
 		context['object'] = new_dataframe
 		return self.render_to_response(context)
 
