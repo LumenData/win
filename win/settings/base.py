@@ -20,18 +20,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-# if 'RDS_DB_NAME' in os.environ:
-# 	DATABASES = {
-# 		'default': {
-# 			'ENGINE': 'django.db.backends.mysql',
-# 			'NAME': os.environ['RDS_DB_NAME'],
-# 			'USER': os.environ['RDS_USERNAME'],
-# 			'PASSWORD': os.environ['RDS_PASSWORD'],
-# 			'HOST': os.environ['RDS_HOSTNAME'],
-# 			'PORT': os.environ['RDS_PORT'],
-# 		}
-# 	}
-
 if 'RDS_HOSTNAME' in os.environ:
 	DATABASES = {
 		'default': {
@@ -69,7 +57,9 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = root('..','uploads')
+# MEDIA_ROOT = root('..','uploads')
+
+MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'media')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.

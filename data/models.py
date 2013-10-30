@@ -13,9 +13,6 @@ import os
 # For deleting from database when dataframe is deleted
 import MySQLdb
 
-# For doing autoslugfield
-#from django_autoslug.fields import AutoSlugField
-
 class DataFile(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, editable=False)
 	name = models.CharField(max_length=255, blank=True, default='')

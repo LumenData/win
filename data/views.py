@@ -22,17 +22,19 @@ class DataFileImportView(TemplateView):
 
 		datafile = DataFile.objects.get(slug = slug)
 
- 		new_dataframe = DataFrame(name = datafile.name)
- 		new_dataframe.save()
- 		import_status = new_dataframe.import_from_file(datafile)
+		new_dataframe = DataFrame(name = datafile.name)
+		new_dataframe.save()
+		import_status = new_dataframe.import_from_file(datafile)
 
 		context['testvar'] = import_status
 		context['object'] = new_dataframe
 		return self.render_to_response(context)
 
+
 def pie(request):
 	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
 	return render_to_response('data/piechart.html', context)
+
 	
 class DataFrameDetailView(TemplateView):
 	model = DataFrame
@@ -54,9 +56,9 @@ class DataFrameDetailView(TemplateView):
 			dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])		
 			dataframe.name = self.request.POST['value']
 			dataframe.save()
- 			return HttpResponse(dataframe.name)
- 		else:
- 			return HttpResponse('error')
+			return HttpResponse(dataframe.name)
+		else:
+			return HttpResponse('error')
 
 		
 		
