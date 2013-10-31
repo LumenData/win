@@ -8,10 +8,12 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from .models import DataFile, DataFrame
 from .forms import DataFileForm
 
-
 ##  Import a file
 import os
 from win import settings
+
+## Get Pretty Print for debugging
+from pprint import pprint
 
 class DataFileImportView(TemplateView):
 	template_name = "data/datafile_import.html"
@@ -49,7 +51,7 @@ class DataFrameDetailView(TemplateView):
 		
 		dataframe = DataFrame.objects.get(slug = thisslug, pk = thispk)
 		context['object'] = dataframe
-#		context['pandas_object'] = dataframe.get_pandas()
+		context['thedata'] = dataframe.get_data()[0]
 		
 		return self.render_to_response(context)
 	

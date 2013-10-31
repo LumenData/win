@@ -66,7 +66,9 @@ class DataFrame(models.Model):
 		return self.name
 	
 	def get_db(self):
-		return MySQLdb.connect(host=self.db_host, user=self.db_user, passwd=self.db_password)
+		db = MySQLdb.connect(host=self.db_host, user=self.db_user, passwd=self.db_password)
+		db.select_db(self.db_name)
+		return db
 
 	def save(self, *args, **kwargs):
 		if not self.name:
@@ -78,13 +80,13 @@ class DataFrame(models.Model):
 	def delete(self):
 		db = self.get_db()
 		cursor = db.cursor()
-		db.select_db(self.db_name)
 
 		try:
 			cursor.execute("DROP TABLE IF EXISTS %s" % (self.db_table_name,))
 		except MySQLdb.Warning:
 			pass
-
+		cursor.close()	
+		db.close()
 		super(DataFrame, self).delete()
 
 	def import_from_file(self, datafile):		
@@ -100,8 +102,14 @@ class DataFrame(models.Model):
 		return import_status
 	
 	def get_data(self):
-		pass
-		#Need to get this returned properly
+		db = self.get_db()
+		cursor = db.cursor()
+		cursor.execute("SELECT * FROM %s" % (self.db_table_name))
+		query_results = cursor.fetchall()
+
+		cursor.close
+		db.close()
+		return query_results
 		
 	@models.permalink
 	def get_absolute_url(self):
