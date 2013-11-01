@@ -15,6 +15,9 @@ from win import settings
 ## Get Pretty Print for debugging
 from pprint import pprint
 
+
+################################## Views ##################################
+
 class DataFileImportView(TemplateView):
 	template_name = "data/datafile_import.html"
 
