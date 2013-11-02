@@ -1,15 +1,16 @@
 {% extends "_layouts/base.html" %}
-{% block page_title %}DataFile Detail{% endblock %}
+{% block page_title %}Data File: {{ object.name }}{% endblock %}
 {% block nav_data_active %}active{% endblock %}
 
 {% block page_content %}
 
 <div class="row-fluid">
+<!-- 
 	<h3>Name: {{ object.name }}</h3>
 	<h4>ID: {{ object.id }}</h4>
 	<h4>Slug: {{ object.slug }}</h4>
+ -->
 	<h4>Data Description: {{ object.description }}</h4>
-	<h4>Database Table: {{ object.db_table_name }}</h4>
 	<h4>Owner: {{ object.owner }}</h4>
 	<h4>File: <a href="{{ MEDIA_URL }}{{ object.file }}">{{ object.file }}</a></h4>
 

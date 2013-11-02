@@ -54,10 +54,7 @@ class DataFrameDetailView(TemplateView):
 		alist = list(rows)
 		alist.insert(0,column_names)
 		context['data_list'] = json.dumps(alist)
-# 		context['debug_content'] = '[' + str(column_names) + ']'
-
-#  		context['data_list'] = "[['Name', 'Height', 'Smokes'], ['Tong Ning mu', 174, true], ['Huang Ang fa', 523, false], ['Teng nu', 86, true]]"
-		
+	
 		return self.render_to_response(context)
 	
 	def post(self, request, *args, **kwargs):

@@ -5,17 +5,17 @@
 {% block page_content %}
 <div class="row-fluid">
 
-	<h3>Create: <a href="{% url data:filelist %}">Import from File</a></h3>
-
+<!-- 	<h3>Create: <a href="{% url data:filelist %}">Import from File</a></h3> -->
+	<h2>
 	{% for data_frame in object_list %}
 	<li><a href="{{ data_frame.get_absolute_url }}">{{ data_frame.name }}</a></li>
 	{% empty %}
 	<li>No data yet.  Upload some!</li>
 	{% endfor %}
-
+	</h2>
 	<br>
 	<ul class="pager">	
-		<li class="previous"><a href="{% url home %}">&larr; Home</a></li>
+		<li class="previous"><a href="{% url data:filelist %}">&larr; Data Files</a></li>
 	</ul>
 </div>
 {% endblock %}
