@@ -13,6 +13,11 @@ import os
 # For deleting from database when dataframe is deleted
 import MySQLdb
 
+# For query from database
+from MySQLdb.constants import FIELD_TYPE
+
+############################## Data File ##############################
+
 class DataFile(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, editable=False)
 	name = models.CharField(max_length=255, blank=True, default='')
@@ -48,6 +53,8 @@ class DataFile(models.Model):
 	def get_absolute_import_url(self):
 		return ("data:fileimport", (), {"slug": self.slug, "pk": self.id})
 
+############################## Data Frame ##############################
+
 
 class DataFrame(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -66,7 +73,9 @@ class DataFrame(models.Model):
 		return self.name
 	
 	def get_db(self):
-		db = MySQLdb.connect(host=self.db_host, user=self.db_user, passwd=self.db_password)
+		"Get connection to the database"
+		myconv = {FIELD_TYPE.LONG: int}
+		db = MySQLdb.connect(conv=myconv, host=self.db_host, user=self.db_user, passwd=self.db_password)		
 		db.select_db(self.db_name)
 		return db
 
@@ -89,7 +98,7 @@ class DataFrame(models.Model):
 		db.close()
 		super(DataFrame, self).delete()
 
-	def import_from_file(self, datafile):		
+	def import_from_file(self, datafile):
 		db_table = '_dataframe' + '_U' + str(datafile.owner) + '_DF' + str(self.id)	
 
 		import_string = "python data/includes/csv2mysql.py --table=%s --database=%s --user=%s --password=%s --host=%s %s" % (db_table, self.db_name, self.db_user, self.db_password, self.db_host, datafile.file.path)
@@ -100,17 +109,18 @@ class DataFrame(models.Model):
 		self.db_table_name = db_table
 		super(DataFrame, self).save()
 		return import_status
-	
-	def get_data(self):
+
+	def get_data(self, nrows = 20):
 		db = self.get_db()
 		cursor = db.cursor()
 		cursor.execute("SELECT * FROM %s" % (self.db_table_name))
-		query_results = cursor.fetchall()
-
+		query_results = {}
+		query_results = cursor.fetchmany(nrows)
+ 		column_names = tuple([i[0] for i in cursor.description])
 		cursor.close
 		db.close()
-		return query_results
-		
+		return query_results, column_names
+
 	@models.permalink
 	def get_absolute_url(self):
 		return ("data:framedetail", (), {"slug": self.slug, "pk": self.id})

@@ -14,7 +14,7 @@ from win import settings
 
 ## Get Pretty Print for debugging
 from pprint import pprint
-
+import json
 
 ################################## Views ##################################
 
@@ -38,11 +38,6 @@ class DataFileImportView(TemplateView):
 		return self.render_to_response(context)
 
 
-def pie(request):
-	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
-	return render_to_response('data/piechart.html', context)
-
-	
 class DataFrameDetailView(TemplateView):
 	model = DataFrame
 	template_name = "data/dataframe_detail.html"
@@ -54,7 +49,14 @@ class DataFrameDetailView(TemplateView):
 		
 		dataframe = DataFrame.objects.get(slug = thisslug, pk = thispk)
 		context['object'] = dataframe
-		context['thedata'] = dataframe.get_data()[0]
+		
+		(rows, column_names) = dataframe.get_data(nrows = 20)
+		alist = list(rows)
+		alist.insert(0,column_names)
+		context['data_list'] = json.dumps(alist)
+# 		context['debug_content'] = '[' + str(column_names) + ']'
+
+#  		context['data_list'] = "[['Name', 'Height', 'Smokes'], ['Tong Ning mu', 174, true], ['Huang Ang fa', 523, false], ['Teng nu', 86, true]]"
 		
 		return self.render_to_response(context)
 	
@@ -68,7 +70,10 @@ class DataFrameDetailView(TemplateView):
 			return HttpResponse('error')
 
 		
-		
+def pie(request):
+	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
+	return render_to_response('data/piechart.html', context)
+
 		
 		
 		

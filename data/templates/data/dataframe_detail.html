@@ -10,14 +10,33 @@
 		});
 	});
 </script>
+
+    <script type="text/javascript" src="//www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['table']});
+    </script>
+    <script type="text/javascript">
+		function drawVisualization() {
+			// Create and populate the data table.
+			var data = google.visualization.arrayToDataTable({{ data_list|safe }});
+			// Create and draw the visualization.
+			visualization = new google.visualization.Table(document.getElementById('table1'));
+			visualization.draw(data, null);
+		}
+
+		google.setOnLoadCallback(drawVisualization);
+    </script>
+
 {% endblock %}
 
-{% block page_title %}DataFrame Detail{% endblock %}
+{% block page_title %}<span style="display:inline-block" class="edit" id="name">{{ object.name }}</span>{% endblock %}
 {% block nav_data_active %}active{% endblock %}
 
 {% block page_content %}
 
 <div class="row-fluid">
+
+<!-- 
 	<h3>Name: <span style="display:inline-block" class="edit" id="name">{{ object.name }}</span></h3>
 	<h4>ID: {{ object.id }}</h4>
 	<h4>Slug: {{ object.slug }}</h4>
@@ -28,17 +47,23 @@
 	<h4>Name: {{ object.db_name }}</h4>
 	<h4>User: {{ object.db_user }}</h4>
 	<h4>Password: {{ object.db_password }}</h4>
+ -->
 	
-	<h4>Data: {{ thedata }}</h4>
+<!-- 	<h4>Data: {{ thedata }}</h4> -->
 
 	<br>
-
+	
+    <div id="table1"></div>
+	<br>
+	<div id="table2"></div>
+	<br>    
 	<form action="{{ object.get_absolute_delete_url }}" method="post">
 {#	{% csrf_token %} #}
 		<input type="submit" class="btn btn-danger" value="Delete" />
 	</form>
 
-	<br>
+	<br>	
+	
 	<ul class="pager">	
 		<li class="previous"><a href="{% url data:framelist %}">&larr; Data Frames</a></li>
 	</ul>

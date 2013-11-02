@@ -5,17 +5,24 @@
 {% block page_content %}
 <div class="row-fluid">
 
-	<h3>Create New: <a href="{% url data:filecreate %}">Import File</a></h3>
-
+	<h2>
 	{% for data_frame in object_list %}
 	<li><a href="{{ data_frame.get_absolute_url }}">{{ data_frame.name }}</a></li>
 	{% empty %}
 	<li>No data yet.  Upload some!</li>
 	{% endfor %}
-	
+	</h2>
 	<br>
+	
+	
+<!-- 	<h3>Create New: <a href="{% url data:filecreate %}">Import File</a></h3> -->
+
+	<a class="btn btn-primary" href="{% url data:filecreate %}">	<span class="glyphicon glyphicon-import"></span> Import File</a>
+
+<!-- 
 	<ul class="pager">	
 		<li class="previous"><a href="{% url home %}">&larr; Home</a></li>
 	</ul>
+ -->
 </div>
 {% endblock %}
