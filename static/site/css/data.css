@@ -17,71 +17,58 @@
 	filter: alpha(opacity=0);
 }
  */
-
-#sortable1, #sortable2 { 
-	list-style-type: none; 
-	margin: 0; 
-	padding: 0 0 2.5em; 
-	float: left; 
-	margin-right: 10px; 
-}
-
-#sortable1 li, #sortable2 li { 
-	margin: 0 5px 5px 5px; 
-	padding: 5px; 
-	font-size: 
-	1.2em; 
-	width: 120px; 
-}
+ 
 
 /* Reports - Columns */
 
-.panel.panel-primary.column-frame{
+.column-frame{
+	max-height: 500px;
+	min-height: 100px;
 	width: 150px;
-	margin: 0px 20px 0 0;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
 	float: left;
-	display: block;
 }
 
-.panel-heading.columns{
-	height: 30px;
+.column-title{
+	height: auto;
 	width: 100%;
- 	margin: 0 0 0 0;
+ 	margin: 0 0 10px 0;
 	padding: 5px;
 	float: left;
 	display: block;
 }
 
-btn.btn-primary.btn-xs.pill{
-	display:none;	
-	width: 80%
+.mypill{
+	width: 130px;
+/* 	height: 30px; */
+	margin: 4px 0px 0px 10px;
+	overflow: auto;
 }
 
 /* Reports - Rows */
 
-
 .panel.panel-success.rows{
-	height: 100px;
-	margin: 0 0 0 160px;
-/*  width: 500px; */
-/* 	float: left; */
+	height: 32px;
+	margin: 0px 0px 5px 160px;
+	padding: 0px;
 }
 
 .panel-heading.rows{
 	height: 30px;
-	padding: 5px 0 0 0;
-
+	width: 100px;
+ 	padding: 5px 0 0 10px;
+	float: left;
 }
 
-.panel-body.rows{
-	height: 50px;
-/* 	width: 100%; */
-/* 	padding: 5px; */
-/* 	float: left; */
+.dropzone{
+ 	height: 100%;
+ 	width: auto;
+ 	padding: 0;
+/*  	background: #EEEEEE; */
 }
-
-
-
 
 
 
