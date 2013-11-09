@@ -9,10 +9,6 @@ function toTitleCase(str) {
 $(document).ready(function(){
 	console.log("Document Loaded");
 
-// 	$("div").on("click", function(){
-// 		console.log("div click")
-// 	});
-
 	$("#report-rows").on( "sortreceive", function( event, ui ) {
 		elementName = event.toElement.id;
 		console.debug(elementName);
