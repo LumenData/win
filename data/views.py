@@ -16,7 +16,7 @@ from win import settings
 from pprint import pprint
 import json
 
-################################## Views ##################################
+################################## File Import ##################################
 
 class DataFileImportView(TemplateView):
 	template_name = "data/datafile_import.html"
@@ -37,6 +37,7 @@ class DataFileImportView(TemplateView):
 		context['object'] = new_dataframe
 		return self.render_to_response(context)
 
+################################## Frame Detail ##################################
 
 class DataFrameDetailView(TemplateView):
 	model = DataFrame
@@ -54,7 +55,10 @@ class DataFrameDetailView(TemplateView):
 		alist = list(rows)
 		alist.insert(0,column_names)
 		context['data_list'] = json.dumps(alist)
-	
+
+# 		rows = dataframe.get_column_details()
+# 		context['debug_content'] = rows[1]		
+
 		return self.render_to_response(context)
 	
 	def post(self, request, *args, **kwargs):
@@ -66,7 +70,28 @@ class DataFrameDetailView(TemplateView):
 		else:
 			return HttpResponse('error')
 
+################################## Frame Frame Report ##################################
+
+class DataFrameReportView(TemplateView):
+	template_name = "data/dataframe_report.html"
+
+	def get(self, request, *args, **kwargs):
+		context = super(DataFrameReportView, self).get_context_data(**kwargs)
+		thisslug = self.kwargs['slug']
+		thispk = self.kwargs['pk']
+
+		dataframe = DataFrame.objects.get(slug = thisslug, pk = thispk)
+		context['object'] = dataframe
+		context['columns'] = dataframe.columns
 		
+# 		context['debug_content'] = dataframe.columns
+
+		return self.render_to_response(context)
+
+
+################################## Archive ##################################
+
+
 def pie(request):
 	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
 	return render_to_response('data/piechart.html', context)

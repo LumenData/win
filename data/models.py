@@ -15,6 +15,7 @@ import MySQLdb
 
 # For query from database
 from MySQLdb.constants import FIELD_TYPE
+import MySQLdb.cursors
 
 ############################## Data File ##############################
 
@@ -72,10 +73,10 @@ class DataFrame(models.Model):
 	def __unicode__(self):
 		return self.name
 	
-	def get_db(self):
+	def get_db(self, cursorclass = MySQLdb.cursors.Cursor):
 		"Get connection to the database"
 		myconv = {FIELD_TYPE.LONG: int}
-		db = MySQLdb.connect(conv=myconv, host=self.db_host, user=self.db_user, passwd=self.db_password)		
+		db = MySQLdb.connect(cursorclass=cursorclass, conv=myconv, host=self.db_host, user=self.db_user, passwd=self.db_password)		
 		db.select_db(self.db_name)
 		return db
 
@@ -110,16 +111,26 @@ class DataFrame(models.Model):
 		super(DataFrame, self).save()
 		return import_status
 
-	def get_data(self, nrows = 20):
+	def get_data(self, nrows = 5):
 		db = self.get_db()
 		cursor = db.cursor()
-		cursor.execute("SELECT * FROM %s" % (self.db_table_name))
-		query_results = {}
-		query_results = cursor.fetchmany(nrows)
+		cursor.execute("SELECT * FROM %s LIMIT %s" % (self.db_table_name, nrows))
+		query_results = cursor.fetchall()
  		column_names = tuple([i[0] for i in cursor.description])
 		cursor.close
 		db.close()
 		return query_results, column_names
+
+	@property
+	def columns(self):
+		db = self.get_db(MySQLdb.cursors.DictCursor)
+		cursor = db.cursor()
+
+		cursor.execute("EXPLAIN %s" % (self.db_table_name))
+		columns = cursor.fetchall()
+		cursor.close
+		db.close()
+		return columns
 
 	@models.permalink
 	def get_absolute_url(self):
@@ -128,6 +139,10 @@ class DataFrame(models.Model):
 	@models.permalink
 	def get_absolute_delete_url(self):
 		return ("data:framedelete", (), {"slug": self.slug, "pk": self.id})
+
+	@models.permalink
+	def get_absolute_report_url(self):
+		return ("data:framereport", (), {"slug": self.slug, "pk": self.id})
 
 
 

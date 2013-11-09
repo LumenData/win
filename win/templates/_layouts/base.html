@@ -1,19 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>  
 <html>
 	<head>
-		<link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap.css">
+		<link rel="stylesheet" href="http://bootswatch.com/simplex/bootstrap.css">
 		<link rel="stylesheet" href="/static/site/css/base.css">
-		<script src="/static/jquery-1.10.2.js"></script>
-		<script src="/static/jquery.jeditable.js"></script>
-<!-- 		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script> -->
+		<script src="/static/jquery/jquery-1.10.2.js"></script>
+		<script src="/static/jquery/jquery.jeditable.js"></script>
 		<script src="/static/bootstrap/dist/js/bootstrap.js"></script>
+		<script src="/static/jquery/jquery-ui-1.10.3.js"></script>
+
+		<link rel="stylesheet" href="/static/site/css/data.css">
+		<script src="/static/site/js/data.js"></script>
 		{% block head_content %}{% endblock %}	
-		<title>Win Analytics</title>
+		<title>My Analytics</title>
 	</head>
 	<body>
-		<nav class="navbar navbar-default" role="navigation">
-			<div class="container">
-				<a class="navbar-brand" href="{% url data:filelist %}">Win Analytics</a>
+		<nav class="navbar navbar-default" role="navigation" id="topbar">
+			<div class="container" id="topContainer">
+				<a class="navbar-brand" href="{% url home %}">My Analytics</a>
 				<ul class="nav navbar-nav">
 					<li class="{% block nav_home_active %}{% endblock %}"><a href="{% url home %}">Home</a></li>
 					<li class="dropdown {% block nav_data_active %}{% endblock %}">
@@ -32,15 +36,18 @@
 			</div>
 		</nav>		
 		<div class="container">
-			<h1>{% block page_title %}{% endblock %}</h1>
+<!-- 			{% if page_title %} -->
+				<h1>{% block page_title %}{% endblock %}</h1>
+<!-- 			{% endif %} -->
 			{% block page_content %}Empty Page Content{% endblock %}
 		</div>
 		
 		
+		
+		
 		<br>
 		<div>{{ debug_content }}</div>
-		
-		
+
 	</body>
 </html>
 

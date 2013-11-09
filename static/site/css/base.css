@@ -2,3 +2,8 @@
   border-color: #463265;
   background-color: #563D7C;
 }
+
+.dropdown-visible{
+	.dropdown-menu;
+	display: inline;
+}
