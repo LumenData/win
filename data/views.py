@@ -23,10 +23,8 @@ class DataFileImportView(TemplateView):
 
 	def get(self, request, *args, **kwargs):
 		context = super(DataFileImportView, self).get_context_data(**kwargs)
-		slug = self.kwargs['slug']
 
-		datafile = DataFile.objects.get(slug = slug)
-
+		datafile = DataFile.objects.get(slug =  self.kwargs['slug'], pk = self.kwargs['pk'])
 		new_dataframe = DataFrame(name = datafile.name)
 		new_dataframe.save()
 		import_status = new_dataframe.import_from_file(datafile)

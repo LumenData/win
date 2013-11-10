@@ -1,5 +1,5 @@
 from django.contrib import admin 
-from .models import DataFile, DataColumn, DataFrame
+from .models import DataFile, DataFrame
 
 class DataFileAdmin(admin.ModelAdmin):
 	date_hierarchy = "created_at"

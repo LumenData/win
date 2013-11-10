@@ -1,16 +1,10 @@
 from django.conf.urls import patterns, url
 from . import views
+from .views import *
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView, DeleteView
 from .models import DataFile, DataFrame
 from .forms import DataFileForm
-
-from .views import *
-
-# Importing for the list function-based views
-from django.conf.urls.defaults import include
-from django.conf import settings
-from django.conf.urls.static import static
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse_lazy
 
 urlpatterns = patterns('',
 	url(r'^file$', ListView.as_view(model=DataFile), name="filelist"),
@@ -20,12 +14,9 @@ urlpatterns = patterns('',
 	url(r'^file/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/import$', views.DataFileImportView.as_view(), name="fileimport"),
 
 	url(r'^frame$', ListView.as_view(model=DataFrame), name="framelist"),
-# 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DetailView.as_view(model=DataFrame), name="framedetail"),
  	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DataFrameDetailView.as_view(), name="framedetail"),
 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/delete$', DeleteView.as_view(model = DataFrame, success_url = reverse_lazy('data:framelist')), name="framedelete"),
 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/report$', DataFrameReportView.as_view(), name="framereport"),
 
 	url(r'^pie$', 'data.views.pie', name="pie"),
-
-
 )

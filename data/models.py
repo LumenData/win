@@ -145,25 +145,25 @@ class DataFrame(models.Model):
 		return ("data:framereport", (), {"slug": self.slug, "pk": self.id})
 
 
-
-# Prob should get rid of this
-class DataColumn(models.Model):
-	created_at = models.DateTimeField(auto_now_add=True, editable=False)
-	updated_at = models.DateTimeField(auto_now=True, editable=False)
-	name = models.CharField(max_length=255)
-	description = models.TextField()
-	data_frame = models.ForeignKey(DataFrame, related_name = "data_column")
-	slug = models.SlugField(max_length=255, blank=True, default='')
-	db_column_name = models.CharField(max_length=255, blank=True, default='')
-
-	def __unicode__(self):
-		return self.name
-	
-	def save(self, *args, **kwargs):
-		if not self.slug:
-			self.slug = slugify(self.name)
-		super(DataColumn, self).save(*args, **kwargs)
-
-	@models.permalink
-	def get_absolute_url(self):
-		return ("data:file:column", (), {"slug": self.slug, "pk": self.id})
+# 
+# # Prob should get rid of this
+# class DataColumn(models.Model):
+# 	created_at = models.DateTimeField(auto_now_add=True, editable=False)
+# 	updated_at = models.DateTimeField(auto_now=True, editable=False)
+# 	name = models.CharField(max_length=255)
+# 	description = models.TextField()
+# 	data_frame = models.ForeignKey(DataFrame, related_name = "data_column")
+# 	slug = models.SlugField(max_length=255, blank=True, default='')
+# 	db_column_name = models.CharField(max_length=255, blank=True, default='')
+# 
+# 	def __unicode__(self):
+# 		return self.name
+# 	
+# 	def save(self, *args, **kwargs):
+# 		if not self.slug:
+# 			self.slug = slugify(self.name)
+# 		super(DataColumn, self).save(*args, **kwargs)
+# 
+# 	@models.permalink
+# 	def get_absolute_url(self):
+# 		return ("data:file:column", (), {"slug": self.slug, "pk": self.id})
