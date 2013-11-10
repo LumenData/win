@@ -28,7 +28,7 @@ class DataFileImportView(TemplateView):
 
 		context['output'] = import_status['output']
 		context['command'] = import_status['command']
-		
+
 		context['object'] = new_dataframe
 		return self.render_to_response(context)
 
