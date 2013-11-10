@@ -143,6 +143,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'south',
     'data',
+    'charts',
     #'debug_toolbar',
     #'googlecharts',
     #'django_autoslug',

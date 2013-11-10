@@ -1,14 +1,11 @@
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, FormView, DeleteView
-#All these imports for function based list view
 from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.http import HttpResponse
 
 from .models import DataFile, DataFrame
 from .forms import DataFileForm
 
-##  Import a file
+##  For importing a file
 import os
 from win import settings
 
@@ -54,9 +51,6 @@ class DataFrameDetailView(TemplateView):
 		alist.insert(0,column_names)
 		context['data_list'] = json.dumps(alist)
 
-# 		rows = dataframe.get_column_details()
-# 		context['debug_content'] = rows[1]		
-
 		return self.render_to_response(context)
 	
 	def post(self, request, *args, **kwargs):
@@ -81,8 +75,8 @@ class DataFrameReportView(TemplateView):
 		dataframe = DataFrame.objects.get(slug = thisslug, pk = thispk)
 		context['object'] = dataframe
 		context['columns'] = dataframe.columns
-		
-# 		context['debug_content'] = dataframe.columns
+				
+#		context['debug_content'] = dataframe.columns
 
 		return self.render_to_response(context)
 
@@ -90,9 +84,9 @@ class DataFrameReportView(TemplateView):
 ################################## Archive ##################################
 
 
-def pie(request):
-	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
-	return render_to_response('data/piechart.html', context)
+# def pie(request):
+# 	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
+# 	return render_to_response('data/piechart.html', context)
 
 		
 		

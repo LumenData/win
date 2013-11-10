@@ -121,6 +121,16 @@ class DataFrame(models.Model):
 		db.close()
 		return query_results, column_names
 
+	def query_results(self, query):
+		db = self.get_db()
+		cursor = db.cursor()
+		cursor.execute(query)
+		query_results = cursor.fetchall()
+ 		column_names = tuple([i[0] for i in cursor.description])
+		cursor.close
+		db.close()
+		return query_results, column_names
+
 	@property
 	def columns(self):
 		db = self.get_db(MySQLdb.cursors.DictCursor)

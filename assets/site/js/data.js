@@ -10,11 +10,30 @@ $(document).ready(function(){
 	console.log("Document Loaded");
 
 	$("#report-rows").on( "sortreceive", function( event, ui ) {
-		elementName = event.toElement.id;
-		console.debug(elementName);
+		window.rows_name = event.toElement.id;
+		console.debug(window.rows_name);
+		
+		updateChart();
+	});
+
+	$("#report-columns").on( "sortreceive", function( event, ui ) {
+		window.column_name = event.toElement.id;
+		console.debug(window.column_name);
+		
+		updateChart();
 	});
 });
 
+function updateChart(){
+	var request = $.ajax({
+		url: "/charts",
+		type: "GET",
+		data: {dataframe_id: window.dataframe_id, column_name: window.rows_name},
+		dataType: "html"
+	}).done(function(html) {
+		$( "#report-area" ).html(html);
+	});
+}
 
 $(function() {
 	$(".connectedSortable").sortable({

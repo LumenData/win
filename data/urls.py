@@ -18,5 +18,5 @@ urlpatterns = patterns('',
 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/delete$', DeleteView.as_view(model = DataFrame, success_url = reverse_lazy('data:framelist')), name="framedelete"),
 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/report$', DataFrameReportView.as_view(), name="framereport"),
 
-	url(r'^pie$', 'data.views.pie', name="pie"),
+# 	url(r'^pie$', 'data.views.pie', name="pie"),
 )

@@ -70,8 +70,13 @@
 /*  	background: #EEEEEE; */
 }
 
-
-
+#report-frame{
+	height: 10%;
+	width: 90%;
+	margin: 0 0 0 10px;
+	display: inline;
+	float: left;
+}
 
 
 

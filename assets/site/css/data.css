@@ -71,7 +71,12 @@
 }
 
 
-
+#report-area{
+	height: 100%;
+	margin-left: 160px;
+	margin-top: 10px;
+/* 	background-color: purple; */
+}
 
 
 

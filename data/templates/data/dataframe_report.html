@@ -21,13 +21,19 @@
 <div class="panel panel-success rows">
 	<span class="panel-heading rows">Rows</span> 
 	<ul id="report-rows" class="connectedSortable dropzone"></ul>
-</div> 
+</div>
 
 <div class="panel panel-success rows">
 	<span class="panel-heading rows">Columns</span> 
 	<ul id="report-columns" class="connectedSortable dropzone"></ul>
-</div> 
+</div>
 
 
+<div id="report-area"></div>
+
+
+<script>
+	window.dataframe_id = {{ object.id }}
+</script>
 
 {% endblock %}

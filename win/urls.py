@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     # Examples:
 	url(r'^$', TemplateView.as_view(template_name = "index.html"), name="home"),
 	url(r'^data/', include("data.urls",namespace="data")),
+	url(r'^charts/', include("charts.urls",namespace="charts")),	
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
