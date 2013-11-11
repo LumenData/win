@@ -1,3 +1,4 @@
 .elasticbeanstalk/
 *.pyc
 win/settings/local.py
+win/media/datafiles/*
