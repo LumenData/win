@@ -9,29 +9,34 @@ function toTitleCase(str) {
 $(document).ready(function(){
 	console.log("Document Loaded");
 
-	$("#report-rows").on( "sortreceive", function( event, ui ) {
-		window.rows_name = event.toElement.id;
-		console.debug(window.rows_name);
-		
-		updateChart();
-	});
+	$(".connectedSortable").on( "sortreceive", function( event, ui ) {
+		var row_names = new Array();
+		$("#report-rows").children().each(function(){
+			row_names.push($(this).attr('id')); 
+		});
 
-	$("#report-columns").on( "sortreceive", function( event, ui ) {
-		window.column_name = event.toElement.id;
-		console.debug(window.column_name);
+		var col_names = new Array();
+		$("#report-columns").children().each(function(){
+			col_names.push($(this).attr('id')); 
+		});
 		
-		updateChart();
+		console.debug(row_names);
+		console.debug(col_names);
+		
+		updateChart(row_names, col_names);
 	});
 });
 
-function updateChart(){
+function updateChart(row_names, column_names){
+// 	var cols = JSON.stringify(col_names);
+	
 	var request = $.ajax({
 		url: "/charts",
 		type: "GET",
-		data: {dataframe_id: window.dataframe_id, column_name: window.rows_name},
+		data: {dataframe_id: window.dataframe_id, row_names: row_names, column_names: column_names},
 		dataType: "html"
-	}).done(function(html) {
-		$( "#report-area" ).html(html);
+	}).done(function(response) {
+		$( "#report-area" ).html(response);
 	});
 }
 
