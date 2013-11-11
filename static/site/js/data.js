@@ -9,12 +9,36 @@ function toTitleCase(str) {
 $(document).ready(function(){
 	console.log("Document Loaded");
 
-	$("#report-rows").on( "sortreceive", function( event, ui ) {
-		elementName = event.toElement.id;
-		console.debug(elementName);
+	$(".connectedSortable").on( "sortreceive", function( event, ui ) {
+		var row_names = new Array();
+		$("#report-rows").children().each(function(){
+			row_names.push($(this).attr('id')); 
+		});
+
+		var col_names = new Array();
+		$("#report-columns").children().each(function(){
+			col_names.push($(this).attr('id')); 
+		});
+		
+		console.debug(row_names);
+		console.debug(col_names);
+		
+		updateChart(row_names, col_names);
 	});
 });
 
+function updateChart(row_names, column_names){
+// 	var cols = JSON.stringify(col_names);
+	
+	var request = $.ajax({
+		url: "/charts",
+		type: "GET",
+		data: {dataframe_id: window.dataframe_id, row_names: row_names, column_names: column_names},
+		dataType: "html"
+	}).done(function(response) {
+		$( "#report-area" ).html(response);
+	});
+}
 
 $(function() {
 	$(".connectedSortable").sortable({

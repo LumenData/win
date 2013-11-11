@@ -70,12 +70,12 @@
 /*  	background: #EEEEEE; */
 }
 
-#report-frame{
-	height: 10%;
-	width: 90%;
-	margin: 0 0 0 10px;
-	display: inline;
-	float: left;
+
+#report-area{
+	height: 100%;
+	margin-left: 160px;
+	margin-top: 10px;
+/* 	background-color: purple; */
 }
 
 
