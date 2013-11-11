@@ -1,0 +1,2 @@
+ssh -i ~/.ssh/eb-keypair1.pem ec2-user@54.204.6.147
+mysql -h aai7xdxbr0xqv8.cpwo5ko0pnju.us-east-1.rds.amazonaws.com -P 3306 -u ebroot -p
