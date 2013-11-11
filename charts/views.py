@@ -25,7 +25,9 @@ class PieChartView(TemplateView):
  		ncols = len(column_names)
  		nrows = len(row_names)
 
-		if((nrows + ncols) == 1):
+		if((nrows + ncols) == 0):
+			context['contents'] = ""
+		elif((nrows + ncols) == 1):
 			if(ncols > 0):
 				column_name = column_names[0]
 			if(nrows > 0):
