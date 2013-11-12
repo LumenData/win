@@ -1,18 +1,31 @@
 <!DOCTYPE html>  
 <html>
 	<head>
+		<meta charset="utf-8">
+		
+		{# Bootstrap #}
 		<link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap.css">
 		<link rel="stylesheet" href="http://bootswatch.com/simplex/bootstrap.css">
-		<link rel="stylesheet" href="/static/site/css/base.css">
+		
+		{# jQuery #}
 		<script src="/static/jquery/jquery-1.10.2.js"></script>
 		<script src="/static/jquery/jquery.jeditable.js"></script>
 		<script src="/static/bootstrap/dist/js/bootstrap.js"></script>
 		<script src="/static/jquery/jquery-ui-1.10.3.js"></script>
+		
+		{# NVD3 #}
+		<link href="/static/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
+    	<script src="/static/nvd3/d3.v3.js"></script>
+	    <script src="/static/nvd3/nv.d3.js"></script>
 
+		{# Custom #}
+		<link rel="stylesheet" href="/static/site/css/base.css">
 		<link rel="stylesheet" href="/static/site/css/data.css">
 		<script src="/static/site/js/data.js"></script>
+		
 		{% block head_content %}{% endblock %}	
-		<title>My Analytics</title>
+		
+		<title>Win Analytics</title>
 	</head>
 	<body>
 		<nav class="navbar navbar-default" role="navigation" id="topbar">

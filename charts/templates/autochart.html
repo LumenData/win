@@ -1,1 +1,17 @@
-{{ contents }}
+{{ error_message }}
+{# NVD3 #}
+<link href="/static/nvd3/css/nv.d3.css" rel="stylesheet" type="text/css">
+<script src="/static/nvd3/js/d3.v3.js"></script>
+<script src="/static/nvd3/js/nv.d3.js"></script>
+
+<svg id="mainChart" ></svg>
+
+<script>
+	var chartData = {{ chartData|safe }} ;
+	console.debug(chartData);
+</script>
+
+
+{% if chartType == "pieChart" %}
+	<script src='/static/charts/js/piechart.js' type='text/javascript'> </script>
+{% endif %}}

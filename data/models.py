@@ -122,7 +122,7 @@ class DataFrame(models.Model):
 		return query_results, column_names
 
 	def query_results(self, query):
-		db = self.get_db()
+		db = self.get_db(cursorclass= MySQLdb.cursors.DictCursor)
 		cursor = db.cursor()
 		cursor.execute(query)
 		query_results = cursor.fetchall()

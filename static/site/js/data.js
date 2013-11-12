@@ -29,7 +29,7 @@ $(document).ready(function(){
 
 function updateChart(row_names, column_names){
 // 	var cols = JSON.stringify(col_names);
-	
+
 	var request = $.ajax({
 		url: "/charts",
 		type: "GET",

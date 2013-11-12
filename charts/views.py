@@ -34,13 +34,22 @@ class PieChartView(TemplateView):
 				column_name = row_names[0]
 
 			query_results, tmp = dataframe.query_results(
-				"SELECT count(*), " + column_name + 
+				"SELECT " + column_name + ", count(*) " + 
 				" FROM " + dataframe.db_table_name +
 				" GROUP BY " + column_name
 			)
-			context['contents'] = query_results
+			
+			chart_data = []
+ 			for row in query_results:
+ 				count = row["count(*)"]
+ 				key = row[column_name]
+				chart_data.append({"key": key, "y": count})
+
+			context['chartData'] = json.dumps(chart_data)
+			context['chartType'] = 'pieChart';
 		else:
-			context['contents'] = "That query hasn't been implemented yet"
+			context['error_message'] = "That query hasn't been implemented yet"
+			
 
 		return self.render_to_response(context)
 
