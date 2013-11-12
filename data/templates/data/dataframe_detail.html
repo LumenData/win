@@ -2,6 +2,7 @@
 
 {% block head_content %}
 <script>
+	// Should refactor this into a separate JS/CSS file
 	$(document).ready(function() {
 		$('.edit').editable('{{ object.get_absolute_url }}',
 		{
