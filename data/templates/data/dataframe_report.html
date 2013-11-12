@@ -12,7 +12,27 @@
 	<span class="panel-heading column-title">{{ object.name }}</span>
 		<ul id="column-list" class="connectedSortable dropzone">
 			{% for column in object.columns %}
-				<div class="btn btn-danger btn-xs mypill" id="{{ column.Field }}" data-name="{{ column.Field }}"><script>document.write(toTitleCase('{{ column.Field }}'));</script></div>
+				<div class="btn btn-danger btn-xs mypill" id="{{ column.Field }}" data-name="{{ column.Field }}">
+
+					{% if "date" in column.Type %}
+						<span class="glyphicon glyphicon-calendar"> </span>
+					{% elif "char" in column.Type %}
+						<span class="glyphicon glyphicon-font"> </span>
+					{% elif "text" in column.Type %}
+						<span class="glyphicon glyphicon-font"> </span>
+					{% elif "time" in column.Type %}
+						<span class="glyphicon glyphicon-time"> </span>
+					{% elif "int" in column.Type %}
+						<span class="hashicon">#</span> 
+					{% elif "double" in column.Type %}
+						<span class="hashicon">#</span> 
+
+					{% else %}
+						{{ column.Type }}
+					{% endif %}
+					<script>document.write(toTitleCase('{{ column.Field }}'));</script>
+				</div>
+				
 			{% endfor %}
 		</ul>
 </div>
@@ -30,7 +50,6 @@
 
 
 <div id="report-area"> </div>
-
 
 <script>
 	window.dataframe_id = {{ object.id }}

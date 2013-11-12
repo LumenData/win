@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 # from django.views.generic import TemplateView
-from views import PieChartView;
+from views import AutoChartView;
 
 urlpatterns = patterns('',
-	url(r'^$', PieChartView.as_view(), name="pie"),
+	url(r'^$', AutoChartView.as_view(), name="autochart"),
 )

@@ -140,7 +140,16 @@ class DataFrame(models.Model):
 		columns = cursor.fetchall()
 		cursor.close
 		db.close()
-		return columns
+
+		# Turning something like varchar(255) into Type: varchar and Length: 255
+		newColumns = [];	
+		for col in columns:
+			if '(' in col["Type"]:
+				col["Length"] = col["Type"].split('(')[1].split(')')[0]
+				col["Type"] = col["Type"].split('(')[0]
+			newColumns.append(col)
+
+		return newColumns
 
 	@models.permalink
 	def get_absolute_url(self):
@@ -154,26 +163,3 @@ class DataFrame(models.Model):
 	def get_absolute_report_url(self):
 		return ("data:framereport", (), {"slug": self.slug, "pk": self.id})
 
-
-# 
-# # Prob should get rid of this
-# class DataColumn(models.Model):
-# 	created_at = models.DateTimeField(auto_now_add=True, editable=False)
-# 	updated_at = models.DateTimeField(auto_now=True, editable=False)
-# 	name = models.CharField(max_length=255)
-# 	description = models.TextField()
-# 	data_frame = models.ForeignKey(DataFrame, related_name = "data_column")
-# 	slug = models.SlugField(max_length=255, blank=True, default='')
-# 	db_column_name = models.CharField(max_length=255, blank=True, default='')
-# 
-# 	def __unicode__(self):
-# 		return self.name
-# 	
-# 	def save(self, *args, **kwargs):
-# 		if not self.slug:
-# 			self.slug = slugify(self.name)
-# 		super(DataColumn, self).save(*args, **kwargs)
-# 
-# 	@models.permalink
-# 	def get_absolute_url(self):
-# 		return ("data:file:column", (), {"slug": self.slug, "pk": self.id})

@@ -6,11 +6,11 @@ from pprint import pprint
 
 # Create your views here.
 
-class PieChartView(TemplateView):
+class AutoChartView(TemplateView):
 	template_name = "autochart.html"
 
 	def get(self, request, *args, **kwargs):
-		context = super(PieChartView, self).get_context_data(**kwargs)
+		context = super(AutoChartView, self).get_context_data(**kwargs)
 		
 		dataframe_pk = request.GET.get('dataframe_id')
 		column_names = request.GET.getlist("column_names[]");
@@ -32,7 +32,7 @@ class PieChartView(TemplateView):
 				column_name = column_names[0]
 			if(nrows > 0):
 				column_name = row_names[0]
-
+		
 			query_results, tmp = dataframe.query_results(
 				"SELECT " + column_name + ", count(*) " + 
 				" FROM " + dataframe.db_table_name +
@@ -47,9 +47,11 @@ class PieChartView(TemplateView):
 
 			context['chartData'] = json.dumps(chart_data)
 			context['chartType'] = 'pieChart';
+		elif((nrows + ncols) == 1):
+			pass
 		else:
 			context['error_message'] = "That query hasn't been implemented yet"
 			
-
+		context["debug_mode"] = request.GET.get('debug_mode')
 		return self.render_to_response(context)
 

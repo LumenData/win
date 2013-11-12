@@ -75,21 +75,9 @@ class DataFrameReportView(TemplateView):
 		dataframe = DataFrame.objects.get(slug = thisslug, pk = thispk)
 		context['object'] = dataframe
 		context['columns'] = dataframe.columns
-				
-#		context['debug_content'] = dataframe.columns
 
 		return self.render_to_response(context)
 
-
-################################## Archive ##################################
-
-
-# def pie(request):
-# 	context = {'values': [['foo', 32], ['bar', 64], ['baz', 96]]}
-# 	return render_to_response('data/piechart.html', context)
-
-		
-		
 		
 		
 		
