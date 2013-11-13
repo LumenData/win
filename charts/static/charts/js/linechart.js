@@ -1,4 +1,3 @@
-
 nv.addGraph(function() {
   chart = nv.models.lineChart()
   .options({
@@ -20,7 +19,7 @@ nv.addGraph(function() {
     .tickFormat(d3.format(',.2f'))
     ;
 
-  d3.select('#chart1 svg')
+  d3.select('#mainChart')
     .datum(sinAndCos())
     .call(chart);
 

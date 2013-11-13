@@ -66,8 +66,29 @@ class AutoChartView(TemplateView):
 
 			context['chartData'] = json.dumps(chart_data)
 			context['chartType'] = 'pieChart';
-		elif((nrows + ncols) == 1):
-			pass
+		
+		## Line Chart 				
+		elif((nrows == 1) & (ncols == 1)):
+		
+			if(ncols > 0):
+				column_name = column_names[0]
+			if(nrows > 0):
+				column_name = row_names[0]
+		
+			query_results, tmp = dataframe.query_results(
+				"SELECT " + column_name + ", count(*) " + 
+				" FROM " + dataframe.db_table_name +
+				" GROUP BY " + column_name
+			)
+			
+			chart_data = []
+ 			for row in query_results:
+ 				count = row["count(*)"]
+ 				key = row[column_name]
+				chart_data.append({"key": key, "y": count})
+
+			context['chartData'] = json.dumps(chart_data)
+			context['chartType'] = 'lineChart';
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
 			
