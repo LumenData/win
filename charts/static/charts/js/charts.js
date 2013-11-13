@@ -31,7 +31,7 @@ function updateChart(row_names, column_names){
 // 	var cols = JSON.stringify(col_names);
 
 	var request = $.ajax({
-		url: "/charts",
+		url: "/charts/autochart",
 		type: "GET",
 		data: {dataframe_id: window.dataframe_id, row_names: row_names, column_names: column_names},
 		dataType: "html"

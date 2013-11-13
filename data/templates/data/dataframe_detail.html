@@ -49,18 +49,14 @@
 	<h4>User: {{ object.db_user }}</h4>
 	<h4>Password: {{ object.db_password }}</h4>
  -->
-	
-<!-- 	<h4>Data: {{ thedata }}</h4> -->
 
 	<br>
 	
     <div id="table1"></div>
 	<br>
-	<div id="table2"></div>
-	<br>    
-	
+
 	<form action="{{ object.get_absolute_delete_url }}" method="post">
-		<a href="{{ object.get_absolute_report_url }}" class="btn btn-primary">Report</a>
+		<a href="{% url charts:home %}?dataframe_id={{ object.pk }}" class="btn btn-primary">Report</a>
 		<input type="submit" class="btn btn-danger" value="Delete" />
 	</form>
 

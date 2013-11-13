@@ -1,10 +1,29 @@
 from django.views.generic import TemplateView
 from data.models import DataFrame
+from django.http import HttpResponse
 import json
 import sys
 from pprint import pprint
 
 # Create your views here.
+
+class ChartBuilderView(TemplateView):
+	template_name = "chart_builder.html"
+
+	def get(self, request, *args, **kwargs):
+		context = super(ChartBuilderView, self).get_context_data(**kwargs)
+		column_names = request.GET.getlist("column_names[]");
+		row_names = request.GET.getlist("row_names[]");
+
+		try:
+			dataframe = DataFrame.objects.get(pk = request.GET.get('dataframe_id'))
+		except Exception,e:
+			context['debug_content'] = str(e)
+			return self.render_to_response(context)
+			
+		context['dataframe'] = dataframe
+
+		return self.render_to_response(context)
 
 class AutoChartView(TemplateView):
 	template_name = "autochart.html"

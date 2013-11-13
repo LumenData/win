@@ -40,16 +40,14 @@ class DataFrameDetailView(TemplateView):
 	
 	def get(self, request, *args, **kwargs):
 		context = super(DataFrameDetailView, self).get_context_data(**kwargs)
-		thisslug = self.kwargs['slug']
-		thispk = self.kwargs['pk']
-		
-		dataframe = DataFrame.objects.get(slug = thisslug, pk = thispk)
+
+		dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])
 		context['object'] = dataframe
 		
 		(rows, column_names) = dataframe.get_data(nrows = 20)
-		alist = list(rows)
-		alist.insert(0,column_names)
-		context['data_list'] = json.dumps(alist)
+		rows_as_list = list(rows)
+		rows_as_list.insert(0,column_names)
+		context['data_list'] = json.dumps(rows_as_list)
 
 		return self.render_to_response(context)
 	
@@ -62,21 +60,6 @@ class DataFrameDetailView(TemplateView):
 		else:
 			return HttpResponse('error')
 
-################################## Frame Frame Report ##################################
-
-class DataFrameReportView(TemplateView):
-	template_name = "data/dataframe_report.html"
-
-	def get(self, request, *args, **kwargs):
-		context = super(DataFrameReportView, self).get_context_data(**kwargs)
-		thisslug = self.kwargs['slug']
-		thispk = self.kwargs['pk']
-
-		dataframe = DataFrame.objects.get(slug = thisslug, pk = thispk)
-		context['object'] = dataframe
-		context['columns'] = dataframe.columns
-
-		return self.render_to_response(context)
 
 		
 		
