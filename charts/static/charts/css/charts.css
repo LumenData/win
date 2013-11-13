@@ -84,7 +84,9 @@
 /* 	background-color: purple; */
 }
 
-
+#chart_loading_bar{
+	display: none;
+}
 
 
 

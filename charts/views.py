@@ -69,7 +69,7 @@ class AutoChartView(TemplateView):
 		elif((nrows + ncols) == 1):
 			pass
 		else:
-			context['error_message'] = "That query hasn't been implemented yet"
+			context['error_message'] = "That analysis type hasn't been implemented yet"
 			
 		context["debug_mode"] = request.GET.get('debug_mode')
 		return self.render_to_response(context)

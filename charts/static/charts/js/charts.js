@@ -23,12 +23,13 @@ $(document).ready(function(){
 		console.debug(row_names);
 		console.debug(col_names);
 		
+		$("#chart_loading_bar").show();
 		updateChart(row_names, col_names);
+		$("#chart_loading_bar").hide();
 	});
 });
 
 function updateChart(row_names, column_names){
-// 	var cols = JSON.stringify(col_names);
 
 	var request = $.ajax({
 		url: "/charts/autochart",

@@ -32,7 +32,6 @@
 			<div class="container" id="topContainer">
 				<a class="navbar-brand" href="{% url home %}">My Analytics</a>
 				<ul class="nav navbar-nav">
-<!-- 					<li class="{% block nav_home_active %}{% endblock %}"><a href="{% url home %}">Home</a></li> -->
 					<li class="dropdown {% block nav_data_active %}{% endblock %}">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Manager
 							<b class="caret"></b>
@@ -42,6 +41,8 @@
 							<li><a href="{% url data:framelist %}">Data Frames</a></li>
 						</ul>
 					</li>
+					<li class="{% block nav_analysis_active %}{% endblock %}"><a href="{% url charts:home %}">Analysis Studio</a></li>
+
     			</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="/admin">Admin</a></li>
