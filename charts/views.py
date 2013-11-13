@@ -47,48 +47,35 @@ class AutoChartView(TemplateView):
 		if((nrows + ncols) == 0):
 			context['contents'] = ""
 		elif((nrows + ncols) == 1):
-			if(ncols > 0):
-				column_name = column_names[0]
-			if(nrows > 0):
-				column_name = row_names[0]
-		
+			column_name = row_names[0] if nrows > 0 else column_names[0]	
 			query_results, tmp = dataframe.query_results(
-				"SELECT " + column_name + ", count(*) " + 
-				" FROM " + dataframe.db_table_name +
-				" GROUP BY " + column_name
-			)
+				"SELECT %s `key`, count(*) y \n\
+				FROM %s \n\
+				GROUP BY 1" 
+				% (column_name, dataframe.db_table_name)
+			);
 			
-			chart_data = []
- 			for row in query_results:
- 				count = row["count(*)"]
- 				key = row[column_name]
-				chart_data.append({"key": key, "y": count})
+			chart_data = list(query_results)
 
 			context['chartData'] = json.dumps(chart_data)
 			context['chartType'] = 'pieChart';
-		
+# 			context['error_message'] = chart_data
 		## Line Chart 				
 		elif((nrows == 1) & (ncols == 1)):
 		
-			if(ncols > 0):
-				column_name = column_names[0]
-			if(nrows > 0):
-				column_name = row_names[0]
-		
 			query_results, tmp = dataframe.query_results(
-				"SELECT " + column_name + ", count(*) " + 
-				" FROM " + dataframe.db_table_name +
-				" GROUP BY " + column_name
-			)
-			
-			chart_data = []
- 			for row in query_results:
- 				count = row["count(*)"]
- 				key = row[column_name]
-				chart_data.append({"key": key, "y": count})
+				"SELECT %s x, %s y \n\
+				FROM %s \n\
+				ORDER BY %s" 
+				% (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
+			);
+
+			query_results_as_list = list(query_results)
+ 			chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
 
 			context['chartData'] = json.dumps(chart_data)
 			context['chartType'] = 'lineChart';
+# 			context['error_message'] = chart_data;
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
 			

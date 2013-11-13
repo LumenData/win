@@ -78,7 +78,9 @@
 
 
 #report-area{
-	height: 100%;
+	height: 400px;
+	width: auto;
+	overflow:hidden;
 	margin-left: 160px;
 	margin-top: 10px;
 /* 	background-color: purple; */
