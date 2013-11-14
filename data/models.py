@@ -73,14 +73,8 @@ class DataFrame(models.Model):
 	def __unicode__(self):
 		return self.name
 	
-	def get_db(self, cursorclass = MySQLdb.cursors.Cursor):
-		"Get connection to the database"
-		myconv = {FIELD_TYPE.LONG: int}
-		db = MySQLdb.connect(cursorclass=cursorclass, conv=myconv, host=self.db_host, user=self.db_user, passwd=self.db_password)		
-		db.select_db(self.db_name)
-		return db
-
 	def save(self, *args, **kwargs):
+		"Save the model, specifying default values where needed"
 		if not self.name:
 			self.name = self.file.name
 		if not self.slug:
@@ -99,6 +93,15 @@ class DataFrame(models.Model):
 		db.close()
 		super(DataFrame, self).delete()
 
+	def get_db(self, cursorclass = MySQLdb.cursors.Cursor):
+		"Get connection to the database"
+# 		myconv = {FIELD_TYPE.LONG: int}
+# 		db = MySQLdb.connect(cursorclass=cursorclass, conv=myconv, host=self.db_host, user=self.db_user, passwd=self.db_password)		
+		db = MySQLdb.connect(cursorclass=cursorclass, host=self.db_host, user=self.db_user, passwd=self.db_password)		
+
+		db.select_db(self.db_name)
+		return db
+
 	def import_from_file(self, datafile):
 		db_table = '_dataframe' + '_U' + str(datafile.owner) + '_DF' + str(self.id)	
 
@@ -111,12 +114,13 @@ class DataFrame(models.Model):
 		super(DataFrame, self).save()
 		return import_status
 
-	def get_data(self, nrows = 5):
+	def get_data(self, nrows = 10):
 		db = self.get_db()
 		cursor = db.cursor()
 		cursor.execute("SELECT * FROM %s LIMIT %s" % (self.db_table_name, nrows))
 		query_results = cursor.fetchall()
- 		column_names = tuple([i[0] for i in cursor.description])
+#  		column_names = tuple([i[0] for i in cursor.description])
+		column_names = cursor.description
 		cursor.close
 		db.close()
 		return query_results, column_names
@@ -126,7 +130,8 @@ class DataFrame(models.Model):
 		cursor = db.cursor()
 		cursor.execute(query)
 		query_results = cursor.fetchall()
- 		column_names = tuple([i[0] for i in cursor.description])
+		# There seems to be a problem with column_names
+		column_names = tuple([i[0] for i in cursor.description])
 		cursor.close
 		db.close()
 		return query_results, column_names

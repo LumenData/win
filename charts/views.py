@@ -4,7 +4,8 @@ from django.http import HttpResponse
 import json
 import sys
 from pprint import pprint
-
+from django.utils import timezone
+import datetime
 # Create your views here.
 
 class ChartBuilderView(TemplateView):
@@ -46,6 +47,8 @@ class AutoChartView(TemplateView):
 
 		if((nrows + ncols) == 0):
 			context['contents'] = ""
+			
+		### Pie Chart ###
 		elif((nrows + ncols) == 1):
 			column_name = row_names[0] if nrows > 0 else column_names[0]	
 			query_results, tmp = dataframe.query_results(
@@ -57,13 +60,14 @@ class AutoChartView(TemplateView):
 			
 			chart_data = list(query_results)
 
-			context['chartData'] = json.dumps(chart_data)
+			context['chart_data'] = json.dumps(chart_data)
 			context['chartType'] = 'pieChart';
 # 			context['error_message'] = chart_data
-		## Line Chart 				
+
+		### Line Chart ###		
 		elif((nrows == 1) & (ncols == 1)):
 		
-			query_results, tmp = dataframe.query_results(
+			query_results, query_headings = dataframe.query_results(
 				"SELECT %s x, %s y \n\
 				FROM %s \n\
 				ORDER BY %s" 
@@ -73,8 +77,22 @@ class AutoChartView(TemplateView):
 			query_results_as_list = list(query_results)
  			chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
 
-			context['chartData'] = json.dumps(chart_data)
-			context['chartType'] = 'lineChart';
+			# Move this later 		
+			class CustomJSONEncoder(json.JSONEncoder):
+				def default(self, obj):
+					if hasattr(obj, 'isoformat'): #handles both date and datetime objects
+						return obj.isoformat()
+					else:
+						return json.JSONEncoder.default(self, obj)
+
+			context['xaxis_label'] = column_names[0]
+			context['xaxis_type'] = 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other'
+			context['yaxis_label'] = row_names[0]
+			context['chartType'] = 'lineChart'
+
+			context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
+# 			context['chart_data'] = json.dumps(chart_data)
+			
 # 			context['error_message'] = chart_data;
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
