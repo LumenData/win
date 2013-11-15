@@ -18,6 +18,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 		else:
 			return json.JSONEncoder.default(self, obj)
 
+####################### Chart Builder #######################
 
 class ChartBuilderView(TemplateView):
 	template_name = "chart_builder.html"
@@ -37,6 +38,8 @@ class ChartBuilderView(TemplateView):
 
 		return self.render_to_response(context)
 
+####################### Choose the right chart type #######################
+
 def chart_selector(dataframe, chart_builder_input):
 	ncols = len(chart_builder_input["column_names"])
 	nrows = len(chart_builder_input["row_names"])
@@ -48,7 +51,53 @@ def chart_selector(dataframe, chart_builder_input):
 	else:
 		return "none"
 
+####################### Generate Query & Chart Options #######################
 
+def pie_chart(dataframe, chart_builder_input):
+	"Pie Chart"
+	column_names = chart_builder_input["column_names"]
+	row_names = chart_builder_input["row_names"]
+	
+	# Get either the column or row name (whichever was specified)
+	column_name = (row_names[:1] or column_names[:1])[0]
+
+	query_results, tmp = dataframe.query_results(
+		"SELECT %s `key`, count(*) y FROM %s GROUP BY 1" 
+		% (column_name, dataframe.db_table_name)
+	);
+	
+	chart_data = list(query_results)
+	chart_data_json = json.dumps(chart_data, cls=CustomJSONEncoder)
+	chart_options = {}
+	return chart_data_json, chart_options
+
+
+def line_chart(dataframe, chart_builder_input):
+	
+	column_names = chart_builder_input["column_names"]
+	row_names = chart_builder_input["row_names"]
+		
+	query_results, query_headings = dataframe.query_results(
+		"SELECT %s x, %s y \n\
+		FROM %s \n\
+		ORDER BY %s" 
+		% (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
+	);
+
+	query_results_as_list = list(query_results)
+	chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
+
+	chart_options = {
+		"xaxis_label": column_names[0],
+		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other',
+		"yaxis_label": row_names[0]
+	}
+
+	chart_data_json = json.dumps(chart_data, cls=CustomJSONEncoder)
+
+	return chart_data_json, chart_options
+
+####################### Build Chart #######################
 
 class AutoChartView(TemplateView):
 	template_name = "autochart.html"
@@ -59,8 +108,7 @@ class AutoChartView(TemplateView):
 		chart_builder_input = json.loads(request.GET.get("chart_builder_input"))
 		
 		dataframe_id = chart_builder_input["dataframe_id"]
-		column_names = chart_builder_input["column_names"]
-		row_names = chart_builder_input["row_names"]
+
 
 		try:
 			dataframe = DataFrame.objects.get(pk = dataframe_id)
@@ -69,50 +117,30 @@ class AutoChartView(TemplateView):
 			return self.render_to_response(context)
 
 		chart_type = chart_selector(dataframe, chart_builder_input)
-# 		context["error_message"] = dataframe.columns
-		
+
 		### No Chart ###
 		if(chart_type == "none"):
 			context['contents'] = ""
 			
 		### Pie Chart ###
 		elif(chart_type == "pieChart"):
-			# Get either the column or row name (whichever was specified)
-			column_name = (row_names[:1] or column_names[:1])[0]
-
-			query_results, tmp = dataframe.query_results(
-				"SELECT %s `key`, count(*) y FROM %s GROUP BY 1" 
-				% (column_name, dataframe.db_table_name)
-			);
+			chart_data_json, chart_options = pie_chart(dataframe, chart_builder_input)
+			context['chart_data'] = chart_data_json
 			
-			chart_data = list(query_results)
-
-			context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
-			context['chartType'] = 'pieChart';
-# 			context['error_message'] = chart_data
-
 		### Line Chart ###		
 		elif(chart_type == "lineChart"):
+			chart_data_json, chart_options = line_chart(dataframe, chart_builder_input)
+
+			context['xaxis_label'] = chart_options['xaxis_label']
+			context['xaxis_type'] = chart_options['xaxis_type']
+			context['yaxis_label'] = chart_options['yaxis_label']
+			context['chart_data'] = chart_data_json
 		
-			query_results, query_headings = dataframe.query_results(
-				"SELECT %s x, %s y \n\
-				FROM %s \n\
-				ORDER BY %s" 
-				% (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
-			);
 
-			query_results_as_list = list(query_results)
- 			chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
-
-			context['xaxis_label'] = column_names[0]
-			context['xaxis_type'] = 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other'
-			context['yaxis_label'] = row_names[0]
-			context['chartType'] = 'lineChart'
-
-			context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
-			
+
+		context['chart_type'] = chart_type
 		context["debug_mode"] = request.GET.get('debug_mode')
 		return self.render_to_response(context)
 
