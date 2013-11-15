@@ -9,12 +9,26 @@ from .forms import DataFileForm
 import os
 from win import settings
 
-## For converting dates 
-from charts.views import CustomJSONEncoder
 
 ## Get Pretty Print for debugging
 from pprint import pprint
 import json
+
+## For converting dates 
+# from charts.views import CustomJSONEncoder
+
+### Testing copying this function rather than including it
+
+class CustomJSONEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if hasattr(obj, 'isoformat'): #handles both date and datetime objects
+			return obj.isoformat()
+ 		elif hasattr(obj, 'total_seconds'):
+ 			return str(obj)
+		else:
+			return json.JSONEncoder.default(self, obj)
+
+
 
 ################################## File Import ##################################
 
