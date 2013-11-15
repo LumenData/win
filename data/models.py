@@ -82,6 +82,7 @@ class DataFrame(models.Model):
 		super(DataFrame, self).save(*args, **kwargs)
 
 	def delete(self):
+		"Delete the dataframe and drop the underlying table"
 		db = self.get_db()
 		cursor = db.cursor()
 
@@ -95,10 +96,7 @@ class DataFrame(models.Model):
 
 	def get_db(self, cursorclass = MySQLdb.cursors.Cursor):
 		"Get connection to the database"
-# 		myconv = {FIELD_TYPE.LONG: int}
-# 		db = MySQLdb.connect(cursorclass=cursorclass, conv=myconv, host=self.db_host, user=self.db_user, passwd=self.db_password)		
-		db = MySQLdb.connect(cursorclass=cursorclass, host=self.db_host, user=self.db_user, passwd=self.db_password)		
-
+		db = MySQLdb.connect(cursorclass=cursorclass, host=self.db_host, user=self.db_user, passwd=self.db_password)
 		db.select_db(self.db_name)
 		return db
 
@@ -119,8 +117,7 @@ class DataFrame(models.Model):
 		cursor = db.cursor()
 		cursor.execute("SELECT * FROM %s LIMIT %s" % (self.db_table_name, nrows))
 		query_results = cursor.fetchall()
-#  		column_names = tuple([i[0] for i in cursor.description])
-		column_names = cursor.description
+		column_names = tuple([i[0] for i in cursor.description])
 		cursor.close
 		db.close()
 		return query_results, column_names

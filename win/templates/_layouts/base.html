@@ -12,17 +12,13 @@
 		<script src="/static/jquery/jquery.jeditable.js"></script>
 		<script src="/static/bootstrap/dist/js/bootstrap.js"></script>
 		<script src="/static/jquery/jquery-ui-1.10.3.js"></script>
-		
-<!-- 
-		{# NVD3 Maybe shouldn't have this here #}
-		<link href="/static/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
-    	<script src="/static/nvd3/d3.v3.js"></script>
-	    <script src="/static/nvd3/nv.d3.js"></script>
- -->
 
 		{# Custom #}
 		<link rel="stylesheet" href="/static/site/css/base.css">
 		
+		<script>
+			console.debug("{{ debug_content }}");
+		</script>
 		{% block head_content %}{% endblock %}	
 		
 		<title>Win Analytics</title>
@@ -62,7 +58,7 @@
 		
 		
 		<br>
-		<div>{{ debug_content }}</div>
+		<div>{{ debug }}</div>
 
 	</body>
 </html>

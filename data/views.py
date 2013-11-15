@@ -9,6 +9,9 @@ from .forms import DataFileForm
 import os
 from win import settings
 
+## For converting dates 
+from charts.views import CustomJSONEncoder
+
 ## Get Pretty Print for debugging
 from pprint import pprint
 import json
@@ -47,8 +50,8 @@ class DataFrameDetailView(TemplateView):
 		(rows, column_names) = dataframe.get_data(nrows = 20)
 		rows_as_list = list(rows)
 		rows_as_list.insert(0,column_names)
-		context['data_list'] = json.dumps(rows_as_list)
-
+		context['data_list'] = json.dumps(rows_as_list, cls=CustomJSONEncoder)
+		
 		return self.render_to_response(context)
 	
 	def post(self, request, *args, **kwargs):
