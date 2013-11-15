@@ -57,11 +57,10 @@ class AutoChartView(TemplateView):
 		context = super(AutoChartView, self).get_context_data(**kwargs)
 
 		chart_builder_input = json.loads(request.GET.get("chart_builder_input"))
-		context["error_message"] = chart_builder_input
 		
 		dataframe_id = chart_builder_input["dataframe_id"]
- 		column_names = chart_builder_input["column_names"]
- 		row_names = chart_builder_input["row_names"]
+		column_names = chart_builder_input["column_names"]
+		row_names = chart_builder_input["row_names"]
 
 		try:
 			dataframe = DataFrame.objects.get(pk = dataframe_id)
@@ -70,8 +69,8 @@ class AutoChartView(TemplateView):
 			return self.render_to_response(context)
 
 		chart_type = chart_selector(dataframe, chart_builder_input)
-
-
+# 		context["error_message"] = dataframe.columns
+		
 		### No Chart ###
 		if(chart_type == "none"):
 			context['contents'] = ""
@@ -82,9 +81,7 @@ class AutoChartView(TemplateView):
 			column_name = (row_names[:1] or column_names[:1])[0]
 
 			query_results, tmp = dataframe.query_results(
-				"SELECT %s `key`, count(*) y \n\
-				FROM %s \n\
-				GROUP BY 1" 
+				"SELECT %s `key`, count(*) y FROM %s GROUP BY 1" 
 				% (column_name, dataframe.db_table_name)
 			);
 			

@@ -9,16 +9,16 @@
 <svg id="mainChart" ></svg>
 
 <script>
- 	var chart_data = {{ chart_data|safe }};
- 	var xaxis_label = "{{ xaxis_label }}";
- 	var yaxis_label = "{{ yaxis_label }}";
- 	var xaxis_type = "{{ xaxis_type }}";
- 	 	
- 	if(xaxis_type == "date"){
- 		for (var i=0; i < chart_data[0]["values"].length; i++){
- 			chart_data[0]["values"][i]["x"] = new Date(x_value = chart_data[0]["values"][i]["x"])
- 		}
- 	}
+	var chart_data = {{ chart_data|safe }};
+	var xaxis_label = "{{ xaxis_label }}";
+	var yaxis_label = "{{ yaxis_label }}";
+	var xaxis_type = "{{ xaxis_type }}";
+
+	if(xaxis_type == "date"){
+		for (var i=0; i < chart_data[0]["values"].length; i++){
+			chart_data[0]["values"][i]["x"] = new Date(x_value = chart_data[0]["values"][i]["x"])
+		}
+	}
 
 	console.debug(chart_data);
 </script>
@@ -28,3 +28,8 @@
 {% elif chartType == "lineChart" %}
 	<script src='/static/charts/js/linechart.js' type='text/javascript'> </script>
 {% endif %}
+
+
+
+
+

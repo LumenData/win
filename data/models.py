@@ -142,16 +142,31 @@ class DataFrame(models.Model):
 		columns = cursor.fetchall()
 		cursor.close
 		db.close()
-
-		# Turning something like varchar(255) into Type: varchar and Length: 255
-		newColumns = [];	
+		
+		newDict = {}
 		for col in columns:
+
+			key = col["Field"]
+			
 			if '(' in col["Type"]:
 				col["Length"] = col["Type"].split('(')[1].split(')')[0]
 				col["Type"] = col["Type"].split('(')[0]
-			newColumns.append(col)
+			
+			newDict[key] = col
 
-		return newColumns
+		return newDict
+		
+		
+#		#Turning something like varchar(255) into Type: varchar and Length: 255
+# 		newColumns = [];	
+# 		for col in columns:
+# 			
+# 			if '(' in col["Type"]:
+# 				col["Length"] = col["Type"].split('(')[1].split(')')[0]
+# 				col["Type"] = col["Type"].split('(')[0]
+# 			newColumns.append(col)
+# 
+# 		return newColumns
 
 	@models.permalink
 	def get_absolute_url(self):

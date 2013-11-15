@@ -27,6 +27,8 @@ $(document).ready(function(){
 			"column_names": col_names
 		};
 		
+		console.debug(chart_builder_input);
+		
 		$("#chart_loading_bar").show();
 		updateChart(chart_builder_input);
 		$("#chart_loading_bar").hide();
