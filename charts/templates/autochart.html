@@ -1,5 +1,4 @@
 {{ error_message }}
-{# {{ chart_data|safe }} #}
 {# NVD3 #}
 
 <link href="/static/nvd3/css/nv.d3.css" rel="stylesheet" type="text/css">
@@ -10,17 +9,15 @@
 
 <script>
 	var chart_data = {{ chart_data|safe }};
-	var xaxis_label = "{{ xaxis_label }}";
-	var yaxis_label = "{{ yaxis_label }}";
-	var xaxis_type = "{{ xaxis_type }}";
+	var chart_options = {{ chart_options|safe }};
+	var chart_type = "{{ chart_type }}";
 
-	if(xaxis_type == "date"){
+	// Django had to pass dates as strings, converting them back
+	if(chart_options["xaxis_type"] == "date"){
 		for (var i=0; i < chart_data[0]["values"].length; i++){
 			chart_data[0]["values"][i]["x"] = new Date(x_value = chart_data[0]["values"][i]["x"])
 		}
 	}
-
-	console.debug(chart_data);
 </script>
 
 {% if chart_type == "pieChart" %}

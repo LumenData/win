@@ -17,7 +17,7 @@ $(document).ready(function(){
 		$("#report-columns").children().each(function(){
 			col_names.push($(this).attr('id')); 
 		});
-		
+
 		// Collect input to chart builder input into dictionary
 		// Should replace this hard coded url later with something from django
 		chart_builder_input = {

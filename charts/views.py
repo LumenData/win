@@ -25,8 +25,6 @@ class ChartBuilderView(TemplateView):
 
 	def get(self, request, *args, **kwargs):
 		context = super(ChartBuilderView, self).get_context_data(**kwargs)
-		column_names = request.GET.getlist("column_names[]");
-		row_names = request.GET.getlist("row_names[]");
 
 		try:
 			dataframe = DataFrame.objects.get(pk = request.GET.get('dataframe_id'))
@@ -43,6 +41,12 @@ class ChartBuilderView(TemplateView):
 def chart_selector(dataframe, chart_builder_input):
 	ncols = len(chart_builder_input["column_names"])
 	nrows = len(chart_builder_input["row_names"])
+	
+	datacols = dataframe.columns;
+	
+	if(ncols == 1):
+		x_role = datacols[chart_builder_input["column_names"][0]]["Type"];
+		print(x_role)
 	
 	if ncols + nrows == 1:
 		return "pieChart"  
@@ -67,9 +71,8 @@ def pie_chart(dataframe, chart_builder_input):
 	);
 	
 	chart_data = list(query_results)
-	chart_data_json = json.dumps(chart_data, cls=CustomJSONEncoder)
 	chart_options = {}
-	return chart_data_json, chart_options
+	return chart_data, chart_options
 
 
 def line_chart(dataframe, chart_builder_input):
@@ -92,10 +95,8 @@ def line_chart(dataframe, chart_builder_input):
 		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other',
 		"yaxis_label": row_names[0]
 	}
-
-	chart_data_json = json.dumps(chart_data, cls=CustomJSONEncoder)
-
-	return chart_data_json, chart_options
+	
+	return chart_data, chart_options
 
 ####################### Build Chart #######################
 
@@ -106,10 +107,9 @@ class AutoChartView(TemplateView):
 		context = super(AutoChartView, self).get_context_data(**kwargs)
 
 		chart_builder_input = json.loads(request.GET.get("chart_builder_input"))
-		
 		dataframe_id = chart_builder_input["dataframe_id"]
 
-
+		# Get the dataframe
 		try:
 			dataframe = DataFrame.objects.get(pk = dataframe_id)
 		except Exception,e:
@@ -118,29 +118,21 @@ class AutoChartView(TemplateView):
 
 		chart_type = chart_selector(dataframe, chart_builder_input)
 
-		### No Chart ###
+		# Create chart data & chart options function
 		if(chart_type == "none"):
-			context['contents'] = ""
-			
-		### Pie Chart ###
+			chart_data = []
+			chart_options = {}
 		elif(chart_type == "pieChart"):
-			chart_data_json, chart_options = pie_chart(dataframe, chart_builder_input)
-			context['chart_data'] = chart_data_json
-			
-		### Line Chart ###		
+			chart_data, chart_options = pie_chart(dataframe, chart_builder_input)
 		elif(chart_type == "lineChart"):
-			chart_data_json, chart_options = line_chart(dataframe, chart_builder_input)
-
-			context['xaxis_label'] = chart_options['xaxis_label']
-			context['xaxis_type'] = chart_options['xaxis_type']
-			context['yaxis_label'] = chart_options['yaxis_label']
-			context['chart_data'] = chart_data_json
-		
-
+			chart_data, chart_options = line_chart(dataframe, chart_builder_input)		
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
 
 		context['chart_type'] = chart_type
+		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
+		context['chart_options'] = json.dumps(chart_options)
+
 		context["debug_mode"] = request.GET.get('debug_mode')
 		return self.render_to_response(context)
 

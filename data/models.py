@@ -155,18 +155,7 @@ class DataFrame(models.Model):
 			newDict[key] = col
 
 		return newDict
-		
-		
-#		#Turning something like varchar(255) into Type: varchar and Length: 255
-# 		newColumns = [];	
-# 		for col in columns:
-# 			
-# 			if '(' in col["Type"]:
-# 				col["Length"] = col["Type"].split('(')[1].split(')')[0]
-# 				col["Type"] = col["Type"].split('(')[0]
-# 			newColumns.append(col)
-# 
-# 		return newColumns
+
 
 	@models.permalink
 	def get_absolute_url(self):
