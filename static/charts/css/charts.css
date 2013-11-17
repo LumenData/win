@@ -1,35 +1,21 @@
-/* 
-.fileUpload {
-	position: relative;
-	overflow: hidden;
-	margin: 10px;
-}
 
-.fileUpload input {
-	position: absolute;
-	top: 0;
-	right: 0;
-	margin: 0;
-	padding: 0;
-	font-size: 20px;
-	cursor: pointer;
-	opacity: 0;
-	filter: alpha(opacity=0);
-}
- */
- 
+/* Panels */
 
-/* Reports - Columns */
+#main_panel{ position: relative;}
+#left_panel{ position: absolute; left: 10px; top: 0px; width: 150px; }
+#right_panel{ position: absolute; right: 10px; top: 0px; width: 150px; }
+#middle_panel{ margin: 0 170px; }
+
+/* Left Side  */
 
 .column-frame{
 	max-height: 500px;
-	min-height: 100px;
+	min-height: 75px;
 	width: 150px;
 	overflow-y: scroll;
 	overflow-x: hidden;
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
-	float: left;
+	margin: 0 0 10px 0;
+	padding: 0;
 }
 
 .column-title{
@@ -38,7 +24,6 @@
  	margin: 0 0 10px 0;
 	padding: 5px;
 	float: left;
-	display: block;
 }
 
 .mypill{
@@ -47,6 +32,34 @@
 	overflow: auto;
 	text-align:left;
 	padding: 0 0 0 6px;
+/* 	position: fixed; */
+	
+}
+
+/* Get rid of this */
+.col_pill{
+	width: 148px;
+	margin: -1px 0px 0px 0px;
+	overflow: auto;
+	padding: 0 0 0 6px;
+
+	text-align: left;
+	color: white;
+	
+	border-radius: 0;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #F9791D;
+	
+	background: #FEAF00;
+}
+
+.dropzone{
+ 	height: 100%;
+ 	width: 100%;
+ 	min-width: 200px;
+ 	padding: 0;
+/*  	background: #EEEEEE; */
 }
 
 .hashicon{
@@ -54,12 +67,14 @@
 	margin: 0px 4px 0px 0px;
 }
 
-/* Reports - Rows */
+/* Middle Area */
 
 .panel.panel-success.rows{
 	height: 32px;
-	margin: 0px 0px 5px 160px;
+	width: auto;
+	margin: 0px 0px 5px 0px;
 	padding: 0px;
+
 }
 
 .panel-heading.rows{
@@ -69,34 +84,22 @@
 	float: left;
 }
 
-.dropzone{
- 	height: 100%;
- 	width: auto;
- 	padding: 0;
-/*  	background: #EEEEEE; */
-}
-
-
 #report-area{
 	height: 400px;
 	width: auto;
 	overflow:hidden;
-	margin-left: 160px;
 	margin-top: 10px;
-/* 	background-color: purple; */
 }
 
 #chart_loading_bar{
 	display: none;
 }
 
+/*  Right Area  */
 
-
-
-
-
-
-
+.dropzone.filters{
+	min-height: 50px;	
+}
 
 
 

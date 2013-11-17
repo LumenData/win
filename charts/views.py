@@ -43,7 +43,7 @@ def chart_selector(dataframe, chart_builder_input):
 	nrows = len(chart_builder_input["row_names"])
 	
 	datacols = dataframe.columns;
-	
+
 	if(ncols == 1):
 		x_role = datacols[chart_builder_input["column_names"][0]]["Type"];
 		print(x_role)

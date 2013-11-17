@@ -1,8 +1,9 @@
 // Format expected is something like:
 // chart_data = [{key: "Test Data", values: [{x: 1, y: 2}, {x: 4, y: 4}, {x: 5, y: 8}]}];
 
-console.debug(chart_data);
-
+var xaxis_label = chart_options["xaxis_label"];
+var yaxis_label = chart_options["yaxis_label"];
+var xaxis_type = chart_options["xaxis_type"];
 
 nv.addGraph(function() {
 	var chart = nv.models.lineChart();

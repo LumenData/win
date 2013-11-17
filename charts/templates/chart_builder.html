@@ -19,7 +19,8 @@
 				{% for column_name, column in dataframe.columns.items %}
 					<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" data-name="{{ column_name }}">
 						{% if "date" in column.Type %}
-							<span class="glyphicon glyphicon-calendar"> </span>
+<!-- 							<span class="glyphicon glyphicon-calendar"> </span> -->
+							<img id="calendar_icon" src="/static/site/images/calendar.png">
 						{% elif "char" in column.Type %}
 							<span class="glyphicon glyphicon-font"> </span>
 						{% elif "text" in column.Type %}
@@ -46,7 +47,8 @@
 				{% for column_name, column in dataframe.columns.items %}
 					<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" data-name="{{ column_name }}">
 						{% if "date" in column.Type %}
-							<span class="glyphicon glyphicon-calendar"> </span>
+<!-- 							<span class="glyphicon glyphicon-calendar"> </span> -->
+							<img id="calendar_icon" src="/static/site/images/calendar.png">
 						{% elif "char" in column.Type %}
 							<span class="glyphicon glyphicon-font"> </span>
 						{% elif "text" in column.Type %}
@@ -88,10 +90,16 @@
 		</div>
 	</div>
 
-
 	<!-- Filters -->
 
 	<div id="right_panel">
+<!-- Soon!
+		<div class="panel panel-danger column-frame">
+			<span class="panel-heading column-title">Predict</span>
+			<ul id="column-list" class="connectedSortable dropzone filters"></ul>
+		</div>
+ -->
+
 		<div class="panel panel-success column-frame">
 			<span class="panel-heading column-title">Filters</span>
 			<ul id="column-list" class="connectedSortable dropzone filters"></ul>

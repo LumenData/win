@@ -10,7 +10,7 @@
 
 .column-frame{
 	max-height: 500px;
-	min-height: 50px;
+	min-height: 75px;
 	width: 150px;
 	overflow-y: scroll;
 	overflow-x: hidden;
@@ -33,7 +33,12 @@
 	text-align:left;
 	padding: 0 0 0 6px;
 /* 	position: fixed; */
-	
+}
+
+#calendar_icon{
+	width: 10px;
+	height: 10px;
+	margin: -2px 0 0 0;
 }
 
 /* Get rid of this */
@@ -98,7 +103,7 @@
 /*  Right Area  */
 
 .dropzone.filters{
-	min-height: 160px;	
+	min-height: 50px;	
 }
 
 
