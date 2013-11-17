@@ -36,7 +36,7 @@ class DataFile(models.Model):
 		if not self.slug:
 			self.slug = slugify(self.name)
 		super(DataFile, self).save(*args, **kwargs)
-		
+
 	def delete(self):
 		# Note: this wont work on queryset deletes
 		self.file.delete()

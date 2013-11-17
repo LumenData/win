@@ -10,7 +10,7 @@ import os
 from win import settings
 
 
-## Get Pretty Print for debugging
+## Pretty Print for debugging
 from pprint import pprint
 import json
 
@@ -58,7 +58,11 @@ class DataFrameDetailView(TemplateView):
 	def get(self, request, *args, **kwargs):
 		context = super(DataFrameDetailView, self).get_context_data(**kwargs)
 
-		dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])
+		try:
+			dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])
+		except Exception,e:
+			context['debug'] = str(e)
+		
 		context['object'] = dataframe
 		
 		(rows, column_names) = dataframe.get_data(nrows = 20)

@@ -60,6 +60,8 @@ def get_col_types(input_file, max_rows=10):
     """
     csv_types = collections.defaultdict(list)
     reader = csv.reader(open(input_file))
+#     reader = csv.reader(open(input_file, 'rU'), dialect=csv.excel_tab)
+    
     # test the first few rows for their data types
     for row_i, row in enumerate(reader):
         if row_i == 0:
@@ -118,6 +120,7 @@ def main(input_file, user, password, host, table, database):
 
     header = None
     for row in csv.reader(open(input_file)):
+#     for row in csv.reader(open(input_file, 'rU'), dialect=csv.excel_tab):
         if header:
             cursor.execute(insert_sql, row)
         else:
