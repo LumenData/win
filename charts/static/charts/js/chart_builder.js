@@ -49,7 +49,8 @@ function updateChart(chart_builder_input){
 
 $(function() {
 	$(".connectedSortable").sortable({
-		connectWith: ".connectedSortable"
+		connectWith: ".connectedSortable",
+		scroll : false,
 	}).disableSelection();
 });
 
