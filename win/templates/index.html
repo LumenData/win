@@ -3,10 +3,107 @@
 
 {% block page_content %}
 
-<div class="jumbotron">
-  <h1>Welcome to Win!</h1>
-  <p>Win Analytics helps companies with lots of data create predictions about their businesses.  Getting ahead of the competition has never been easier.</p>
-  <p><a class="btn btn-primary btn-lg" role="button" href="{% url data:filelist %}">Get Started!</a></p>
-  
+<style>
+
+/* Could do better subclassing for these three elements */
+#jumbotron_box{
+	height: 350px;
+	width: 100%;
+	background-size: 100%;
+	top: 40px;
+	background-image: url(/static/site/images/homepage_header.jpg);
+	background-position: 50% 50%;
+	position: absolute;
+	z-index: 0;
+}
+
+#welcome_silhouette{
+	top: 40px;
+	height: 350px;
+	width: 100%;
+	position: absolute;
+	background-size: 100%;
+	background: black;
+	opacity: 0.4;
+	z-index: 1;
+}
+
+#welcome_message{
+	height: 350px;
+	background-size: 100%;
+	margin: 0 0 0 0;
+	padding: 0 10% 0 10%;
+	color: white;
+	position: absolute;
+	background: transparent;
+	z-index: 2;
+}
+
+#row_id{
+	margin-top: 350px;
+}
+
+.thumbnail_homepage{
+	width: 277px;
+	height: 200px;
+	background-size: cover;
+	background-position: 50% 50%;
+	
+	border-radius: 6px;
+}
+
+</style>
+
+<div class="jumbotron" id="welcome_silhouette"></div>
+<div class="jumbotron" id="jumbotron_box"></div>
+
+<div class ="jumbotron" id="welcome_message">
+	<h1>Welcome to Win!</h1>
+	<p>Win Analytics helps companies make better predictions with their data.  Getting ahead of the competition has never been easier.  Go Ahead, be a Winner.</p>
+	<p><a class="btn btn-primary btn-lg" role="button" href="{% url data:filelist %}">Get Started!</a></p>  
 </div>
+
+
+
+
+<div class="container">
+	<div class="row" id="row_id">
+		<div class="col-sm-6 col-sm-4">
+			<div class="thumbnail">
+<!-- 				<div class="thumbnail_homepage" id="thumb_1" style="background-image: url(/static/site/images/homepage_row_1.jpg)"></div> -->
+				<img style="width: 300px; height: 200px;" src="/static/site/images/homepage_row_1.jpg"/>
+				<div class="caption">
+					<h3>Big Data Platform</h3>
+					<p>Analytics and Machine Learning at massive scales requires serious horsepower.  Luckily, you'll never have to think about it. </p>
+
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6 col-sm-4">
+			<div class="thumbnail">
+				<img style="width: 300px; height: 200px;" src="/static/site/images/homepage_row_2.jpg"/>
+				<div class="caption">
+					<h3>Visual Analytics</h3>
+					<p>Mastering your data means understanding it.  Win tools help insights pop off the page with beautiful charts and visualizations.</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6 col-sm-4">
+			<div class="thumbnail">
+				<img style="width: 300px; height: 200px;" src="/static/site/images/homepage_row_3.jpg"/>
+				<div class="caption">
+					<h3>Machine Learning</h3>
+					<p>Predicting the future is literally a few clicks away, and anyone can do it.  Pretty cool, right?</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 {% endblock %}
+
+
+
+
+
