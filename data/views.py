@@ -14,6 +14,7 @@ from win import settings
 from pprint import pprint
 import json
 from decimal import Decimal
+import datetime
 
 ## For converting dates 
 # from charts.views import CustomJSONEncoder
@@ -33,6 +34,8 @@ class CustomJSONEncoder(json.JSONEncoder):
 			
 class StringJSONEncoder(json.JSONEncoder):
 	def default(self, obj):
+# 		if isinstance(obj, datetime.timedelta):
+# 			print "YES"
 		if hasattr(obj, 'isoformat'): #handles both date and datetime objects
 			return obj.isoformat()
  		elif hasattr(obj, 'total_seconds'):
