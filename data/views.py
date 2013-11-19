@@ -25,6 +25,8 @@ class CustomJSONEncoder(json.JSONEncoder):
 			return obj.isoformat()
  		elif hasattr(obj, 'total_seconds'):
  			return str(obj)
+		if isinstance(obj, Decimal):
+			return float(obj)
 		else:
 			return json.JSONEncoder.default(self, obj)
 
