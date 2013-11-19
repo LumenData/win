@@ -1,22 +1,16 @@
 {% extends "_layouts/base.html" %}
 
 {% block head_content %}
-<script>
-	// Should refactor this into a separate JS/CSS file
-	$(document).ready(function() {
-		$('.edit').editable('{{ object.get_absolute_url }}',
-		{
-			width:($(".edit").width() + 100) + "px",
-			height:($(".edit").height() + 10) + "px"
-		});
-	});
-</script>
+	<script>
+		var object_url = "{{ object.get_absolute_url }}";
+	</script>
+
+	<script src="/static/data/js/dataframe_detail.js"></script>
 
     <script type="text/javascript" src="//www.google.com/jsapi"></script>
     <script type="text/javascript">
-      google.load('visualization', '1', {packages: ['table']});
-    </script>
-    <script type="text/javascript">
+		google.load('visualization', '1', {packages: ['table']});
+		
 		function drawVisualization() {
 			// Create and populate the data table.
 			var data = google.visualization.arrayToDataTable({{ data_list|safe }});

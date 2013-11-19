@@ -1,21 +1,58 @@
 {% extends "_layouts/base.html" %}
-{% block page_title %}Data Frames{% endblock %}
+
+{% block page_title %}Data Frame{% endblock %}
+
+{% block head_content %}
+<!-- <script src="/static/data/js/datafile_list.js"></script> -->
+{% endblock %}
+
 {% block nav_data_active %}active{% endblock %}
 
 {% block page_content %}
 <div class="container row-fluid">
+	
+	<h1> Data Frames </h1>
 
-<!-- 	<h3>Create: <a href="{% url data:filelist %}">Import from File</a></h3> -->
-	<h2>
-	{% for data_frame in object_list %}
-	<li><a href="{{ data_frame.get_absolute_url }}">{{ data_frame.name }}</a></li>
-	{% empty %}
-	<li>No data yet.  Upload some!</li>
-	{% endfor %}
-	</h2>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Created Date</th>
+				<th>Analyze</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for data_frame in object_list %}
+			<tr>
+				<td>{{ data_frame.id }}</td>
+				<td class="name_editable">
+					<a href="{{ data_frame.get_absolute_url }}" class="edit">{{ data_frame.name }}</a>
+					<span class="glyphicon glyphicon-edit" id="name_edit_icon"/>
+				</td>
+				<td>{{ data_frame.created_at }}</td>
+				<td><a href="{% url charts:home %}?dataframe_id={{ data_frame.pk }}"><span class="glyphicon glyphicon-stats"/></a></td>
+			</tr>
+			
+			{% empty %}
+			<tr>
+					<td>-</td>
+					<td>-</td>
+					<td>-</td>
+					<td>-</td>
+					<td>-</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 	<br>
+
+	<a class="btn btn-primary" href="{% url data:filecreate %}">	<span class="glyphicon glyphicon-import"></span> Import New File</a>
+
+<!-- 
 	<ul class="pager">	
-		<li class="previous"><a href="{% url data:filelist %}">&larr; Data Files</a></li>
+		<li class="previous"><a href="{% url home %}">&larr; Home</a></li>
 	</ul>
+ -->
 </div>
 {% endblock %}

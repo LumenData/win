@@ -29,6 +29,35 @@ class CustomJSONEncoder(json.JSONEncoder):
 			return json.JSONEncoder.default(self, obj)
 
 
+################################## File Detail ##################################
+
+class DataFileDetailView(TemplateView):
+	model = DataFile
+	template_name = "data/datafile_detail.html"
+	
+	def get(self, request, *args, **kwargs):
+		context = super(DataFileDetailView, self).get_context_data(**kwargs)
+
+		try:
+			datafile = DataFile.objects.get(pk = self.kwargs['pk'])
+		except Exception,e:
+			context['debug'] = str(e)
+		
+		context['object'] = datafile
+		
+		return self.render_to_response(context)
+	
+	def post(self, request, *args, **kwargs):
+		if(self.request.POST['id'] == 'name'):
+			datafile = DataFile.objects.get(pk = self.kwargs['pk'])		
+			datafile.name = self.request.POST['value']
+			datafile.save()
+			return HttpResponse(datafile.name)
+		else:
+			return HttpResponse('error')
+
+
+
 
 ################################## File Import ##################################
 

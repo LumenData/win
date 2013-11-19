@@ -1,17 +1,52 @@
 {% extends "_layouts/base.html" %}
+
 {% block page_title %}Data Files{% endblock %}
+
+{% block head_content %}
+<script src="/static/data/js/datafile_list.js"></script>
+{% endblock %}
+
 {% block nav_data_active %}active{% endblock %}
 
 {% block page_content %}
 <div class="container row-fluid">
+	
+	<h1> Source Files </h1>
 
-	<h2>
-	{% for data_frame in object_list %}
-	<li><a href="{{ data_frame.get_absolute_url }}">{{ data_frame.name }}</a></li>
-	{% empty %}
-	<li>No data yet.  Upload some!</li>
-	{% endfor %}
-	</h2>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Created Date</th>
+				<th>Source File</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for data_file in object_list %}
+			<tr>
+				<td>{{ data_file.id }}</td>
+				<td class="name_editable">
+					<a href="{{ data_file.get_absolute_url }}" class="edit">{{ data_file.name }}</a>
+					<span class="glyphicon glyphicon-edit" id="name_edit_icon"/>
+				</td>
+				<td>{{ data_file.created_at }}</td>
+				<td><a href="{{ data_file.file }}" alt="{{ data_file.file }}">Download</a></td>
+				<td>{{ data_file.description }}</td>
+			</tr>
+			
+			{% empty %}
+			<tr>
+					<td>-</td>
+					<td>-</td>
+					<td>-</td>
+					<td>-</td>
+					<td>-</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 	<br>
 
 	<a class="btn btn-primary" href="{% url data:filecreate %}">	<span class="glyphicon glyphicon-import"></span> Import New File</a>

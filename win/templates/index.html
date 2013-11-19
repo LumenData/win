@@ -1,4 +1,5 @@
 {% extends "_layouts/base.html" %}
+{% block navbar-style %}inverse{% endblock %}
 {% block nav_home_active %}active{% endblock %}
 
 {% block page_content %}
@@ -59,8 +60,9 @@
 
 <div class ="jumbotron" id="welcome_message">
 	<h1>Welcome to Win!</h1>
-	<p>Win Analytics helps companies make better predictions with their data.  Getting ahead of the competition has never been easier.  Go Ahead, be a Winner.</p>
-	<p><a class="btn btn-primary btn-lg" role="button" href="{% url data:filelist %}">Get Started!</a></p>  
+	<p>Win Predictive Analytics help organizations make better predictions with their data.  Getting ahead of the competition has never been easier.  Go Ahead, be a Winner.</p>
+	<p><a class="btn btn-primary btn-lg" role="button" href="{% url data:filelist %}">Get Started</a></p>  
+	
 </div>
 
 
