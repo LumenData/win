@@ -114,8 +114,8 @@ class DataFrameDetailView(TemplateView):
 		(rows, column_names) = dataframe.get_data(nrows = 20)
 		rows_as_list = list(rows)
 		rows_as_list.insert(0, column_names)
-#		context['data_list'] = json.dumps(rows_as_list, cls=CustomJSONEncoder)
-		context['data_list'] = json.dumps(rows_as_list, cls=StringJSONEncoder)
+		context['data_list'] = json.dumps(rows_as_list, cls=CustomJSONEncoder)
+# 		context['data_list'] = json.dumps(rows_as_list, cls=StringJSONEncoder)
 
 		return self.render_to_response(context)
 	
