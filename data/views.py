@@ -18,7 +18,7 @@ from decimal import Decimal
 ## For converting dates 
 # from charts.views import CustomJSONEncoder
 
-### Testing copying this function rather than including it
+### Testing copying this function rather than including it for aws reasons
 
 class CustomJSONEncoder(json.JSONEncoder):
 	def default(self, obj):
@@ -30,6 +30,10 @@ class CustomJSONEncoder(json.JSONEncoder):
 			return float(obj)
 		else:
 			return json.JSONEncoder.default(self, obj)
+			
+class StringJSONEncoder(json.JSONEncoder):
+	def default(self, obj):
+		return str(obj)
 
 
 ################################## File Detail ##################################
@@ -99,9 +103,10 @@ class DataFrameDetailView(TemplateView):
 		
 		(rows, column_names) = dataframe.get_data(nrows = 20)
 		rows_as_list = list(rows)
-		rows_as_list.insert(0,column_names)
-		context['data_list'] = json.dumps(rows_as_list, cls=CustomJSONEncoder)
-		
+		rows_as_list.insert(0, column_names)
+#		context['data_list'] = json.dumps(rows_as_list, cls=CustomJSONEncoder)
+		context['data_list'] = json.dumps(rows_as_list, cls=StringJSONEncoder)
+
 		return self.render_to_response(context)
 	
 	def post(self, request, *args, **kwargs):
