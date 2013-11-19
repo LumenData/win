@@ -13,6 +13,7 @@ from win import settings
 ## Pretty Print for debugging
 from pprint import pprint
 import json
+from decimal import Decimal
 
 ## For converting dates 
 # from charts.views import CustomJSONEncoder
