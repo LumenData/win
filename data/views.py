@@ -36,7 +36,7 @@ class StringJSONEncoder(json.JSONEncoder):
 		if hasattr(obj, 'isoformat'): #handles both date and datetime objects
 			return obj.isoformat()
  		elif hasattr(obj, 'total_seconds'):
- 			return str(obj)
+ 			return "seconds" #str(obj)
 		elif isinstance(obj, Decimal):
 			return float(obj)
 		else:
