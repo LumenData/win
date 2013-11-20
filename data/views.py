@@ -32,20 +32,6 @@ class CustomJSONEncoder(json.JSONEncoder):
 		else:
 			return json.JSONEncoder.default(self, obj)
 
-# This should be changed later, defaults to string to avoid serialization isssues		
-# class StringJSONEncoder(json.JSONEncoder):
-# 	def default(self, obj):
-# 		if hasattr(obj, 'isoformat'): #handles both date and datetime objects
-# 			return obj.isoformat()
-#  		elif hasattr(obj, 'total_seconds'):
-# 		elif isinstance(obj, datetime.timedelta):
-#  			return "string" #str(obj)
-# 		elif isinstance(obj, Decimal):
-# 			return float(obj)
-# 		else:
-# 			return str(obj)
-
-
 ################################## File Detail ##################################
 
 class DataFileDetailView(TemplateView):
@@ -115,7 +101,6 @@ class DataFrameDetailView(TemplateView):
 		rows_as_list = list(rows)
 		rows_as_list.insert(0, column_names)
 		context['data_list'] = json.dumps(rows_as_list, cls=CustomJSONEncoder)
-# 		context['data_list'] = json.dumps(rows_as_list, cls=StringJSONEncoder)
 
 		return self.render_to_response(context)
 	
