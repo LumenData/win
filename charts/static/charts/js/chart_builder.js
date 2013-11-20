@@ -33,6 +33,12 @@ $(document).ready(function(){
 		updateChart(chart_builder_input);
 		$("#chart_loading_bar").hide();
 	});
+	
+	if(typeof(dataframe_id) == "undefined"){
+		$('#myModal').modal({
+//  			remote: "/data/frame?table_only=true"
+		})
+	}
 });
 
 function updateChart(chart_builder_input){

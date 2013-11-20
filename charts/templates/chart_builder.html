@@ -11,6 +11,59 @@
 {% endblock %}
 
 {% block page_content %}
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog" >
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h3 class="modal-title" id="myModalLabel">Choose a Data Frame</h3>
+			</div>
+			<div class="modal-body">
+				<!-- 		Table of DataFrames		 -->
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Name</th>
+							<th>Created Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for data_frame in object_list %}
+						<tr>
+							<td>{{ data_frame.id }}</td>
+							<td class="name_editable">
+								<a href="{% url charts:home %}?dataframe_id={{ data_frame.pk }}"><span class="glyphicon glyphicon-stats"/></a>&nbsp&nbsp 
+								<a href="{% url charts:home %}?dataframe_id={{ data_frame.pk }}">{{ data_frame.name }} </a>
+							</td>
+							<td>{{ data_frame.created_at }}</td>
+						</tr>
+			
+						{% empty %}
+						<tr>
+								<td>-</td>
+								<td>-</td>
+								<td>-</td>
+								<td>-</td>
+								<td>-</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<!-- 		/Table of DataFrames		 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
 <div id="main_panel">
 	<div id="left_panel">
 		<div class="panel panel-info column-frame">
@@ -106,4 +159,10 @@
 		</div>
 	</div>
 </div>
+
+
+
+
+
+
 {% endblock %}

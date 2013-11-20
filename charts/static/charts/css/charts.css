@@ -1,4 +1,5 @@
 
+
 /* Panels */
 
 #main_panel{ position: relative;}
@@ -107,20 +108,13 @@
 }
 
 
+/* Opening Modal */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+.modal-dialog{
+	left: 20%;
+	right: 20%;
+	position: absolute;
+}
 
 
 

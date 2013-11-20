@@ -34,8 +34,12 @@ class ChartBuilderView(TemplateView):
 		try:
 			dataframe = DataFrame.objects.get(pk = request.GET.get('dataframe_id'))
 		except Exception,e:
-			context['debug'] = str(e)
+# 			context['debug'] = str(e)
+			context['no_dataframe'] = True
+			context['object_list'] = DataFrame.objects.all()
+			
 			return self.render_to_response(context)
+
 			
 		context['dataframe'] = dataframe
 
