@@ -47,7 +47,7 @@ class AutoChartView(TemplateView):
 			return self.render_to_response(context)
 
 		chart_type = chart_selector(dataframe, chart_builder_input)
-		
+
 		# Create chart data & chart options to pass to javascript
 		if(chart_type == "none"):
 			chart_data = []
@@ -63,21 +63,9 @@ class AutoChartView(TemplateView):
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
 
-# 		print("\n\nChart Data")
-# 		print(chart_data)
-
 		context['chart_type'] = chart_type
 		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
 		context['chart_options'] = json.dumps(chart_options)
-
-# 		print("\n\n chart_data_json: ")
-# 		print(context['chart_data'])
-# 		
-# 		print("\n\n chart_type: ")
-# 		print(context['chart_type'])
-# 		
-# 		print("\n\n chart_options: ")
-# 		print(context['chart_options'])
 
 		return self.render_to_response(context)
 
@@ -92,24 +80,8 @@ def chart_selector(dataframe, chart_builder_input):
 
 	## Get xaxis and yaxis data types (note: assumes only one x and one y)
 
-	col_datatype = datacols[chart_builder_input["column_names"][0]]["Type"]	if(ncols > 0) else ""
-	row_datatype = datacols[chart_builder_input["row_names"][0]]["Type"] 	if(nrows > 0) else ""
-
-	def chart_datatype(base_type):
-		if base_type in ("int", "double"):
-			new_type = "numeric"
-		elif base_type in ("date", "time", "datetime"):
-			new_type = "time"
-		elif base_type in ("varchar"):
-			new_type = "character"
-		else:
-			return(base_type)
-		return(new_type)
-		
-	col_datatype = chart_datatype(col_datatype)
-	row_datatype = chart_datatype(row_datatype)
-	
-# 	print(row_datatype + " " + col_datatype);
+	col_datatype = datacols[chart_builder_input["column_names"][0]]["type_category"]	if(ncols > 0) else ""
+	row_datatype = datacols[chart_builder_input["row_names"][0]]["type_category"] 	if(nrows > 0) else ""
 
 	if (ncols + nrows) == 1:
 		return "pieChart"  
@@ -198,16 +170,16 @@ def bar_chart(dataframe, chart_builder_input):
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
 	
-	query = "SELECT %s label, avg(%s) value FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
+	query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC" % (column_names[0], row_names[0], dataframe.db_table_name )
 	query_results, query_headings = dataframe.query_results(query);
 
 	query_results_as_list = list(query_results)
 	chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
-	
+
 	chart_options = {
 		"xaxis_label": column_names[0],
 		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["label"], "isoformat") else 'other',
-		"yaxis_label": "avg(" + row_names[0] + ")"
+		"yaxis_label": "sum(" + row_names[0] + ")"
 	}
 
 	print("Bar Chart Query: ")

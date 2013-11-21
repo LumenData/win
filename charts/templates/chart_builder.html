@@ -70,26 +70,22 @@
 			<span class="panel-heading column-title">Dimensions</span>
 			<ul id="column-list" class="connectedSortable dropzone">
 				{% for column_name, column in dataframe.columns.items %}
-					<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" title="{{ column_name }}" data-name="{{ column_name }}">
-						{% if "date" in column.Type %}
-<!-- 							<span class="glyphicon glyphicon-calendar"> </span> -->
-							<img id="calendar_icon" src="/static/site/images/calendar.png">
-						{% elif "char" in column.Type %}
-							<span class="glyphicon glyphicon-font"> </span>
-						{% elif "text" in column.Type %}
-							<span class="glyphicon glyphicon-font"> </span>
-						{% elif "time" in column.Type %}
-							<span class="glyphicon glyphicon-time"> </span>
-						{% elif "int" in column.Type %}
-							<span class="hashicon">#</span> 
-						{% elif "double" in column.Type %}
-							<span class="hashicon">#</span> 
-						{% else %}
-							{{ column.Type }}
-						{% endif %}
+					{% if column.role == "dimension" %}
+						<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" title="{{ column_name }}" data-name="{{ column_name }}">
+							{% if "date" in column.type %}
+								<!-- <span class="glyphicon glyphicon-calendar"> </span> -->
+								<img id="calendar_icon" src="/static/site/images/calendar.png">
+							{% elif "time" in column.type %}
+								<span class="glyphicon glyphicon-time"> </span>
+							{% elif "character" in column.type_category %}
+								<span class="glyphicon glyphicon-font"> </span>
+							{% else %}
+								{{ column.type }}
+							{% endif %}
 
-						<script>document.write(toTitleCase('{{ column_name }}'));</script>
-					</div>
+							{{ column_name }}
+						</div>
+					{% endif %}
 				{% endfor %}
 			</ul>
 		</div>
@@ -98,26 +94,16 @@
 			<span class="panel-heading column-title">Measures</span>
 			<ul id="column-list" class="connectedSortable dropzone">
 				{% for column_name, column in dataframe.columns.items %}
-					<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" data-name="{{ column_name }}">
-						{% if "date" in column.Type %}
-<!-- 							<span class="glyphicon glyphicon-calendar"> </span> -->
-							<img id="calendar_icon" src="/static/site/images/calendar.png">
-						{% elif "char" in column.Type %}
-							<span class="glyphicon glyphicon-font"> </span>
-						{% elif "text" in column.Type %}
-							<span class="glyphicon glyphicon-font"> </span>
-						{% elif "time" in column.Type %}
-							<span class="glyphicon glyphicon-time"> </span>
-						{% elif "int" in column.Type %}
-							<span class="hashicon">#</span> 
-						{% elif "double" in column.Type %}
-							<span class="hashicon">#</span> 
-						{% else %}
-							{{ column.Type }}
-						{% endif %}
-
-						<script>document.write(toTitleCase('{{ column_name }}'));</script>
-					</div>
+					{% if column.role == "measure" %}
+						<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" data-name="{{ column_name }}">
+							{% if "numeric" in column.type_category %}
+								<span class="hashicon">#</span> 
+							{% else %}
+								{{ column.type }}
+							{% endif %}
+							{{ column_name }}
+						</div>
+					{% endif %}
 				{% endfor %}
 			</ul>
 		</div>

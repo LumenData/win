@@ -143,15 +143,42 @@ class DataFrame(models.Model):
 		cursor.close
 		db.close()
 		
+		# Creating dict with field names as keys
+		# Should make these lower case at some point
 		newDict = {}
 		for col in columns:
-
-			key = col["Field"]
+			# Assign key and title case
+			key = col["Field"].title()
 			
+			# Split varchar(255) as varchar and 255
 			if '(' in col["Type"]:
-				col["Length"] = col["Type"].split('(')[1].split(')')[0]
+				col["length"] = col["Type"].split('(')[1].split(')')[0]
 				col["Type"] = col["Type"].split('(')[0]
 			
+			# Numeric / Measure
+			if col["Type"] in ("int", "double"):
+				col["type_category"] = "numeric"
+				col["role"] = "measure"
+
+			# Character / Dimension
+			if col["Type"] in ("varchar"):
+				col["type_category"] = "character"
+				col["role"] = "dimension"
+
+			# Time / Dimension
+			if col["Type"] in ("date", "datetime", "time"):
+				col["type_category"] = "time"
+				col["role"] = "dimension"
+
+			# Get rid of useless info from database
+			del col["Key"]
+			del col["Extra"]
+			del col["Default"]
+			del col["Field"]
+			
+			# Switch key to lowercase (type from Type)
+			col["type"] = col.pop("Type")
+
 			newDict[key] = col
 
 		return newDict
