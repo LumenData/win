@@ -124,6 +124,9 @@
 	min-height: 50px;	
 }
 
+.dropzone.groups{
+	min-height: 50px;	
+}
 
 /* Opening Modal */
 

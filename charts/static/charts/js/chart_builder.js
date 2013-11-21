@@ -15,6 +15,12 @@ $(document).ready(function(){
 		$("#report-columns").children().each(function(){
 			col_names.push($(this).attr('id')); 
 		});
+		
+		// Get group name from sortable area
+		var group_names = new Array();
+		$("#report-group").children().each(function(){
+			group_names.push($(this).attr('id')); 
+		});
 
 		// Collect input to chart builder input into dictionary
 		// Should replace this hard coded url later with something from django
@@ -22,7 +28,8 @@ $(document).ready(function(){
 			"chart_builder_url": "/charts/autochart",
 			"dataframe_id": dataframe_id, 
 			"row_names": row_names, 
-			"column_names": col_names
+			"column_names": col_names,
+			"group_names": group_names
 		};
 
 		console.debug(chart_builder_input);

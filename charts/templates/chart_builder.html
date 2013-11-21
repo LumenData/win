@@ -1,6 +1,7 @@
 {% extends "_layouts/base.html" %}
 {# {% block page_title %}{{ dataframe.name }}{% endblock %} #}
 {% block nav_analysis_active %}active{% endblock %}
+{% block navbar-style %}default{% endblock %}
 
 {% block head_content %}
 	<link rel="stylesheet" href="/static/charts/css/charts.css">
@@ -132,20 +133,27 @@
 	<!-- Filters -->
 
 	<div id="right_panel">
-<!-- Soon!
+	
+		<!-- Soon!
 		<div class="panel panel-danger column-frame">
 			<span class="panel-heading column-title">Predict</span>
 			<ul id="column-list" class="connectedSortable dropzone filters"></ul>
 		</div>
- -->
+ 		-->
 
+		<!-- Filter -->
 		<div class="panel panel-success column-frame">
 			<span class="panel-heading column-title">Filters</span>
-			<ul id="column-list" class="connectedSortable dropzone filters"></ul>
+			<ul id="report-filters" class="connectedSortable dropzone filters"></ul>
+		</div>
+
+		<!-- Group By -->
+		<div class="panel panel-success column-frame">
+			<span class="panel-heading column-title">Groups</span>
+			<ul id="report-group" class="connectedSortable dropzone groups"></ul>
 		</div>
 	</div>
 </div>
-
 
 
 

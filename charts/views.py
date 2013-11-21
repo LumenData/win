@@ -142,9 +142,14 @@ def scatter_chart(dataframe, chart_builder_input):
 	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
+	group_names = chart_builder_input["group_names"]
 
-	query = "SELECT %s x, %s y FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
-	query_results, query_headings = dataframe.query_results(query);
+	if(group_names == []):
+		query = "SELECT %s x, %s y FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
+	else:
+		pass
+
+	query_results, query_headings = dataframe.query_results(query)
 
 	query_results_as_list = list(query_results)
 	chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
@@ -155,12 +160,12 @@ def scatter_chart(dataframe, chart_builder_input):
 		"yaxis_label": row_names[0]
 	}
 
-	print("Scatter Chart Query: ")
-	print(query)
-	print("\n\nScatter Chart Options: ")
-	print(chart_options)
-	print("\n\nScatter Chart Data: ")
-	print(chart_data)
+# 	print("Scatter Chart Query: ")
+# 	print(query)
+# 	print("\n\nScatter Chart Options: ")
+# 	print(chart_options)
+# 	print("\n\nScatter Chart Data: ")
+# 	print(chart_data)
 	
 	return chart_data, chart_options
 
@@ -170,7 +175,7 @@ def bar_chart(dataframe, chart_builder_input):
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
 	
-	query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC" % (column_names[0], row_names[0], dataframe.db_table_name )
+	query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
 	query_results, query_headings = dataframe.query_results(query);
 
 	query_results_as_list = list(query_results)
