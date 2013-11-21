@@ -26,14 +26,14 @@ $(document).ready(function(){
 			"row_names": row_names, 
 			"column_names": col_names
 		};
-		
+
 		console.debug(chart_builder_input);
-		
+
 		$("#chart_loading_bar").show();
 		updateChart(chart_builder_input);
 		$("#chart_loading_bar").hide();
 	});
-	
+
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal({
 //  			remote: "/data/frame?table_only=true"

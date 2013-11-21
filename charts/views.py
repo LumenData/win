@@ -6,24 +6,10 @@ from decimal import Decimal
 import datetime
 
 import sys
-from pprint import pprint
 from django.utils import timezone
 
 
-# Move this later 		
-class CustomJSONEncoder(json.JSONEncoder):
-	def default(self, obj):
-		if hasattr(obj, 'isoformat'): #handles both date and datetime objects
-			print("\n\n\nGOT A DATE:")
-			return obj.isoformat()
- 		elif hasattr(obj, 'total_seconds'):
- 			return str(obj)
-		if isinstance(obj, Decimal):
-			return float(obj)
-		else:
-			return json.JSONEncoder.default(self, obj)
-
-####################### Chart Builder #######################
+####################### View - Chart Builder #######################
 
 class ChartBuilderView(TemplateView):
 	template_name = "chart_builder.html"
@@ -34,18 +20,69 @@ class ChartBuilderView(TemplateView):
 		try:
 			dataframe = DataFrame.objects.get(pk = request.GET.get('dataframe_id'))
 		except Exception,e:
-# 			context['debug'] = str(e)
 			context['no_dataframe'] = True
-			context['object_list'] = DataFrame.objects.all()
-			
+			context['object_list'] = DataFrame.objects.all()			
 			return self.render_to_response(context)
 
-			
 		context['dataframe'] = dataframe
+		return self.render_to_response(context)
+		
+####################### View - AutoChart #######################
+
+class AutoChartView(TemplateView):
+	template_name = "autochart.html"
+
+	def get(self, request, *args, **kwargs):
+		context = super(AutoChartView, self).get_context_data(**kwargs)
+
+		# Get the state of the chart builder app "chart_builder_input"
+		chart_builder_input = json.loads(request.GET.get("chart_builder_input"))
+		dataframe_id = chart_builder_input["dataframe_id"]
+
+		# Get the dataframe
+		try:
+			dataframe = DataFrame.objects.get(pk = dataframe_id)
+		except Exception,e:
+			context['debug'] = str(e)
+			return self.render_to_response(context)
+
+		chart_type = chart_selector(dataframe, chart_builder_input)
+		
+		# Create chart data & chart options to pass to javascript
+		if(chart_type == "none"):
+			chart_data = []
+			chart_options = {}
+		elif(chart_type == "pieChart"):
+			chart_data, chart_options = pie_chart(dataframe, chart_builder_input)
+		elif(chart_type == "lineChart"):
+			chart_data, chart_options = line_chart(dataframe, chart_builder_input)
+		elif(chart_type == "scatterChart"):
+			chart_data, chart_options = scatter_chart(dataframe, chart_builder_input)
+		elif(chart_type == "barChart"):
+			chart_data, chart_options = bar_chart(dataframe, chart_builder_input)
+		else:
+			context['error_message'] = "That analysis type hasn't been implemented yet"
+
+# 		print("\n\nChart Data")
+# 		print(chart_data)
+
+		context['chart_type'] = chart_type
+		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
+		context['chart_options'] = json.dumps(chart_options)
+
+# 		print("\n\n chart_data_json: ")
+# 		print(context['chart_data'])
+# 		
+# 		print("\n\n chart_type: ")
+# 		print(context['chart_type'])
+# 		
+# 		print("\n\n chart_options: ")
+# 		print(context['chart_options'])
 
 		return self.render_to_response(context)
 
-####################### Choose the right chart type #######################
+
+####################### Chart Selector #######################
 
 def chart_selector(dataframe, chart_builder_input):
 	ncols = len(chart_builder_input["column_names"])
@@ -53,15 +90,39 @@ def chart_selector(dataframe, chart_builder_input):
 	
 	datacols = dataframe.columns;
 
-	if(ncols == 1):
-		x_role = datacols[chart_builder_input["column_names"][0]]["Type"];
+	## Get xaxis and yaxis data types (note: assumes only one x and one y)
+
+	col_datatype = datacols[chart_builder_input["column_names"][0]]["Type"]	if(ncols > 0) else ""
+	row_datatype = datacols[chart_builder_input["row_names"][0]]["Type"] 	if(nrows > 0) else ""
+
+	def chart_datatype(base_type):
+		if base_type in ("int", "double"):
+			new_type = "numeric"
+		elif base_type in ("date", "time", "datetime"):
+			new_type = "time"
+		elif base_type in ("varchar"):
+			new_type = "character"
+		else:
+			return(base_type)
+		return(new_type)
+		
+	col_datatype = chart_datatype(col_datatype)
+	row_datatype = chart_datatype(row_datatype)
 	
+# 	print(row_datatype + " " + col_datatype);
+
 	if (ncols + nrows) == 1:
 		return "pieChart"  
-	elif (ncols == 1) and (nrows == 1):
-		return "lineChart"  
+	elif (ncols ==1) and (nrows == 1) and (col_datatype == "time") and (row_datatype == "numeric"):
+		return "lineChart"
+	elif (ncols ==1) and (nrows == 1) and (col_datatype == "character") and (row_datatype == "numeric"):
+		return "barChart"
+	elif (ncols == 1) and (nrows == 1) and (col_datatype == "numeric") and (row_datatype == "numeric"):
+		return "scatterChart"  
 	else:
 		return "none"
+
+	### Need to make this build all chart options not just type
 
 ####################### Generate Query & Chart Options #######################
 
@@ -89,7 +150,6 @@ def line_chart(dataframe, chart_builder_input):
 	row_names = chart_builder_input["row_names"]
 	
 	query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
-# 	query = "SELECT %s x, %s y FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
 	query_results, query_headings = dataframe.query_results(query);
 
 	query_results_as_list = list(query_results)
@@ -100,56 +160,75 @@ def line_chart(dataframe, chart_builder_input):
 	chart_options = {
 		"xaxis_label": column_names[0],
 		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other',
-		"yaxis_label": row_names[0]
+		"yaxis_label": "avg(" + row_names[0] + ")"
 	}
 
 	return chart_data, chart_options
 
-####################### Build Chart #######################
 
-class AutoChartView(TemplateView):
-	template_name = "autochart.html"
+def scatter_chart(dataframe, chart_builder_input):
+	
+	column_names = chart_builder_input["column_names"]
+	row_names = chart_builder_input["row_names"]
 
-	def get(self, request, *args, **kwargs):
-		context = super(AutoChartView, self).get_context_data(**kwargs)
+	query = "SELECT %s x, %s y FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
+	query_results, query_headings = dataframe.query_results(query);
 
-		chart_builder_input = json.loads(request.GET.get("chart_builder_input"))
-		dataframe_id = chart_builder_input["dataframe_id"]
+	query_results_as_list = list(query_results)
+	chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
 
-		# Get the dataframe
-		try:
-			dataframe = DataFrame.objects.get(pk = dataframe_id)
-		except Exception,e:
-			context['debug'] = str(e)
-			return self.render_to_response(context)
+	chart_options = {
+		"xaxis_label": column_names[0],
+		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other',
+		"yaxis_label": row_names[0]
+	}
 
-		chart_type = chart_selector(dataframe, chart_builder_input)
-		# Create chart data & chart options function
-		if(chart_type == "none"):
-			chart_data = []
-			chart_options = {}
-		elif(chart_type == "pieChart"):
-			chart_data, chart_options = pie_chart(dataframe, chart_builder_input)
-		elif(chart_type == "lineChart"):
-			chart_data, chart_options = line_chart(dataframe, chart_builder_input)
+	print("Scatter Chart Query: ")
+	print(query)
+	print("\n\nScatter Chart Options: ")
+	print(chart_options)
+	print("\n\nScatter Chart Data: ")
+	print(chart_data)
+	
+	return chart_data, chart_options
+
+
+def bar_chart(dataframe, chart_builder_input):
+	
+	column_names = chart_builder_input["column_names"]
+	row_names = chart_builder_input["row_names"]
+	
+	query = "SELECT %s label, avg(%s) value FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
+	query_results, query_headings = dataframe.query_results(query);
+
+	query_results_as_list = list(query_results)
+	chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
+	
+	chart_options = {
+		"xaxis_label": column_names[0],
+		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["label"], "isoformat") else 'other',
+		"yaxis_label": "avg(" + row_names[0] + ")"
+	}
+
+	print("Bar Chart Query: ")
+	print(query)
+	print("\n\nBar Chart Options: ")
+	print(chart_options)
+	print("\n\nBar Chart Data: ")
+	print(chart_data)
+	
+	return chart_data, chart_options
+
+
+####################### Custom JSON Encoder #######################
+
+class CustomJSONEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if hasattr(obj, 'isoformat'): #handles both date and datetime objects
+			return obj.isoformat()
+		elif isinstance(obj, datetime.timedelta):
+			return str(obj)
+		elif isinstance(obj, Decimal):
+			return float(obj)
 		else:
-			context['error_message'] = "That analysis type hasn't been implemented yet"
-
-		print("\n\nChart Data")
-		print(chart_data)
-
-		context['chart_type'] = chart_type
-		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
-		context['chart_options'] = json.dumps(chart_options)
-
-		print("\n\n chart_data_json: ")
-		print(context['chart_data'])
-		
-		print("\n\n chart_type: ")
-		print(context['chart_type'])
-		
-		print("\n\n chart_options: ")
-		print(context['chart_options'])
-
-		return self.render_to_response(context)
-
+			return json.JSONEncoder.default(self, obj)

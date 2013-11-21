@@ -2,10 +2,27 @@
 
 /* Panels */
 
-#main_panel{ position: relative;}
-#left_panel{ position: absolute; left: 10px; top: 0px; width: 150px; }
-#right_panel{ position: absolute; right: 10px; top: 0px; width: 150px; }
-#middle_panel{ margin: 0 170px; }
+#main_panel{ 
+	position: relative;
+}
+
+#left_panel{ 
+	position: absolute; 
+	left: 10px; 
+	top: 0px; 
+	width: 150px; 
+}
+
+#right_panel{ 
+	position: absolute; 
+	right: 10px; 
+	top: 0px; 
+	width: 150px; 
+}
+
+#middle_panel{ 
+	margin: 0 170px; 
+}
 
 /* Left Side  */
 

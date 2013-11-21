@@ -9,11 +9,12 @@ from .forms import DataFileForm
 import os
 from win import settings
 
+## For serializing to JSON 
 import json
 from decimal import Decimal
 import datetime
 
-## For serializing to JSON 
+
 # from charts.views import CustomJSONEncoder
 ## Testing copying this function rather than including it for aws reasons
 
