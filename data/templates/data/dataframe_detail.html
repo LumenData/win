@@ -10,7 +10,7 @@
     <script type="text/javascript" src="//www.google.com/jsapi"></script>
     <script type="text/javascript">
 		google.load('visualization', '1', {packages: ['table']});
-		
+
 		function drawVisualization() {
 			// Create and populate the data table.
 			var data = google.visualization.arrayToDataTable({{ data_list|safe }});
@@ -20,7 +20,7 @@
 		}
 
 		google.setOnLoadCallback(drawVisualization);
-    </script>
+	</script>
 
 {% endblock %}
 

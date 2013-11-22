@@ -115,7 +115,12 @@ class DataFrame(models.Model):
 	def get_data(self, nrows = 10):
 		db = self.get_db()
 		cursor = db.cursor()
-		cursor.execute("SELECT * FROM %s LIMIT %s" % (self.db_table_name, nrows))
+		try:
+			cursor.execute("SELECT * FROM %s LIMIT %s" % (self.db_table_name, nrows))
+		except Exception,e:
+			# Return error as both query_result and column_name so that page still loads
+			return str(e), str(e)
+		
 		query_results = cursor.fetchall()
 		column_names = tuple([i[0] for i in cursor.description])
 		cursor.close

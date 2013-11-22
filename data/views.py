@@ -91,7 +91,7 @@ class DataFrameDetailView(TemplateView):
 			dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])
 		except Exception,e:
 			context['debug'] = str(e)
-		
+
 		context['object'] = dataframe
 		
 		(rows, column_names) = dataframe.get_data(nrows = 20)
