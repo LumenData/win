@@ -120,44 +120,21 @@ def line_chart(dataframe, chart_builder_input):
 	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
+	group_names = chart_builder_input["group_names"]
 	
-	query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY %s" % (column_names[0], row_names[0], dataframe.db_table_name, column_names[0] )
+	if(group_names == []):
+		query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY 1" % (column_names[0], row_names[0], dataframe.db_table_name)
+	else:
+		query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 1" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name)
+
 	query_results, query_headings = dataframe.query_results(query);
 
-	query_results_as_list = list(query_results)
-	chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
-
-	print("\n\nLine Chart Query is: " + query)
-
-	chart_options = {
-		"xaxis_label": column_names[0],
-		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other',
-		"yaxis_label": "avg(" + row_names[0] + ")"
-	}
-
-	return chart_data, chart_options
-
-
-def scatter_chart(dataframe, chart_builder_input):
-	
-	column_names = chart_builder_input["column_names"]
-	row_names = chart_builder_input["row_names"]
-	group_names = chart_builder_input["group_names"]
-
-	if(group_names == []):
-		query = "SELECT %s x, %s y FROM %s" % (column_names[0], row_names[0], dataframe.db_table_name)
-	else:
-		# Also include group as a column (note: converts to string to handle datetime serialization issues, remove this later)		
-		query = "SELECT %s x, %s y, CAST(%s AS CHAR(255)) g FROM %s ORDER BY 3" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name)
-
-	query_results, query_headings = dataframe.query_results(query)
-# 	print(query_results)
 
 	if(group_names == []):
 		query_results_as_list = list(query_results)
-		chart_data = [{"key": row_names[0], "values":  query_results_as_list}]	
+		chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
 	else:
-		# Build a dictionary where each group value is a key for an array of x/y values		
+		# Build a dictionary where each unique group value is a key for an array of x/y values
 		query_results_group_dict = {}
 		for dict in query_results:
 			if(dict['g'] in query_results_group_dict.keys()):
@@ -170,20 +147,68 @@ def scatter_chart(dataframe, chart_builder_input):
 		for key in query_results_group_dict.keys():
 			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
 			chart_data.append(one_group_data)
-		print(chart_data)
-		
+
 	chart_options = {
 		"xaxis_label": column_names[0],
 		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other',
+		"yaxis_label": "avg(" + row_names[0] + ")"
+	}
+
+	print("\n\nLine Chart Query: ")
+	print(query)
+	print("\n\nLine Chart Options: ")
+	print(chart_options)
+	print("\n\nLine Chart Data: ")
+	print(chart_data)
+
+	return chart_data, chart_options
+
+
+def scatter_chart(dataframe, chart_builder_input):
+	
+	column_names = chart_builder_input["column_names"]
+	row_names = chart_builder_input["row_names"]
+	group_names = chart_builder_input["group_names"]
+	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else 1
+
+	if(group_names == []):
+		query = "SELECT %s x, %s y, %s size FROM %s" % (column_names[0], row_names[0], size_names, dataframe.db_table_name)
+	else:
+		# Also include group as a column (note: converts to string to handle datetime serialization issues, remove this later)		
+		query = "SELECT %s x, %s y, %s size, %s g FROM %s ORDER BY 4" % (column_names[0], row_names[0], size_names, group_names[0], dataframe.db_table_name)
+
+	query_results, query_headings = dataframe.query_results(query)
+
+	if(group_names == []):
+		query_results_as_list = list(query_results)
+		chart_data = [{"key": row_names[0], "values":  query_results_as_list}]	
+	else:
+		# Build a dictionary where each group value is a key for an array of x/y values		
+		query_results_group_dict = {}
+		for dict in query_results:
+			if(dict['g'] in query_results_group_dict.keys()):
+				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y'], 'size': dict['size']})
+			else:
+				query_results_group_dict[dict['g']] = []
+
+		# Instantiate a list then create an array where each element has all x/y data for a group value
+		chart_data = []
+		for key in query_results_group_dict.keys():
+			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
+			chart_data.append(one_group_data)
+		
+	chart_options = {
+		"xaxis_label": column_names[0],
+		"xaxis_type": row_names[0],
 		"yaxis_label": row_names[0]
 	}
 
-# 	print("Scatter Chart Query: ")
-# 	print(query)
-# 	print("\n\nScatter Chart Options: ")
-# 	print(chart_options)
-# 	print("\n\nScatter Chart Data: ")
-# 	print(chart_data)
+	print("Scatter Chart Query: ")
+	print(query)
+	print("\n\nScatter Chart Options: ")
+	print(chart_options)
+	print("\n\nScatter Chart Data: ")
+	print(chart_data)
 	
 	return chart_data, chart_options
 
@@ -192,17 +217,40 @@ def bar_chart(dataframe, chart_builder_input):
 	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
+	group_names = chart_builder_input["group_names"]
 	
-	query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
+	if(group_names):
+		query = "SELECT %s x, sum(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
+	else:
+		query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
+
 	query_results, query_headings = dataframe.query_results(query);
 
-	query_results_as_list = list(query_results)
-	chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
+	if(group_names == []):
+		query_results_as_list = list(query_results)
+		chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
+	else:
+		# Build a dictionary where each group value is a key for an array of x/y values		
+		query_results_group_dict = {}
+		for dict in query_results:
+			print "\n\n" + json.dumps(query_results_group_dict) + "\n\n"
+			if(dict['g'] in query_results_group_dict.keys()):
+				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
+			else:
+				query_results_group_dict[dict['g']] = []
+
+		# Instantiate a list then create an array where each element has all x/y data for a group value
+		chart_data = []
+		for key in query_results_group_dict.keys():
+			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
+			chart_data.append(one_group_data)
+
 
 	chart_options = {
 		"xaxis_label": column_names[0],
-		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["label"], "isoformat") else 'other',
-		"yaxis_label": "sum(" + row_names[0] + ")"
+		"xaxis_type": row_names[0],
+		"yaxis_label": "sum(" + row_names[0] + ")",
+		"group_label": group_names[0] if group_names else ""
 	}
 
 	print("Bar Chart Query: ")

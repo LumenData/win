@@ -6,8 +6,6 @@ var xaxis_label = chart_options["xaxis_label"];
 var yaxis_label = chart_options["yaxis_label"];
 var xaxis_type = chart_options["xaxis_type"];
 
-console.debug(chart_data);
-
 var chart;
 nv.addGraph(function() {
 	chart = nv.models.scatterChart()

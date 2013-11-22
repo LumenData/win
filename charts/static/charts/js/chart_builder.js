@@ -21,6 +21,12 @@ $(document).ready(function(){
 		$("#report-group").children().each(function(){
 			group_names.push($(this).attr('id')); 
 		});
+		
+		// Get group name from sortable area
+		var size_names = new Array();
+		$("#report-size").children().each(function(){
+			size_names.push($(this).attr('id')); 
+		});
 
 		// Collect input to chart builder input into dictionary
 		// Should replace this hard coded url later with something from django
@@ -29,7 +35,8 @@ $(document).ready(function(){
 			"dataframe_id": dataframe_id, 
 			"row_names": row_names, 
 			"column_names": col_names,
-			"group_names": group_names
+			"group_names": group_names,
+			"size_names": size_names
 		};
 
 		console.debug(chart_builder_input);
@@ -40,9 +47,7 @@ $(document).ready(function(){
 	});
 
 	if(typeof(dataframe_id) == "undefined"){
-		$('#myModal').modal({
-//  			remote: "/data/frame?table_only=true"
-		})
+		$('#myModal').modal()
 	}
 });
 

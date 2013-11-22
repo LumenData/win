@@ -13,11 +13,18 @@
 	var chart_type = "{{ chart_type }}";
 
 	// Django had to pass dates as strings, converting them back
+	// Loop through each group which is one list in chart_data
+	// Loop through each dictionary with a x & y keys and convert the x formats to date
 	if(chart_options["xaxis_type"] == "date"){
-		for (var i=0; i < chart_data[0]["values"].length; i++){
-			chart_data[0]["values"][i]["x"] = new Date(x_value = chart_data[0]["values"][i]["x"])
+		for(var i = 0; i < chart_data.length; i++){
+			for (var j=0; j < chart_data[i]["values"].length; j++){
+				chart_data[i]["values"][j]["x"] = new Date(x_value = chart_data[i]["values"][j]["x"])
+			}
 		}
 	}
+	
+	console.debug(chart_data);
+// 	console.debug(JSON.stringify(chart_data));
 </script>
 
 {% if chart_type == "pieChart" %}

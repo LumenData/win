@@ -69,7 +69,7 @@
 	<div id="left_panel">
 		<div class="panel panel-info column-frame">
 			<span class="panel-heading column-title">Dimensions</span>
-			<ul id="column-list" class="connectedSortable dropzone">
+			<ul id="column-list" class="connectedSortable dropzone dropzone-tall">
 				{% for column_name, column in dataframe.columns.items %}
 					{% if column.role == "dimension" %}
 						<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" title="{{ column_name }}" data-name="{{ column_name }}">
@@ -93,7 +93,7 @@
 
 		<div class="panel panel-info column-frame">
 			<span class="panel-heading column-title">Measures</span>
-			<ul id="column-list" class="connectedSortable dropzone">
+			<ul id="column-list" class="connectedSortable dropzone dropzone-tall">
 				{% for column_name, column in dataframe.columns.items %}
 					{% if column.role == "measure" %}
 						<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" data-name="{{ column_name }}">
@@ -144,14 +144,21 @@
 		<!-- Filter -->
 		<div class="panel panel-success column-frame">
 			<span class="panel-heading column-title">Filters</span>
-			<ul id="report-filters" class="connectedSortable dropzone filters"></ul>
+			<ul id="report-filters" class="connectedSortable dropzone dropzone-tall"></ul>
 		</div>
 
-		<!-- Group By -->
+		<!-- Groups -->
 		<div class="panel panel-success column-frame">
 			<span class="panel-heading column-title">Groups</span>
-			<ul id="report-group" class="connectedSortable dropzone groups"></ul>
+			<ul id="report-group" class="connectedSortable dropzone dropzone-tall"></ul>
 		</div>
+		
+		<!-- Size -->
+		<div class="panel panel-success column-frame">
+			<span class="panel-heading column-title">Size</span>
+			<ul id="report-size" class="connectedSortable dropzone dropzone-tall"></ul>
+		</div>
+		
 	</div>
 </div>
 
