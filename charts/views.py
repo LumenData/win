@@ -47,21 +47,29 @@ class AutoChartView(TemplateView):
 			return self.render_to_response(context)
 
 		chart_type = chart_selector(dataframe, chart_builder_input)
+		query = query_builder(dataframe, chart_type, chart_builder_input)
 
 		# Create chart data & chart options to pass to javascript
 		if(chart_type == "none"):
 			chart_data = []
 			chart_options = {}
 		elif(chart_type == "pieChart"):
-			chart_data, chart_options = pie_chart(dataframe, chart_builder_input)
+			chart_data, chart_options = pie_chart(dataframe, chart_builder_input, query)
 		elif(chart_type == "lineChart"):
-			chart_data, chart_options = line_chart(dataframe, chart_builder_input)
+			chart_data, chart_options = line_chart(dataframe, chart_builder_input, query)
 		elif(chart_type == "scatterChart"):
-			chart_data, chart_options = scatter_chart(dataframe, chart_builder_input)
+			chart_data, chart_options = scatter_chart(dataframe, chart_builder_input, query)
 		elif(chart_type == "barChart"):
-			chart_data, chart_options = bar_chart(dataframe, chart_builder_input)
+			chart_data, chart_options = bar_chart(dataframe, chart_builder_input, query)
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
+
+		print("\n\nChart Data: ")
+		print(chart_data)
+		print("\n\nChart Query: ")
+		print(query)
+		print("\n\nChart Options: ")
+		print(chart_options)
 
 		context['chart_type'] = chart_type
 		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
@@ -94,39 +102,58 @@ def chart_selector(dataframe, chart_builder_input):
 	else:
 		return "none"
 
-	### Need to make this build all chart options not just type
+
+####################### Query Builder #######################
+
+
+def query_builder(dataframe, chart_type, chart_builder_input):
+	
+	column_names = chart_builder_input["column_names"]
+	row_names = chart_builder_input["row_names"]
+	group_names = chart_builder_input["group_names"]
+	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else 1
+	
+	single_column_name = (row_names[:1] or column_names[:1])[0]
+	
+	if(chart_type == "pieChart"):
+		query = "SELECT %s `key`, count(*) y FROM %s GROUP BY 1" % (single_column_name, dataframe.db_table_name)
+	elif(chart_type == "lineChart"):		
+		if(group_names):
+			query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 1" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name)
+		else:
+			query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY 1" % (column_names[0], row_names[0], dataframe.db_table_name)
+	elif(chart_type == "barChart"):
+		if(group_names):
+			query = "SELECT %s x, sum(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
+		else:
+			query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
+	elif(chart_type == "scatterChart"):
+		if(group_names):
+			query = "SELECT %s x, %s y, %s size, %s g FROM %s ORDER BY 4" % (column_names[0], row_names[0], size_names, group_names[0], dataframe.db_table_name)
+		else:
+			query = "SELECT %s x, %s y, %s size FROM %s" % (column_names[0], row_names[0], size_names, dataframe.db_table_name)
+	else:
+		query = "error"
+		
+	return query
 
 ####################### Generate Query & Chart Options #######################
 
-def pie_chart(dataframe, chart_builder_input):
-	"Pie Chart"
-	column_names = chart_builder_input["column_names"]
-	row_names = chart_builder_input["row_names"]
-	
-	# Get either the column or row name (whichever was specified)
-	column_name = (row_names[:1] or column_names[:1])[0]
 
-	query_results, tmp = dataframe.query_results(
-		"SELECT %s `key`, count(*) y FROM %s GROUP BY 1" 
-		% (column_name, dataframe.db_table_name)
-	);
-	
+def pie_chart(dataframe, chart_builder_input, query):
+	# Get query results, ignore column names (as tmp)
+	query_results, tmp = dataframe.query_results(query);	
 	chart_data = list(query_results)
 	chart_options = {}
 	return chart_data, chart_options
 
 
-def line_chart(dataframe, chart_builder_input):
+def line_chart(dataframe, chart_builder_input, query):
 	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
 	group_names = chart_builder_input["group_names"]
 	
-	if(group_names == []):
-		query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY 1" % (column_names[0], row_names[0], dataframe.db_table_name)
-	else:
-		query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 1" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name)
-
 	query_results, query_headings = dataframe.query_results(query);
 
 
@@ -137,10 +164,10 @@ def line_chart(dataframe, chart_builder_input):
 		# Build a dictionary where each unique group value is a key for an array of x/y values
 		query_results_group_dict = {}
 		for dict in query_results:
-			if(dict['g'] in query_results_group_dict.keys()):
-				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
-			else:
-				query_results_group_dict[dict['g']] = []
+			if(dict['g'] not in query_results_group_dict.keys()):
+				query_results_group_dict[dict['g']] = []	
+			query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
+				
 
 		# Instantiate a list then create an array where each element has all x/y data for a group value
 		chart_data = []
@@ -150,32 +177,19 @@ def line_chart(dataframe, chart_builder_input):
 
 	chart_options = {
 		"xaxis_label": column_names[0],
-		"xaxis_type": 'date' if hasattr(chart_data[0]["values"][0]["x"], "isoformat") else 'other',
+		"xaxis_type": dataframe.columns[column_names[0]]["type"],
 		"yaxis_label": "avg(" + row_names[0] + ")"
 	}
-
-	print("\n\nLine Chart Query: ")
-	print(query)
-	print("\n\nLine Chart Options: ")
-	print(chart_options)
-	print("\n\nLine Chart Data: ")
-	print(chart_data)
 
 	return chart_data, chart_options
 
 
-def scatter_chart(dataframe, chart_builder_input):
+def scatter_chart(dataframe, chart_builder_input, query):
 	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
 	group_names = chart_builder_input["group_names"]
 	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else 1
-
-	if(group_names == []):
-		query = "SELECT %s x, %s y, %s size FROM %s" % (column_names[0], row_names[0], size_names, dataframe.db_table_name)
-	else:
-		# Also include group as a column (note: converts to string to handle datetime serialization issues, remove this later)		
-		query = "SELECT %s x, %s y, %s size, %s g FROM %s ORDER BY 4" % (column_names[0], row_names[0], size_names, group_names[0], dataframe.db_table_name)
 
 	query_results, query_headings = dataframe.query_results(query)
 
@@ -200,30 +214,19 @@ def scatter_chart(dataframe, chart_builder_input):
 	chart_options = {
 		"xaxis_label": column_names[0],
 		"xaxis_type": row_names[0],
-		"yaxis_label": row_names[0]
+		"yaxis_label": row_names[0],
+		"size_label": size_names if size_names else ""
 	}
-
-	print("Scatter Chart Query: ")
-	print(query)
-	print("\n\nScatter Chart Options: ")
-	print(chart_options)
-	print("\n\nScatter Chart Data: ")
-	print(chart_data)
 	
 	return chart_data, chart_options
 
 
-def bar_chart(dataframe, chart_builder_input):
+def bar_chart(dataframe, chart_builder_input, query):
 	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
 	group_names = chart_builder_input["group_names"]
 	
-	if(group_names):
-		query = "SELECT %s x, sum(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
-	else:
-		query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
-
 	query_results, query_headings = dataframe.query_results(query);
 
 	if(group_names == []):
@@ -252,13 +255,6 @@ def bar_chart(dataframe, chart_builder_input):
 		"yaxis_label": "sum(" + row_names[0] + ")",
 		"group_label": group_names[0] if group_names else ""
 	}
-
-	print("Bar Chart Query: ")
-	print(query)
-	print("\n\nBar Chart Options: ")
-	print(chart_options)
-	print("\n\nBar Chart Data: ")
-	print(chart_data)
 	
 	return chart_data, chart_options
 

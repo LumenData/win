@@ -15,6 +15,9 @@ if(group_label.length == 0){
 			.tooltips(false)
 			.showValues(true)
  
+		chart.xAxis.axisLabel(xaxis_label).tickFormat("%s");
+		chart.yAxis.axisLabel(yaxis_label).tickFormat("%s");
+		
 		d3.select('#mainChart')
 			.datum(chart_data)
 			.transition().duration(500)

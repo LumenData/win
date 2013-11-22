@@ -5,6 +5,7 @@
 var xaxis_label = chart_options["xaxis_label"];
 var yaxis_label = chart_options["yaxis_label"];
 var xaxis_type = chart_options["xaxis_type"];
+var size_label = chart_options["size_label"];
 
 var chart;
 nv.addGraph(function() {
@@ -16,10 +17,18 @@ nv.addGraph(function() {
 		.transitionDuration(300)
 		;
 
+	chart.xAxis.axisLabel(xaxis_label);
+	chart.yAxis.axisLabel(yaxis_label);
+		
 	chart.xAxis.tickFormat(d3.format('.02f'));
 	chart.yAxis.tickFormat(d3.format('.02f'));
-	chart.tooltipContent(function(key) {
-		return '<h2>' + key + '</h2>';
+	chart.tooltipContent(function(key, x, y, e, graph) {
+		console.debug(e);
+		var tip = '<h3>' + key + '</h3>';
+		if(size_label != 1){
+			tip += '<br><h3>' + size_label + ": " + e['point']['size'] + '</h3>';
+		}
+		return tip;
 	});
 
 	d3.select('#mainChart')
