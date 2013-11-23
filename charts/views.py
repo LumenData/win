@@ -116,7 +116,7 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	single_column_name = (row_names[:1] or column_names[:1])[0]
 	
 	if(chart_type == "pieChart"):
-		query = "SELECT %s `key`, count(*) y FROM %s GROUP BY 1" % (single_column_name, dataframe.db_table_name)
+		query = "SELECT %s `key`, count(*) y FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 100" % (single_column_name, dataframe.db_table_name)
 	elif(chart_type == "lineChart"):		
 		if(group_names):
 			query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 1" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name)
@@ -124,9 +124,9 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 			query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY 1" % (column_names[0], row_names[0], dataframe.db_table_name)
 	elif(chart_type == "barChart"):
 		if(group_names):
-			query = "SELECT %s x, sum(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
+			query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
 		else:
-			query = "SELECT %s label, sum(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
+			query = "SELECT %s label, avg(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
 	elif(chart_type == "scatterChart"):
 		if(group_names):
 			query = "SELECT %s x, %s y, %s size, %s g FROM %s ORDER BY 4" % (column_names[0], row_names[0], size_names, group_names[0], dataframe.db_table_name)
@@ -200,10 +200,9 @@ def scatter_chart(dataframe, chart_builder_input, query):
 		# Build a dictionary where each group value is a key for an array of x/y values		
 		query_results_group_dict = {}
 		for dict in query_results:
-			if(dict['g'] in query_results_group_dict.keys()):
-				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y'], 'size': dict['size']})
-			else:
+			if(dict['g'] not in query_results_group_dict.keys()):
 				query_results_group_dict[dict['g']] = []
+			query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y'], 'size': dict['size']})
 
 		# Instantiate a list then create an array where each element has all x/y data for a group value
 		chart_data = []
@@ -236,11 +235,9 @@ def bar_chart(dataframe, chart_builder_input, query):
 		# Build a dictionary where each group value is a key for an array of x/y values		
 		query_results_group_dict = {}
 		for dict in query_results:
-			print "\n\n" + json.dumps(query_results_group_dict) + "\n\n"
-			if(dict['g'] in query_results_group_dict.keys()):
-				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
-			else:
+			if(dict['g'] not in query_results_group_dict.keys()):
 				query_results_group_dict[dict['g']] = []
+			query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
 
 		# Instantiate a list then create an array where each element has all x/y data for a group value
 		chart_data = []
@@ -248,11 +245,10 @@ def bar_chart(dataframe, chart_builder_input, query):
 			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
 			chart_data.append(one_group_data)
 
-
 	chart_options = {
 		"xaxis_label": column_names[0],
 		"xaxis_type": row_names[0],
-		"yaxis_label": "sum(" + row_names[0] + ")",
+		"yaxis_label": "avg(" + row_names[0] + ")",
 		"group_label": group_names[0] if group_names else ""
 	}
 	

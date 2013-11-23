@@ -19,14 +19,13 @@ nv.addGraph(function() {
 			.tickFormat(d3.format(',r'));
 	}
 
-// 	chart.yAxis
-// 		.axisLabel(yaxis_label)
-// 		.tickFormat(d3.format('.02f'));
-
-  chart.yAxis
-    .axisLabel('Voltage (v)')
-    .tickFormat(d3.format(',.2f'));
-    
+	// Add margin to make room for y axis label
+	chart.margin({left:75});  
+	
+	chart.yAxis
+		.axisLabel(yaxis_label)
+		.tickFormat(d3.format(',02d'));
+	
 	d3.select('#mainChart')
 		.datum(chart_data)
 		.transition().duration(500)
@@ -36,3 +35,6 @@ nv.addGraph(function() {
 
   return chart;
 });
+
+
+
