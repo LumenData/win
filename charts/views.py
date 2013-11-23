@@ -5,6 +5,7 @@ import json
 from decimal import Decimal
 import datetime
 
+import pprint
 import sys
 from django.utils import timezone
 
@@ -54,27 +55,26 @@ class AutoChartView(TemplateView):
 			chart_data = []
 			chart_options = {}
 		elif(chart_type == "pieChart"):
-			chart_data, chart_options = pie_chart(dataframe, chart_builder_input, query)
-		elif(chart_type == "lineChart"):
-			chart_data, chart_options = line_chart(dataframe, chart_builder_input, query)
-		elif(chart_type == "scatterChart"):
-			chart_data, chart_options = scatter_chart(dataframe, chart_builder_input, query)
-		elif(chart_type == "barChart"):
-			chart_data, chart_options = bar_chart(dataframe, chart_builder_input, query)
+			query_results, tmp = dataframe.query_results(query);	
+			chart_data = list(query_results)
+			chart_options = {}
+		elif(chart_type in ("lineChart", "scatterChart", "barChart")):
+			query_results, query_headings = dataframe.query_results(query)
+			chart_data, chart_options = get_chart_data(dataframe, query_results, chart_builder_input)
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
-
-		print("\n\nChart Data: ")
-		print(chart_data)
-		print("\n\nChart Query: ")
-		print(query)
-		print("\n\nChart Options: ")
-		print(chart_options)
 
 		context['chart_type'] = chart_type
 		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
 		context['chart_options'] = json.dumps(chart_options)
 
+		print("\n\nChart Data: ")
+		pprint.pprint(chart_data)
+		print("\n\nChart Query: ")
+		pprint.pprint(query)
+		print("\n\nChart Options: ")
+		pprint.pprint(chart_options)
+		
 		return self.render_to_response(context)
 
 
@@ -124,7 +124,7 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 			query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY 1" % (column_names[0], row_names[0], dataframe.db_table_name)
 	elif(chart_type == "barChart"):
 		if(group_names):
-			query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
+			query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 1000" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
 		else:
 			query = "SELECT %s label, avg(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
 	elif(chart_type == "scatterChart"):
@@ -139,59 +139,13 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 
 ####################### Generate Query & Chart Options #######################
 
+def get_chart_data(dataframe, query_results, chart_builder_input):
 
-def pie_chart(dataframe, chart_builder_input, query):
-	# Get query results, ignore column names (as tmp)
-	query_results, tmp = dataframe.query_results(query);	
-	chart_data = list(query_results)
-	chart_options = {}
-	return chart_data, chart_options
-
-
-def line_chart(dataframe, chart_builder_input, query):
-	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
 	group_names = chart_builder_input["group_names"]
-	
-	query_results, query_headings = dataframe.query_results(query);
+	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else None
 
-
-	if(group_names == []):
-		query_results_as_list = list(query_results)
-		chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
-	else:
-		# Build a dictionary where each unique group value is a key for an array of x/y values
-		query_results_group_dict = {}
-		for dict in query_results:
-			if(dict['g'] not in query_results_group_dict.keys()):
-				query_results_group_dict[dict['g']] = []	
-			query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
-				
-
-		# Instantiate a list then create an array where each element has all x/y data for a group value
-		chart_data = []
-		for key in query_results_group_dict.keys():
-			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
-			chart_data.append(one_group_data)
-
-	chart_options = {
-		"xaxis_label": column_names[0],
-		"xaxis_type": dataframe.columns[column_names[0]]["type"],
-		"yaxis_label": "avg(" + row_names[0] + ")"
-	}
-
-	return chart_data, chart_options
-
-
-def scatter_chart(dataframe, chart_builder_input, query):
-	
-	column_names = chart_builder_input["column_names"]
-	row_names = chart_builder_input["row_names"]
-	group_names = chart_builder_input["group_names"]
-	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else 1
-
-	query_results, query_headings = dataframe.query_results(query)
 
 	if(group_names == []):
 		query_results_as_list = list(query_results)
@@ -199,59 +153,36 @@ def scatter_chart(dataframe, chart_builder_input, query):
 	else:
 		# Build a dictionary where each group value is a key for an array of x/y values		
 		query_results_group_dict = {}
-		for dict in query_results:
-			if(dict['g'] not in query_results_group_dict.keys()):
-				query_results_group_dict[dict['g']] = []
-			query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y'], 'size': dict['size']})
-
-		# Instantiate a list then create an array where each element has all x/y data for a group value
-		chart_data = []
-		for key in query_results_group_dict.keys():
-			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
-			chart_data.append(one_group_data)
 		
-	chart_options = {
-		"xaxis_label": column_names[0],
-		"xaxis_type": row_names[0],
-		"yaxis_label": row_names[0],
-		"size_label": size_names if size_names else ""
-	}
-	
-	return chart_data, chart_options
-
-
-def bar_chart(dataframe, chart_builder_input, query):
-	
-	column_names = chart_builder_input["column_names"]
-	row_names = chart_builder_input["row_names"]
-	group_names = chart_builder_input["group_names"]
-	
-	query_results, query_headings = dataframe.query_results(query);
-
-	if(group_names == []):
-		query_results_as_list = list(query_results)
-		chart_data = [{"key": row_names[0], "values":  query_results_as_list}]
-	else:
-		# Build a dictionary where each group value is a key for an array of x/y values		
-		query_results_group_dict = {}
+		# MYSQLdb returns each row as a dict of column-name/row-value pairs
+		# Loop through each row of the query results
 		for dict in query_results:
+			# Build a array of dictionaries for each group (of x/y pairs for that group).  
+			# Instantiate new array if none exist
 			if(dict['g'] not in query_results_group_dict.keys()):
 				query_results_group_dict[dict['g']] = []
-			query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
-
-		# Instantiate a list then create an array where each element has all x/y data for a group value
+				
+			# Populate the array element with a new element, a dict of x/y or x/y/size pairs	
+			if(size_names):
+				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y'], 'size': dict['size']})
+			else:
+				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
+			
+		# Instantiate a list then create an array where each element has all x/y/size data for a group value
 		chart_data = []
 		for key in query_results_group_dict.keys():
 			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
 			chart_data.append(one_group_data)
 
+	# 	Should pass function rather than using avg later
 	chart_options = {
 		"xaxis_label": column_names[0],
-		"xaxis_type": row_names[0],
+		"xaxis_type": dataframe.columns[column_names[0]]["type"],
 		"yaxis_label": "avg(" + row_names[0] + ")",
+		"size_label": size_names if size_names else "",
 		"group_label": group_names[0] if group_names else ""
 	}
-	
+
 	return chart_data, chart_options
 
 
