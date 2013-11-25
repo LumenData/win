@@ -19,13 +19,11 @@ nv.addGraph(function() {
 
 	chart.xAxis.axisLabel(xaxis_label);
 	chart.yAxis.axisLabel(yaxis_label);
-		
-	chart.xAxis.tickFormat(d3.format('.02f'));
-	chart.yAxis.tickFormat(d3.format('.02f'));
+
 	chart.tooltipContent(function(key, x, y, e, graph) {
 		console.debug(e);
 		var tip = '<h3>' + key + '</h3>';
-		if(size_label != 1){
+		if(size_label){
 			tip += '<br><h3>' + size_label + ": " + e['point']['size'] + '</h3>';
 		}
 		return tip;

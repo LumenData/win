@@ -6,7 +6,19 @@ var yaxis_label = chart_options["yaxis_label"];
 var xaxis_type = chart_options["xaxis_type"];
 var group_label = chart_options["group_label"];
 
+console.debug(chart_data);
+
 if(group_label.length == 0){
+	// change 'x' and 'y' labels to 'label' and 'value' in JSON
+	var chart_data = JSON.parse(JSON.stringify(chart_data), function(k, v) {
+		if (k == "x") 
+			this.label = v;
+		else if (k == "y") 
+			this.value = v;
+		else
+			return v;
+	});
+
 	nv.addGraph(function() {
 		var chart = nv.models.discreteBarChart()
 			.x(function(d) { return d.label })

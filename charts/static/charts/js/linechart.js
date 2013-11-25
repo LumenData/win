@@ -5,6 +5,8 @@ var xaxis_label = chart_options["xaxis_label"];
 var yaxis_label = chart_options["yaxis_label"];
 var xaxis_type = chart_options["xaxis_type"];
 
+console.debug(chart_data)
+
 nv.addGraph(function() {
 	var chart = nv.models.lineChart();
 
@@ -24,6 +26,7 @@ nv.addGraph(function() {
 	
 	chart.yAxis
 		.axisLabel(yaxis_label)
+		.showMaxMin(false)
 		.tickFormat(d3.format(',02d'));
 	
 	d3.select('#mainChart')

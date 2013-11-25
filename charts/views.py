@@ -38,16 +38,19 @@ class AutoChartView(TemplateView):
 
 		# Get the state of the chart builder app "chart_builder_input"
 		chart_builder_input = json.loads(request.GET.get("chart_builder_input"))
-		dataframe_id = chart_builder_input["dataframe_id"]
-
-		# Get the dataframe
+		
+		# Get the dataframe from the ID passed in the url
 		try:
-			dataframe = DataFrame.objects.get(pk = dataframe_id)
+			dataframe = DataFrame.objects.get(pk = chart_builder_input["dataframe_id"])
 		except Exception,e:
 			context['debug'] = str(e)
 			return self.render_to_response(context)
 
 		chart_type = chart_selector(dataframe, chart_builder_input)
+		
+		if(chart_type is None):
+			return self.render_to_response(context)
+		
 		query = query_builder(dataframe, chart_type, chart_builder_input)
 
 		# Create chart data & chart options to pass to javascript
@@ -63,10 +66,11 @@ class AutoChartView(TemplateView):
 			chart_data, chart_options = get_chart_data(dataframe, query_results, chart_builder_input)
 		else:
 			context['error_message'] = "That analysis type hasn't been implemented yet"
+			return self.render_to_response(context)
 
 		context['chart_type'] = chart_type
 		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
-		context['chart_options'] = json.dumps(chart_options)
+		context['chart_options'] = json.dumps(chart_options) if chart_options else {}
 
 		print("\n\nChart Data: ")
 		pprint.pprint(chart_data)
@@ -76,7 +80,6 @@ class AutoChartView(TemplateView):
 		pprint.pprint(chart_options)
 		
 		return self.render_to_response(context)
-
 
 ####################### Chart Selector #######################
 
@@ -93,48 +96,58 @@ def chart_selector(dataframe, chart_builder_input):
 
 	if (ncols + nrows) == 1:
 		return "pieChart"  
-	elif (ncols ==1) and (nrows == 1) and (col_datatype == "time") and (row_datatype == "numeric"):
+	elif (ncols == 1) and (nrows >= 1) and (col_datatype == "time") and (row_datatype == "numeric"):
 		return "lineChart"
 	elif (ncols ==1) and (nrows == 1) and (col_datatype == "character") and (row_datatype == "numeric"):
 		return "barChart"
 	elif (ncols == 1) and (nrows == 1) and (col_datatype == "numeric") and (row_datatype == "numeric"):
 		return "scatterChart"  
 	else:
-		return "none"
-
+		return None
 
 ####################### Query Builder #######################
-
 
 def query_builder(dataframe, chart_type, chart_builder_input):
 	
 	column_names = chart_builder_input["column_names"]
 	row_names = chart_builder_input["row_names"]
 	group_names = chart_builder_input["group_names"]
-	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else 1
-	
-	single_column_name = (row_names[:1] or column_names[:1])[0]
-	
-	if(chart_type == "pieChart"):
-		query = "SELECT %s `key`, count(*) y FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 100" % (single_column_name, dataframe.db_table_name)
-	elif(chart_type == "lineChart"):		
-		if(group_names):
-			query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 1" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name)
-		else:
-			query = "SELECT %s x, avg(%s) y FROM %s GROUP BY 1 ORDER BY 1" % (column_names[0], row_names[0], dataframe.db_table_name)
-	elif(chart_type == "barChart"):
-		if(group_names):
-			query = "SELECT %s x, avg(%s) y, %s g FROM %s GROUP BY 1, 3 ORDER BY 2 DESC LIMIT 1000" % (column_names[0], row_names[0], group_names[0], dataframe.db_table_name )
-		else:
-			query = "SELECT %s label, avg(%s) value FROM %s GROUP BY 1 ORDER BY 2 DESC LIMIT 20" % (column_names[0], row_names[0], dataframe.db_table_name )
+	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else None
+
+	# Query Aggregate Functions & Groups
+	query_group_by = ""
+
+	if(chart_type in "pieChart"):
+		column_names = column_names if column_names else row_names		
+		return "SELECT %s `key`, count(*) y FROM %s GROUP BY 1 ORDER BY 2 LIMIT 20" % (column_names[0], dataframe.db_table_name)
+		# row_names = row_names if row_names else column_names
+		# row_aggregate_functions = ['count']
+		# query_group_by = "GROUP BY 2"
+	elif(chart_type in ("lineChart", "barChart")):
+		row_aggregate_functions = ['avg'] * len(row_names)
+		query_group_by = "GROUP BY %s " % column_names[0]
+		query_group_by += ", %s " % group_names[0] if group_names else ""
 	elif(chart_type == "scatterChart"):
-		if(group_names):
-			query = "SELECT %s x, %s y, %s size, %s g FROM %s ORDER BY 4" % (column_names[0], row_names[0], size_names, group_names[0], dataframe.db_table_name)
-		else:
-			query = "SELECT %s x, %s y, %s size FROM %s" % (column_names[0], row_names[0], size_names, dataframe.db_table_name)
-	else:
-		query = "error"
-		
+		row_aggregate_functions = [''] * len(row_names)
+
+	print (row_aggregate_functions, column_names, row_names)
+	
+	# Query Select
+	query_select = "SELECT "
+	query_select += "%s g, " % group_names[0] if group_names else ""
+	query_select += "%s size, " % size_names if size_names else ""
+	
+	for row_name in row_names:
+		query_select += "%s(%s) %s, " % (row_aggregate_functions.pop(), row_name, row_name)
+	query_select += "%s x " % column_names[0] if column_names else ""
+
+	# Query From
+	query_from = "FROM %s " % dataframe.db_table_name
+
+	# Query 
+	query = query_select + query_from + query_group_by
+
+	print query
 	return query
 
 ####################### Generate Query & Chart Options #######################
@@ -146,14 +159,10 @@ def get_chart_data(dataframe, query_results, chart_builder_input):
 	group_names = chart_builder_input["group_names"]
 	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else None
 
-
-	if(group_names == []):
-		query_results_as_list = list(query_results)
-		chart_data = [{"key": row_names[0], "values":  query_results_as_list}]	
-	else:
-		# Build a dictionary where each group value is a key for an array of x/y values		
+	if(group_names):
+		# Build a dictionary where each group value is a key for an array of x/y values
 		query_results_group_dict = {}
-		
+
 		# MYSQLdb returns each row as a dict of column-name/row-value pairs
 		# Loop through each row of the query results
 		for dict in query_results:
@@ -161,20 +170,35 @@ def get_chart_data(dataframe, query_results, chart_builder_input):
 			# Instantiate new array if none exist
 			if(dict['g'] not in query_results_group_dict.keys()):
 				query_results_group_dict[dict['g']] = []
-				
-			# Populate the array element with a new element, a dict of x/y or x/y/size pairs	
-			if(size_names):
-				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y'], 'size': dict['size']})
-			else:
-				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
-			
-		# Instantiate a list then create an array where each element has all x/y/size data for a group value
-		chart_data = []
-		for key in query_results_group_dict.keys():
-			one_group_data = {'key': key, 'values': query_results_group_dict[key]}
-			chart_data.append(one_group_data)
 
-	# 	Should pass function rather than using avg later
+			# Populate the array element with a new element, a dict of x/y or x/y/size pairs	
+			y_key = row_names[0]
+			if(size_names):
+				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict[y_key], 'size': dict['size']})
+			else:
+				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict[y_key]})
+
+	else:
+		query_results_group_dict = {}
+
+		for row_name in row_names:			
+			query_results_group_dict[row_name] = []
+
+		for query_row in query_results:		
+			query_row_x = query_row.pop('x')
+			for row_element_key in query_row.keys():
+				if 'size' in query_row.keys():	
+					if(row_element_key != 'size'):
+						query_results_group_dict[row_element_key].append({'x': query_row_x, 'y': query_row[row_element_key], 'size': query_row['size']})
+				else:
+					query_results_group_dict[row_element_key].append({'x': query_row_x, 'y': query_row[row_element_key]})
+
+	chart_data = []
+	for key in query_results_group_dict.keys():
+		one_group_data = {'key': key, 'values': query_results_group_dict[key]}
+		chart_data.append(one_group_data)
+
+	# Should pass function rather than using avg later
 	chart_options = {
 		"xaxis_label": column_names[0],
 		"xaxis_type": dataframe.columns[column_names[0]]["type"],
@@ -184,7 +208,6 @@ def get_chart_data(dataframe, query_results, chart_builder_input):
 	}
 
 	return chart_data, chart_options
-
 
 ####################### Custom JSON Encoder #######################
 

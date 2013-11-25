@@ -1,6 +1,10 @@
 // Format expected is something like:
 // [{'y': '3', 'key': 'Elizabeth'}, {'y': '4', 'key': 'Govind'}, {'y': '5', 'key': 'Heather'}]
 
+var xaxis_label = chart_options["xaxis_label"];
+var yaxis_label = chart_options["yaxis_label"];
+var xaxis_type = chart_options["xaxis_type"];
+
 nv.addGraph(function() {
 
 	var chart = nv.models.pieChart()
