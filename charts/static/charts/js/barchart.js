@@ -38,7 +38,6 @@ if(group_label.length == 0){
 	});
 }
 else{
-	console.debug("HI!");
 
 	// Have to make up for the fact that NVD3 needs 0 y values instead of missing dicts
 	// Create a list of unique x-axis values by looping through each value	
@@ -52,23 +51,25 @@ else{
 		}
 	}
 
+	console.debug("all_x_values: ", all_x_values);
+
 	// Build a list of missing values for each array, then fill them in 	
 	for(i in chart_data){
 		var cross_off_list = JSON.parse(JSON.stringify(all_x_values));
 
 		for(j in chart_data[i].values){
-			cross_off_list.pop(chart_data[i].values[j].x);
+			var x_value = chart_data[i].values[j].x;
+			cross_off_list.splice( cross_off_list.indexOf( x_value ), 1 );
 		}
-
-		//document.write("cross_off_list: " +  cross_off_list + "<br><br>");
-
+		
 		for(k in cross_off_list){
 			filler_dict = {'x': cross_off_list[k], 'y': 0};
+			console.debug("MISSING", filler_dict);
 			chart_data[i].values.push( filler_dict );
 		}
 	}
 	
-	// frack we have to sort it now too for nvd3
+	// We have to sort it now too for nvd3
 	function compare_array_of_dicts(a,b) {
 		if (a.x < b.x)
 			return -1;
@@ -81,16 +82,15 @@ else{
 	for(i in chart_data){
 		chart_data[i].values.sort(compare_array_of_dicts);
 	}
-	// End the part where we fill in missing values and sorting
+	// End the part where we fill in missing values and sort
 	console.debug(chart_data);
-
 
 
 	nv.addGraph(function() {
 		var chart = nv.models.multiBarChart();
 		chart.staggerLabels(true);
 		//chart.stacked(true);
-		
+
 		d3.select('#mainChart').datum(chart_data).transition().duration(500).call(chart);
 		nv.utils.windowResize(chart.update);
  
