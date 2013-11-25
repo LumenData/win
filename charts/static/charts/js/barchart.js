@@ -38,10 +38,58 @@ if(group_label.length == 0){
 	});
 }
 else{
+	console.debug("HI!");
+
+	// Have to make up for the fact that NVD3 needs 0 y values instead of missing dicts
+	// Create a list of unique x-axis values by looping through each value	
+	var all_x_values = [];
+	for(i in chart_data){
+		for(j in chart_data[i].values){
+			x_value = chart_data[i].values[j].x;
+		
+			if(all_x_values.indexOf(x_value) == -1)
+				all_x_values.push(x_value);
+		}
+	}
+
+	// Build a list of missing values for each array, then fill them in 	
+	for(i in chart_data){
+		var cross_off_list = JSON.parse(JSON.stringify(all_x_values));
+
+		for(j in chart_data[i].values){
+			cross_off_list.pop(chart_data[i].values[j].x);
+		}
+
+		//document.write("cross_off_list: " +  cross_off_list + "<br><br>");
+
+		for(k in cross_off_list){
+			filler_dict = {'x': cross_off_list[k], 'y': 0};
+			chart_data[i].values.push( filler_dict );
+		}
+	}
+	
+	// frack we have to sort it now too for nvd3
+	function compare_array_of_dicts(a,b) {
+		if (a.x < b.x)
+			return -1;
+		else if (a.x > b.x)
+			return 1;
+		else
+			return 0;
+	}
+
+	for(i in chart_data){
+		chart_data[i].values.sort(compare_array_of_dicts);
+	}
+	// End the part where we fill in missing values and sorting
+	console.debug(chart_data);
+
+
 
 	nv.addGraph(function() {
 		var chart = nv.models.multiBarChart();
 		chart.staggerLabels(true);
+		//chart.stacked(true);
 		
 		d3.select('#mainChart').datum(chart_data).transition().duration(500).call(chart);
 		nv.utils.windowResize(chart.update);
@@ -50,47 +98,3 @@ else{
 	});
 }
 
-
-
-function data() {
-  return stream_layers(3,10+Math.random()*100,.1).map(function(data, i) {
-    return {
-      key: 'Stream' + i,
-      values: data
-    };
-  });
-}
-
-/* Inspired by Lee Byron's test data generator. */
-function stream_layers(n, m, o) {
-  if (arguments.length < 3) o = 0;
-  function bump(a) {
-    var x = 1 / (.1 + Math.random()),
-        y = 2 * Math.random() - .5,
-        z = 10 / (.1 + Math.random());
-    for (var i = 0; i < m; i++) {
-      var w = (i / m - y) * z;
-      a[i] += x * Math.exp(-w * w);
-    }
-  }
-  return d3.range(n).map(function() {
-      var a = [], i;
-      for (i = 0; i < m; i++) a[i] = o + o * Math.random();
-      for (i = 0; i < 5; i++) bump(a);
-      return a.map(stream_index);
-    });
-}
-
-// Another layer generator using gamma distributions.
-function stream_waves(n, m) {
-  return d3.range(n).map(function(i) {
-    return d3.range(m).map(function(j) {
-        var x = 20 * j / m - i / 3;
-        return 2 * x * Math.exp(-.5 * x);
-      }).map(stream_index);
-    });
-}
-
-function stream_index(d, i) {
-  return {x: i, y: Math.max(0, d)};
-}
