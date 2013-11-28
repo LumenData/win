@@ -120,9 +120,6 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	if(chart_type in "pieChart"):
 		column_names = column_names if column_names else row_names		
 		return "SELECT %s `key`, count(*) y FROM %s GROUP BY 1 ORDER BY 2 LIMIT 20" % (column_names[0], dataframe.db_table_name)
-		# row_names = row_names if row_names else column_names
-		# row_aggregate_functions = ['count']
-		# query_group_by = "GROUP BY 2"
 	elif(chart_type in ("lineChart", "barChart")):
 		row_aggregate_functions = ['avg'] * len(row_names)
 		query_group_by = "GROUP BY %s " % column_names[0]
@@ -131,7 +128,7 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 		row_aggregate_functions = [''] * len(row_names)
 
 	print (row_aggregate_functions, column_names, row_names)
-	
+
 	# Query Select
 	query_select = "SELECT "
 	query_select += "%s g, " % group_names[0] if group_names else ""
@@ -204,7 +201,8 @@ def get_chart_data(dataframe, query_results, chart_builder_input):
 		"xaxis_type": dataframe.columns[column_names[0]]["type"],
 		"yaxis_label": "avg(" + row_names[0] + ")",
 		"size_label": size_names if size_names else "",
-		"group_label": group_names[0] if group_names else ""
+		"group_label": group_names[0] if group_names else "",
+		"show_legend": len(chart_data) < 15
 	}
 
 	return chart_data, chart_options

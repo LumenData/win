@@ -5,8 +5,6 @@ var xaxis_label = chart_options["xaxis_label"];
 var yaxis_label = chart_options["yaxis_label"];
 var xaxis_type = chart_options["xaxis_type"];
 
-console.debug(chart_data)
-
 nv.addGraph(function() {
 	var chart = nv.models.lineChart();
 
@@ -23,6 +21,7 @@ nv.addGraph(function() {
 
 	// Add margin to make room for y axis label
 	chart.margin({left:75});  
+	chart.showLegend(show_legend);
 	
 	chart.yAxis
 		.axisLabel(yaxis_label)

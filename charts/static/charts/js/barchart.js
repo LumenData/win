@@ -90,6 +90,8 @@ else{
 		var chart = nv.models.multiBarChart();
 		chart.staggerLabels(true);
 		//chart.stacked(true);
+ 		chart.showLegend(show_legend);
+
 
 		d3.select('#mainChart').datum(chart_data).transition().duration(500).call(chart);
 		nv.utils.windowResize(chart.update);

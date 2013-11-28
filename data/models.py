@@ -152,8 +152,9 @@ class DataFrame(models.Model):
 		# Should make these lower case at some point
 		newDict = {}
 		for col in columns:
-			# Assign key and title case
-			key = col["Field"].title()
+			# Create new key (with a conversion to Title Case)
+			key = col["Field"]
+			col["display_name"] = key.title().replace('_',' ')
 			
 			# Split varchar(255) as varchar and 255
 			if '(' in col["Type"]:

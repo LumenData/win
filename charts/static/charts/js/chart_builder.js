@@ -2,8 +2,20 @@
 // Document Ready
 $(document).ready(function(){
 	console.log("Document Loaded");
+	
+	$(".connectedSortable").sortable({
+		connectWith: ".connectedSortable",
+		scroll : false,
+// 		helper: 'clone',
+// 		start: function (e, ui) { 
+// 			ui.item.show();
+// 		},
 
+	}).disableSelection();
+
+	//////////////// Set up Sortables ////////////////
 	$(".connectedSortable").on( "sortreceive", function( event, ui ) {
+
 		// Get rownames from row sortable area 		
 		var row_names = new Array();
 		$("#report-rows").children().each(function(){
@@ -39,35 +51,74 @@ $(document).ready(function(){
 			"size_names": size_names
 		};
 
-		console.debug(chart_builder_input);
-
-		$("#chart_loading_bar").show();
 		updateChart(chart_builder_input);
-		$("#chart_loading_bar").hide();
+		
+	});
+	
+	//////////////// Handle Filters ////////////////
+	
+	$( "#report-filters" ).on( "sortreceive", function( event, ui ) {
+		filter_item = $(ui.item[0]).clone();
+		$(ui.sender).append(filter_item);
+		
+		// var title = $(ui.item).attr('title') + " - Filter";
+		// $(ui.item).attr('title',title);
+
+		var popover_content;
+
+		$.ajax({
+		  type: "GET",
+		  url: "/charts/autofilter",
+		  dataType: "html",
+		  async: false,
+		  success : function(data) {
+						popover_content = data;
+					}
+		});	
+
+		$(ui.item[0]).popover({
+			placement: 'left',
+			html : true,
+			container: 'body',
+			content: popover_content
+		});
+		
+		$(ui.item[0]).popover('show');
+
+	});
+	
+	$( "#report-filters" ).on( "sortstart",{distance: 30}, function( event, ui ) {
+		console.debug($(ui.item[0]));
+		$(ui.item[0]).popover("hide");
+		$(ui.item[0]).toggle( "highlight" );
 	});
 
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal()
 	}
+	
 });
-
+	
 function updateChart(chart_builder_input){
 
+// 	$("#report-area").hide();
+// 	$("#chart_loading").toggle('fade');
+	
+	console.debug("chart_builder_input");
+	console.debug(chart_builder_input);
+
+			
 	var request = $.ajax({
 		url: chart_builder_input["chart_builder_url"],
 		type: "GET",
 		data: {"chart_builder_input": JSON.stringify(chart_builder_input)},
 		dataType: "html"
 	}).done(function(response) {
-		$( "#report-area" ).html(response);
+// 		$("#chart_loading").hide();
+		$("#report-area").html(response);
+// 		$("#report-area").show();
+
 	});
 }
-
-$(function() {
-	$(".connectedSortable").sortable({
-		connectWith: ".connectedSortable",
-		scroll : false,
-	}).disableSelection();
-});
 
 

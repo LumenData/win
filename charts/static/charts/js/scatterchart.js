@@ -2,10 +2,6 @@
 // chart_data = [{key: "Test Data", values: [{x: 1, y: 2}, {x: 4, y: 4}, {x: 5, y: 8}]}];
 // chart_data size can be added at the level of 'x' and 'y'.  New colors are set by separate dictionaries with key and value elements of their own in the master list
 
-var xaxis_label = chart_options["xaxis_label"];
-var yaxis_label = chart_options["yaxis_label"];
-var xaxis_type = chart_options["xaxis_type"];
-var size_label = chart_options["size_label"];
 
 var chart;
 nv.addGraph(function() {
@@ -19,6 +15,7 @@ nv.addGraph(function() {
 
 	chart.xAxis.axisLabel(xaxis_label);
 	chart.yAxis.axisLabel(yaxis_label);
+	chart.showLegend(show_legend);
 
 	chart.tooltipContent(function(key, x, y, e, graph) {
 		console.debug(e);

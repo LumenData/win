@@ -69,10 +69,10 @@
 	<div id="left_panel">
 		<div class="panel panel-info column-frame">
 			<span class="panel-heading column-title">Dimensions</span>
-			<ul id="column-list" class="connectedSortable dropzone dropzone-tall">
+			<ul id="column-list-dims" class="connectedSortable dropzone dropzone-tall">
 				{% for column_name, column in dataframe.columns.items %}
 					{% if column.role == "dimension" %}
-						<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" title="{{ column_name }}" data-name="{{ column_name }}">
+						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}">
 							{% if "date" in column.type %}
 								<!-- <span class="glyphicon glyphicon-calendar"> </span> -->
 								<img id="calendar_icon" src="/static/site/images/calendar.png">
@@ -84,7 +84,7 @@
 								{{ column.type }}
 							{% endif %}
 
-							{{ column_name }}
+							{{ column.display_name }}
 						</div>
 					{% endif %}
 				{% endfor %}
@@ -96,13 +96,13 @@
 			<ul id="column-list" class="connectedSortable dropzone dropzone-tall">
 				{% for column_name, column in dataframe.columns.items %}
 					{% if column.role == "measure" %}
-						<div class="btn btn-danger btn-xs mypill" id="{{ column_name }}" data-name="{{ column_name }}">
+						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}">
 							{% if "numeric" in column.type_category %}
 								<span class="hashicon">#</span> 
 							{% else %}
 								{{ column.type }}
 							{% endif %}
-							{{ column_name }}
+							{{ column.display_name }}
 						</div>
 					{% endif %}
 				{% endfor %}
@@ -122,12 +122,12 @@
 			<ul id="report-columns" class="connectedSortable dropzone"></ul>
 		</div>
 
-		<div id="report-area">
-			{# Progress Bar	#}
-			<div id="chart_loading_bar" class="progress progress-striped active">
-				<div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-			</div>
+		{# Progress Bar	#}
+		<div id="chart_loading">
+			<!--	<img id="chart_loading_bar" src="/static/charts/images/ajax-loader.gif"> -->
 		</div>
+		
+		<div id="report-area"></div>
 	</div>
 
 	<!-- Filters -->

@@ -9,8 +9,15 @@
 
 <script>
 	var chart_data = {{ chart_data|safe }};
-	var chart_options = {{ chart_options|safe }};
 	var chart_type = "{{ chart_type }}";
+	var chart_options = {{ chart_options|safe }};
+	
+	var xaxis_label = chart_options["xaxis_label"];
+	var yaxis_label = chart_options["yaxis_label"];
+	var xaxis_type = chart_options["xaxis_type"];
+	var size_label = chart_options["size_label"];
+	var show_legend = chart_options["show_legend"];
+
 
 	// Django had to pass dates as strings, converting them back
 	// Loop through each group which is one list in chart_data
