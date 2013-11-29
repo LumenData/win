@@ -14,7 +14,7 @@
 		<script src="/static/bootstrap/dist/js/bootstrap.js"></script>
 		<script src="/static/jquery/jquery-ui-1.10.3.js"></script>
 		<script src="/static/jquery/jquery.ui.touch-punch.js"></script>
-		
+
 		{# Custom #}
 		<link rel="stylesheet" href="/static/site/css/base.css">
 		<link rel="stylesheet" href="/static/data/css/data.css">
@@ -22,9 +22,9 @@
 		<script>
 			console.debug("{{ debug_content }}");
 			
-			$(document).bind('touchmove', function(e) {
-				e.preventDefault();
-			}, false);
+// 			$(document).bind('touchmove', function(e) {
+// 				e.preventDefault();
+// 			}, false);
 		</script>
 		{% block head_content %}{% endblock %}	
 		
