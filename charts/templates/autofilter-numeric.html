@@ -1,0 +1,45 @@
+<script>
+	// May need a $(document).ready() wrapper	
+	$("#apply_filters").on("click",function(event){
+		var filter_form = $(this).closest(".popover_wrapper");
+		var column_name = filter_form.data("parent_id");
+		var filter_item = $("#report-filters").find("#" + column_name)
+
+		console.debug(filter_item); 
+
+		var exact_value = filter_form.find("#filter-exact-value").val();
+ 		if(filter_item.data("type") == "varchar")
+ 			exact_value = "'" + exact_value + "'";
+ 
+ 		var query_clause = "";
+
+		if(exact_value.length)
+			query_clause = column_name + " = " + exact_value;
+
+		// Set a data element on the filter element with a clause to add to the query
+ 		filter_item.attr("data-filter_clause", query_clause);
+		
+		filter_item.popover('destroy');
+		update_chart();
+	});
+	
+	$("#cancel_filters").on("click",function(event){
+		$("#report-filters").find("div").popover('destroy');
+	});
+</script>
+
+Exact Value: 
+<input id="filter-exact-value" type="text" class="form-control input-sm" placeholder="Enter Value">
+<br>
+
+Minimum: 
+<input id="filter-min-value"  type="text" class="form-control input-sm" placeholder="Enter Value">
+<br>
+
+Maximum: 
+<input id="filter-max-value" type="text" class="form-control input-sm" placeholder="Enter Value">
+<br>
+
+<br>
+<button id="apply_filters" class="btn btn-sm btn-primary">Apply</button>
+<button id="cancel_filters" class="btn btn-sm btn-default">Close</button>

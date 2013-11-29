@@ -135,6 +135,15 @@
 
 /************  Right Area  ************/
 
+/* Fix this later so that it doesn't rely on !important */
+.popover{
+	top: 10px !important;
+}
+
+.arrow{
+	top: 100px !important;
+}
+
 /************ Opening Modal ************/
 
 .modal-dialog{

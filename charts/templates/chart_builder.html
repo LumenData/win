@@ -63,7 +63,7 @@
 </div><!-- /.modal -->
 
 
-
+<!-- Main Body -->
 
 <div id="main_panel">
 	<div id="left_panel">
@@ -72,7 +72,7 @@
 			<ul id="column-list-dims" class="connectedSortable dropzone dropzone-tall">
 				{% for column_name, column in dataframe.columns.items %}
 					{% if column.role == "dimension" %}
-						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}">
+						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}" data-type="{{ column.type }}">
 							{% if "date" in column.type %}
 								<!-- <span class="glyphicon glyphicon-calendar"> </span> -->
 								<img id="calendar_icon" src="/static/site/images/calendar.png">
@@ -96,7 +96,7 @@
 			<ul id="column-list" class="connectedSortable dropzone dropzone-tall">
 				{% for column_name, column in dataframe.columns.items %}
 					{% if column.role == "measure" %}
-						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}">
+						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}" data-type="{{ column.type }}">
 							{% if "numeric" in column.type_category %}
 								<span class="hashicon">#</span> 
 							{% else %}
@@ -112,6 +112,7 @@
 
 
 	<div id="middle_panel">
+		
 		<div class="panel panel-success rows">
 			<span class="panel-heading rows">Rows</span> 
 			<ul id="report-rows" class="connectedSortable dropzone"></ul>
@@ -130,7 +131,6 @@
 		<div id="report-area"></div>
 	</div>
 
-	<!-- Filters -->
 
 	<div id="right_panel">
 	
@@ -141,12 +141,14 @@
 		</div>
  		-->
 
+<!-- Where filter should go -->
+
 		<!-- Filter -->
 		<div class="panel panel-success column-frame">
 			<span class="panel-heading column-title">Filters</span>
 			<ul id="report-filters" class="connectedSortable dropzone dropzone-tall"></ul>
 		</div>
-
+		
 		<!-- Groups -->
 		<div class="panel panel-success column-frame">
 			<span class="panel-heading column-title">Groups</span>

@@ -46,11 +46,13 @@ class AutoChartView(TemplateView):
 			context['debug'] = str(e)
 			return self.render_to_response(context)
 
+		# Choose a Chart Type
 		chart_type = chart_selector(dataframe, chart_builder_input)
 		
 		if(chart_type is None):
 			return self.render_to_response(context)
 		
+		# Generate a Query
 		query = query_builder(dataframe, chart_type, chart_builder_input)
 
 		# Create chart data & chart options to pass to javascript
@@ -80,6 +82,11 @@ class AutoChartView(TemplateView):
 		pprint.pprint(chart_options)
 		
 		return self.render_to_response(context)
+
+####################### View - AutoFilter #######################
+
+class AutoFilterView(TemplateView):
+	template_name = 'autofilter-text.html'
 
 ####################### Chart Selector #######################
 
@@ -113,22 +120,27 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	row_names = chart_builder_input["row_names"]
 	group_names = chart_builder_input["group_names"]
 	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else None
+	filter_clauses = chart_builder_input["filter_clauses"]
+
+	# Query Where
+	if(filter_clauses):
+		query_where = "WHERE " + ', '.join(filter_clauses) + " "
+	else:
+		query_where = ""
 
 	# Query Aggregate Functions & Groups
 	query_group_by = ""
 
 	if(chart_type in "pieChart"):
 		column_names = column_names if column_names else row_names		
-		return "SELECT %s `key`, count(*) y FROM %s GROUP BY 1 ORDER BY 2 LIMIT 20" % (column_names[0], dataframe.db_table_name)
+		return "SELECT %s `key`, count(*) y FROM %s %s GROUP BY 1 ORDER BY 2 LIMIT 20" % (column_names[0], dataframe.db_table_name, query_where)
 	elif(chart_type in ("lineChart", "barChart")):
 		row_aggregate_functions = ['avg'] * len(row_names)
 		query_group_by = "GROUP BY %s " % column_names[0]
 		query_group_by += ", %s " % group_names[0] if group_names else ""
 	elif(chart_type == "scatterChart"):
 		row_aggregate_functions = [''] * len(row_names)
-
-	print (row_aggregate_functions, column_names, row_names)
-
+	
 	# Query Select
 	query_select = "SELECT "
 	query_select += "%s g, " % group_names[0] if group_names else ""
@@ -142,7 +154,7 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	query_from = "FROM %s " % dataframe.db_table_name
 
 	# Query 
-	query = query_select + query_from + query_group_by
+	query = query_select + query_from + query_where + query_group_by
 
 	print query
 	return query
