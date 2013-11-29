@@ -22,6 +22,10 @@
 		
 		<script>
 			console.debug("{{ debug_content }}");
+			
+			$(document).bind('touchmove', function(e) {
+				e.preventDefault();
+			}, false);
 		</script>
 		{% block head_content %}{% endblock %}	
 		
