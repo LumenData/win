@@ -19,10 +19,15 @@ nv.addGraph(function() {
 			.tickFormat(d3.format(',r'));
 	}
 
+	// Add margin to make room for y axis label
+	chart.margin({left:75});  
+	chart.showLegend(show_legend);
+	
 	chart.yAxis
 		.axisLabel(yaxis_label)
-		.tickFormat(d3.format('.02f'));
-
+		.showMaxMin(false)
+		.tickFormat(d3.format(',02d'));
+	
 	d3.select('#mainChart')
 		.datum(chart_data)
 		.transition().duration(500)
@@ -32,3 +37,6 @@ nv.addGraph(function() {
 
   return chart;
 });
+
+
+
