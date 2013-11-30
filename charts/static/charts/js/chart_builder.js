@@ -37,7 +37,7 @@ $(document).ready(function(){
 		  	url: "/charts/autofilter",
 		  	dataType: "html",
 		  	async: false,
-		  	data: {"datatype": filter_item.data('type') },
+			data: {"dataframe_id": dataframe_id, "column_name": filter_item.attr('id')},
 			success : function(data) {
 				var popover_content = "<div class='popover_wrapper' data-parent_id='" + $(ui.item).attr("id") + "'>" + data + "</div>";
 
@@ -60,15 +60,6 @@ $(document).ready(function(){
 			$(ui.item).remove();
 			update_chart();
 		});
-		
-		
-		$('something').animate({ width: 70 }, function() {
-			//jQuery will call this method after the animation finishes.
-			//You can continue your code here.
-			//You can even access variables from the outer function
-			thingy = thingy.fiddle;
-		});
-    
 	});
 
 	if(typeof(dataframe_id) == "undefined"){

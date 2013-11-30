@@ -8,13 +8,22 @@
 		console.debug(filter_item); 
 
 		var exact_value = filter_form.find("#filter-exact-value").val();
- 		if(filter_item.data("type") == "varchar")
- 			exact_value = "'" + exact_value + "'";
+		var min_value = filter_form.find("#filter-min-value").val();
+		var max_value = filter_form.find("#filter-max-value").val();
  
  		var query_clause = "";
 
 		if(exact_value.length)
 			query_clause = column_name + " = " + exact_value;
+		else if(min_value.length && max_value.length)
+			query_clause = column_name + " BETWEEN " + min_value + " AND " + max_value;
+		else if(min_value.length)
+			query_clause = column_name + " > " + min_value;
+		else if(max_value.length)
+			query_clause = column_name + " < " + max_value;		
+		
+
+		console.debug(query_clause);
 
 		// Set a data element on the filter element with a clause to add to the query
  		filter_item.attr("data-filter_clause", query_clause);
@@ -26,20 +35,57 @@
 	$("#cancel_filters").on("click",function(event){
 		$("#report-filters").find("div").popover('destroy');
 	});
+	
+	// Add well class when someone clicks into an area
+	$("#filter-exact-value").on("focus", function(event){
+		$('#filter-value-input').addClass("well well-sm");
+		$('#filter-range-input').removeClass("well well-sm");
+		
+		$("#filter-min-value").val('');
+		$("#filter-max-value").val('');
+	});
+	
+	$("#filter-min-value").on("focus", function(event){
+		$('#filter-range-input').addClass("well well-sm");
+		$('#filter-value-input').removeClass("well well-sm");
+		
+		$("#filter-exact-value").val('');
+	});
+	
 </script>
 
-Exact Value: 
-<input id="filter-exact-value" type="text" class="form-control input-sm" placeholder="Enter Value">
-<br>
+<style>
 
-Minimum: 
-<input id="filter-min-value"  type="text" class="form-control input-sm" placeholder="Enter Value">
-<br>
+input{
+	display: inline;
+	margin: 5px 0 5px 0;
+}
 
-Maximum: 
-<input id="filter-max-value" type="text" class="form-control input-sm" placeholder="Enter Value">
-<br>
+/* 
+.popover-content{
+	padding: 0;
+}
 
-<br>
+.well{
+	margin: 5px;
+}
+ */
+
+</style>
+
+<div id="filter-value-input">
+	Exact Value: 
+	<input id="filter-exact-value" type="text" class="form-control input-sm" placeholder="Enter Value">
+</div>
+<hr>
+
+<div id="filter-range-input">
+	Range: 
+	<input id="filter-min-value"  type="text" class="form-control input-sm" placeholder="Minimum">
+	<input id="filter-max-value" type="text" class="form-control input-sm" placeholder="Maximum">
+</div>
+
+<hr>
+
 <button id="apply_filters" class="btn btn-sm btn-primary">Apply</button>
 <button id="cancel_filters" class="btn btn-sm btn-default">Close</button>

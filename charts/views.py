@@ -1,6 +1,8 @@
 from django.views.generic import TemplateView
 from data.models import DataFrame
 from django.http import HttpResponse
+from django.shortcuts import render
+
 import json
 from decimal import Decimal
 import datetime
@@ -86,8 +88,32 @@ class AutoChartView(TemplateView):
 ####################### View - AutoFilter #######################
 
 class AutoFilterView(TemplateView):
+	# Placeholder template name, should be overwritten with appropriate name later
 	template_name = 'autofilter-text.html'
+	
+	def get(self, request, *args, **kwargs):
+		context = super(AutoFilterView, self).get_context_data(**kwargs)
 
+		# Get input values from URL params
+		dataframe_id = request.GET.get("dataframe_id")
+		column_name = request.GET.get("column_name")
+	
+		# Get the dataframe from the ID passed in the url
+		try:
+			dataframe = DataFrame.objects.get(pk = dataframe_id)
+		except Exception,e:
+			context['debug'] = str(e)
+			return self.render_to_response(context)
+
+		column = dataframe.columns[column_name]
+	
+		if(column['type_category'] == 'character'):
+			template_name = 'autofilter-text.html'
+		if(column['type_category'] == 'numeric'):
+			template_name = 'autofilter-numeric.html'
+
+		return render(request, template_name, context)
+	
 ####################### Chart Selector #######################
 
 def chart_selector(dataframe, chart_builder_input):
@@ -124,7 +150,7 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 
 	# Query Where
 	if(filter_clauses):
-		query_where = "WHERE " + ', '.join(filter_clauses) + " "
+		query_where = "WHERE " + 'AND '.join(filter_clauses) + " "
 	else:
 		query_where = ""
 
