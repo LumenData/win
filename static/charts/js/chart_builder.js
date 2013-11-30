@@ -56,7 +56,7 @@ $(document).ready(function(){
 	$("#report-filters").on("sortstart", {distance: 10}, function( event, ui ) {
 		// When something is dragged from filters, delete it
 		$(ui.item).popover("hide");
-		$(ui.item).toggle( "highlight", complete = function(){
+		$(ui.item).toggle( "highlight", 300, complete = function(){
 			$(ui.item).remove();
 			update_chart();
 		});
