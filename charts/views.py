@@ -111,6 +111,8 @@ class AutoFilterView(TemplateView):
 			template_name = 'autofilter-text.html'
 		if(column['type_category'] == 'numeric'):
 			template_name = 'autofilter-numeric.html'
+		if(column['type'] == 'date'):
+			template_name = 'autofilter-date.html'
 
 		return render(request, template_name, context)
 	

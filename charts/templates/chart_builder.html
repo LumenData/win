@@ -5,6 +5,11 @@
 
 {% block head_content %}
 	<link rel="stylesheet" href="/static/charts/css/charts.css">
+	
+	{# Bootstrap-Datepicker #}
+	<link rel="stylesheet" href="/static/datepicker/css/datepicker.css">
+	<script src="/static/datepicker/js/bootstrap-datepicker.js"></script>
+		
 	<script>
 		var dataframe_id = {{ dataframe.id }};
 	</script>
@@ -141,8 +146,6 @@
 		</div>
  		-->
 
-<!-- Where filter should go -->
-
 		<!-- Filter -->
 		<div class="panel panel-success column-frame">
 			<span class="panel-heading column-title">Filters</span>
@@ -160,7 +163,6 @@
 			<span class="panel-heading column-title">Size</span>
 			<ul id="report-size" class="connectedSortable dropzone dropzone-tall"></ul>
 		</div>
-		
 	</div>
 </div>
 

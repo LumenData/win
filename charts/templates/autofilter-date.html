@@ -1,0 +1,79 @@
+<script>
+	// May need a $(document).ready() wrapper	
+	$("#apply_filters").on("click",function(event){
+		var filter_form = $(this).closest(".popover_wrapper");
+		var column_name = filter_form.data("parent_id");
+		var filter_item = $("#report-filters").find("#" + column_name)
+
+		
+		var start_date = filter_form.find("#filter_start_date").val();
+		var end_date = filter_form.find("#filter_end_date").val();
+		
+ 		start_date = "'" + start_date + "'";
+ 		end_date = "'" + end_date + "'";
+ 
+ 		var query_clause = "";
+
+		if(start_date.length && end_date.length)
+			query_clause = column_name + " BETWEEN " + start_date + " AND " + end_date;
+		else if(start_date.length)
+			query_clause = column_name + " > " + start_date;
+		else if(end_date.length)
+			query_clause = column_name + " < " + end_date;		
+
+		// Set a data element on the filter element with a clause to add to the query
+ 		filter_item.attr("data-filter_clause", query_clause);
+		
+		filter_item.popover('destroy');
+		update_chart();
+	});
+	
+	$("#cancel_filters").on("click",function(event){
+		$("#report-filters").find("div").popover('destroy');
+	});
+	
+	
+	$('#filter_start_date').datepicker({    
+		todayBtn: true,
+    	orientation: "top left",
+    	autoclose: true,
+    	todayHighlight: true,
+    	format: 'yyyy-mm-dd'
+    });
+    
+	$('#filter_end_date').datepicker({    
+		todayBtn: true,
+    	orientation: "top left",
+    	autoclose: true,
+    	todayHighlight: true,
+    	format: 'yyyy-mm-dd'
+    });
+    
+
+	
+
+</script>
+
+<style>
+	
+	.popover{
+		height: 350px;
+	}
+
+</style>
+
+<div id="start_date_area">
+	Start Date: 
+	<input id="filter_start_date" type="text" class="form-control input-sm">
+</div>
+<br>
+<div id="end_date_area">
+	End Date: 
+	<input id="filter_end_date" type="text" class="form-control input-sm">
+</div>
+
+<br>
+<div id="button_area">
+	<button id="apply_filters" class="btn btn-sm btn-primary">Apply</button>
+	<button id="cancel_filters" class="btn btn-sm btn-default">Close</button>
+</div>
