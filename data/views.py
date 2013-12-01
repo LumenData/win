@@ -112,6 +112,8 @@ class DataColumnUniqueListView(TemplateView):
 	def get(self, request, *args, **kwargs):
 		column_name = kwargs['column_name']
 		search_term = request.GET.get('q')
+		
+		max_results = 10
 
 		try:
 			dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])
@@ -119,15 +121,17 @@ class DataColumnUniqueListView(TemplateView):
 			context['debug'] = str(e)
 			
 		if search_term == "*":
-			query = "SELECT distinct(%s) FROM %s LIMIT 20" % (column_name, dataframe.db_table_name);
+			query = "SELECT distinct(%s) FROM %s LIMIT %s" % (column_name, dataframe.db_table_name, max_results);
 		else:
-			query = "SELECT distinct(%s) FROM %s WHERE %s LIKE '%%%s%%' LIMIT 20" % (column_name, dataframe.db_table_name, column_name, search_term);
+			query = "SELECT distinct(%s) FROM %s WHERE %s LIKE '%%%s%%' LIMIT %s" % (column_name, dataframe.db_table_name, column_name, search_term, max_results);
 		
 		uniques_as_list_of_dicts = dataframe.query_results(query)[0]
 		
  		## uniques_as_list_of_dicts lookst like [{'my_col': value1}, {'my_col': value2}, ...]
 		## but we need [value1, value2, ...]
 		uniques_as_list = [item[column_name] for item in uniques_as_list_of_dicts]
+		if len(uniques_as_list) == max_results:
+			uniques_as_list[max_results-1] = "..."
 
 		return HttpResponse(json.dumps(uniques_as_list))
 		

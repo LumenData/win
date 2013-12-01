@@ -25,30 +25,31 @@
 		$("#report-filters").find("div").popover('destroy');
 	});
 	
-	var column_name = $(this).closest(".popover_wrapper").data("parent_id");
-	var remote_url = '/data/frame/31/forest_firescsv/' + column_name + '/unique_values.json?q=%QUERY';
-	console.debug(remote_url);
-	
+	window.localStorage.clear()	
+	var column_name = $(".popover_wrapper").data("parent_id");
+	var remote_url = '/data/frame/' + dataframe_id + '/' + column_name + '/unique_values.json?q=%QUERY';
+
 	$(".typeahead").typeahead({
-		name: 'column_values_1',
-		local: ['timtrueman', 'JakeHarding', 'vskarich'],
-		remote: remote_url,
-// 		prefetch: {url: 'http://127.0.0.1:8889/data/frame/31/forest_firescsv/month/unique_values.json', ttl: 1},
+		name: dataframe_id + '-' + column_name,
+		remote: {url: remote_url, cache: false},
 		limit: 20
 	});
-	
+
 	// Fix typeahead bootstrap issue
 	$('.typeahead.input-sm').siblings('input.tt-hint').addClass('hint-small');
 	$('.typeahead.input-lg').siblings('input.tt-hint').addClass('hint-large');
 	
+	// Put a * in the input box, trigger a search, and highlight the asterisk so that any typing overwrites it
+	$('#filter-exact-value').val('*').trigger("input").select();	
 
-
-	
+	$('#filter-exact-value').keypress(function(e) {
+		if(e.which == 13) {
+			$("#apply_filters").click();
+		}
+	});
 </script>
 
-Exact Value: 
-<!-- <input id="filter-exact-value" type="text" class="form-control input-sm" placeholder="Enter Value"> -->
-<!-- <input id="filter-exact-value" type="text" data-provide="typeahead"> -->
+Value: 
 <input id="filter-exact-value" type="text" class="typeahead form-control input-sm" autocomplete="off">
 
 

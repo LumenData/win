@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 	url(r'^frame$', ListView.as_view(model=DataFrame), name="framelist"),
  	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)$', DataFrameDetailView.as_view(), name="framedetail"),
 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/delete$', DeleteView.as_view(model = DataFrame, success_url = reverse_lazy('data:framelist')), name="framedelete"),
- 	url(r'^frame/(?P<pk>[0-9]+)/(?P<slug>[\w-]+)/(?P<column_name>.+)/unique_values.json$', DataColumnUniqueListView.as_view(), name="column-unique-list"),
+ 	url(r'^frame/(?P<pk>[0-9]+)/(?P<column_name>.+)/unique_values.json$', DataColumnUniqueListView.as_view(), name="column-unique-list"),
 
 
 # 	url(r'^pie$', 'data.views.pie', name="pie"),
