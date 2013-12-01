@@ -19,7 +19,6 @@ $(document).ready(function(){
 		// Any time a pill is dragged to a new location, update chart
 		// Unless the pill was dragged from filters in which case delete the element
 		
-		console.debug(ui);
 		if($(ui.sender).attr('id') == "report-filters")
 			$(ui.item).remove()
 		if($(this).attr('id') != "report-filters")
@@ -56,7 +55,7 @@ $(document).ready(function(){
 	$("#report-filters").on("sortstart", {distance: 10}, function( event, ui ) {
 		// When something is dragged from filters, delete it
 		$(ui.item).popover("hide");
-		$(ui.item).toggle( "highlight", 300, complete = function(){
+		$(ui.item).toggle( "highlight", complete = function(){
 			$(ui.item).remove();
 			update_chart();
 		});
@@ -65,6 +64,21 @@ $(document).ready(function(){
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal()
 	}
+	
+// 	$(".typeahead").typeahead({
+// 		name: 'column_values_1',
+// 		local: ['timtrueman', 'JakeHarding', 'vskarich'],
+// 		remote: 'http://127.0.0.1:8889/data/frame/31/forest_firescsv/month/unique_values.json?q=%QUERY',
+// // 		prefetch: {url: 'http://127.0.0.1:8889/data/frame/31/forest_firescsv/month/unique_values.json', ttl: 1},
+// 		limit: 20
+// 	});
+	
+	
+	// Fix typeahead bootstrap issue
+// 	$('.typeahead.input-sm').siblings('input.tt-hint').addClass('hint-small');
+// 	$('.typeahead.input-lg').siblings('input.tt-hint').addClass('hint-large');
+// 	
+
 	
 });
 
@@ -104,9 +118,8 @@ function update_chart(){
 	$("#report-filters").children().each(function(){
 		filter_clauses.push($(this).data('filter_clause')); 
 	});
-	
+
 	console.debug(filter_clauses);
-	
 
 	// Collect input to chart builder input into dictionary
 	// Should replace this hard coded url later with something from django

@@ -11,9 +11,14 @@
 		<script src="/static/jquery/jquery.ui.touch-punch.js"></script>
 
 		{# Bootstrap & Bootswatch #}
-		<link rel="stylesheet" href="/static/bootstrap/dist/css/bootstrap.css">
+		<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
 		<link rel="stylesheet" href="/static/bootswatch/css/bootstrap.css">
-		<script src="/static/bootstrap/dist/js/bootstrap.js"></script>
+		<script src="/static/bootstrap/js/bootstrap.js"></script>
+
+		{# Typeahead #}
+		<script src="/static/typeahead/js/typeahead.js"></script>
+		<!-- <link rel="stylesheet" href="/static/typeahead/css/typeahead.js-bootstrap.css">		 -->
+		<link rel="stylesheet" href="/static/charts/css/typeahead-bootstrap-fix.css">		
 
 		{# Custom #}
 		<link rel="stylesheet" href="/static/site/css/base.css">
@@ -21,9 +26,10 @@
 		
 		<script>
 			console.debug("{{ debug_content }}");
-
 		</script>
-		{% block head_content %}{% endblock %}	
+		
+		{% block head_content %}
+		{% endblock %}	
 		
 		<title>Win Predictive</title>
 	</head>

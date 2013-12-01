@@ -15,15 +15,15 @@ from decimal import Decimal
 import datetime
 
 
-# from charts.views import CustomJSONEncoder
-## Testing copying this function rather than including it for aws reasons
-
 class CustomJSONEncoder(json.JSONEncoder):
+	## Testing copying this function rather than including it for aws reasons
+	# from charts.views import CustomJSONEncoder (not used)
+	
 	def default(self, obj):
 		if hasattr(obj, 'isoformat'): #handles both date and datetime objects
 			return obj.isoformat()
- 		elif isinstance(obj, datetime.timedelta):
- 			return str(obj)
+		elif isinstance(obj, datetime.timedelta):
+			return str(obj)
 		elif isinstance(obj, Decimal):
 			return float(obj)
 		else:
@@ -56,9 +56,6 @@ class DataFileDetailView(TemplateView):
 		else:
 			return HttpResponse('error')
 
-
-
-
 ################################## File Import ##################################
 
 class DataFileImportView(TemplateView):
@@ -81,7 +78,6 @@ class DataFileImportView(TemplateView):
 ################################## Frame Detail ##################################
 
 class DataFrameDetailView(TemplateView):
-	model = DataFrame
 	template_name = "data/dataframe_detail.html"
 	
 	def get(self, request, *args, **kwargs):
@@ -110,10 +106,28 @@ class DataFrameDetailView(TemplateView):
 		else:
 			return HttpResponse('error')
 
+################################## Column - Unique Values ##################################
+		
+class DataColumnUniqueListView(TemplateView):
+	def get(self, request, *args, **kwargs):
+		column_name = kwargs['column_name']
+		search_term = request.GET.get('q')
 
+		try:
+			dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])
+		except Exception,e:
+			context['debug'] = str(e)
+			
+		if search_term == "*":
+			query = "SELECT distinct(%s) FROM %s LIMIT 20" % (column_name, dataframe.db_table_name);
+		else:
+			query = "SELECT distinct(%s) FROM %s WHERE %s LIKE '%%%s%%' LIMIT 20" % (column_name, dataframe.db_table_name, column_name, search_term);
 		
+		uniques_as_list_of_dicts = dataframe.query_results(query)[0]
 		
-		
-		
-		
+ 		## uniques_as_list_of_dicts lookst like [{'my_col': value1}, {'my_col': value2}, ...]
+		## but we need [value1, value2, ...]
+		uniques_as_list = [item[column_name] for item in uniques_as_list_of_dicts]
+
+		return HttpResponse(json.dumps(uniques_as_list))
 		

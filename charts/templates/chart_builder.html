@@ -69,7 +69,6 @@
 
 
 <!-- Main Body -->
-
 <div id="main_panel">
 	<div id="left_panel">
 		<div class="panel panel-info column-frame">
@@ -79,11 +78,11 @@
 					{% if column.role == "dimension" %}
 						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}" data-type="{{ column.type }}">
 							{% if "date" in column.type %}
-								<span class="glyphicon glyphicon-calendar"> </span>					
+								<i class="glyphicon glyphicon-calendar"> </i>					
 							{% elif "time" in column.type %}
-								<span class="glyphicon glyphicon-time"> </span>
+								<i class="glyphicon glyphicon-time"> </i>
 							{% elif "character" in column.type_category %}
-								<span class="glyphicon glyphicon-font"> </span>
+								<i class="glyphicon glyphicon-font"> </i>
 							{% else %}
 								{{ column.type }}
 							{% endif %}
@@ -131,7 +130,7 @@
 		<div id="chart_loading">
 			<!--	<img id="chart_loading_bar" src="/static/charts/images/ajax-loader.gif"> -->
 		</div>
-		
+
 		<div id="report-area"></div>
 	</div>
 
@@ -162,6 +161,9 @@
 			<span class="panel-heading column-title">Size</span>
 			<ul id="report-size" class="connectedSortable dropzone dropzone-tall"></ul>
 		</div>
+
+<!-- 		<input type="text" class="typeahead form-control input-sm" autocomplete="off"> -->
+
 	</div>
 </div>
 
