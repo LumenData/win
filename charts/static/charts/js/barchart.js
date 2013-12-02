@@ -31,6 +31,7 @@ if(group_label.length == 0){
 		chart.margin({left:75, bottom: 75}); 
 		chart.xAxis.axisLabel(xaxis_label);
  		chart.yAxis.axisLabel(yaxis_label);
+//  		chart.showLegend(true);
  		
 		d3.select('#mainChart').datum(chart_data).transition().duration(500).call(chart);
 		nv.utils.windowResize(chart.update);
