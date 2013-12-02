@@ -5,52 +5,59 @@
 		var column_name = filter_form.data("parent_id");
 		var filter_item = $("#report-filters").find("#" + column_name)
 
-		var exact_value = filter_form.find("#filter-exact-value").val();
- 		if(filter_item.data("type") == "varchar")
- 			exact_value = "'" + exact_value + "'";
- 
- 		var query_clause = "";
+		var exact_value = filter_form.find("#filter-exact-value").select2("val");
 
-		if(exact_value.length)
-			query_clause = column_name + " = " + exact_value;
-
-		// Set a data element on the filter element with a clause to add to the query
- 		filter_item.attr("data-filter_clause", query_clause);
+ 		// Create a query_clause like "day_of_week = 'fri'"
+		if(exact_value != []){
+ 			var query_clause = column_name + " in ('" + exact_value.join("','") + "')";
+		}
+		else{
+			$("#filter-exact-value").select2('open');
+			return;
+		}
 		
+		// Set a data element on the filter element with a clause to add to the query
+		filter_item.data("filter_clause", query_clause);
+		
+		// Close the popup
 		filter_item.popover('destroy');
+		
+		// Refresh the chart
 		update_chart();
 	});
 	
+	// Cancel Button
 	$("#cancel_filters").on("click",function(event){
 		$("#report-filters").find("div").popover('destroy');
 	});
-	
-	window.localStorage.clear()	
+
 	var column_name = $(".popover_wrapper").data("parent_id");
-	var remote_url = '/data/frame/' + dataframe_id + '/' + column_name + '/unique_values.json?q=%QUERY';
+	var remote_url = '/data/frame/' + dataframe_id + '/' + column_name + '/unique_values.json';
 
-	$(".typeahead").typeahead({
-		name: dataframe_id + '-' + column_name,
-		remote: {url: remote_url, cache: false},
-		limit: 20
+	$("#filter-exact-value").select2({
+		placeholder: "Select values",
+		allowClear: true,
+		ajax: {
+			url: remote_url,
+			dataType: 'json',
+			data: function (term, page) {
+				return {
+					q: term // search term
+				};
+			},
+			results: function (data, page) {
+				return {results: data};
+			}
+		},
+		multiple: true
 	});
 
-	// Fix typeahead bootstrap issue
-	$('.typeahead.input-sm').siblings('input.tt-hint').addClass('hint-small');
-	$('.typeahead.input-lg').siblings('input.tt-hint').addClass('hint-large');
-	
-	// Put a * in the input box, trigger a search, and highlight the asterisk so that any typing overwrites it
-	$('#filter-exact-value').val('*').trigger("input").select();	
-
-	$('#filter-exact-value').keypress(function(e) {
-		if(e.which == 13) {
-			$("#apply_filters").click();
-		}
-	});
+	$("#filter-exact-value").select2('open');
 </script>
 
 Value: 
-<input id="filter-exact-value" type="text" class="typeahead form-control input-sm" autocomplete="off">
+<!-- <input id="filter-exact-value" type="text" class="typeahead form-control input-sm" autocomplete="off"> -->
+<input id="filter-exact-value""></input>
 
 
 <br>

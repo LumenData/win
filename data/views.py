@@ -113,25 +113,21 @@ class DataColumnUniqueListView(TemplateView):
 		column_name = kwargs['column_name']
 		search_term = request.GET.get('q')
 		
-		max_results = 10
+		max_results = 1000
 
 		try:
 			dataframe = DataFrame.objects.get(pk = self.kwargs['pk'])
 		except Exception,e:
 			context['debug'] = str(e)
 			
-		if search_term == "*":
-			query = "SELECT distinct(%s) FROM %s LIMIT %s" % (column_name, dataframe.db_table_name, max_results);
-		else:
-			query = "SELECT distinct(%s) FROM %s WHERE %s LIKE '%%%s%%' LIMIT %s" % (column_name, dataframe.db_table_name, column_name, search_term, max_results);
+		query = "SELECT distinct(%s) FROM %s WHERE %s LIKE '%%%s%%' LIMIT %s" % (column_name, dataframe.db_table_name, column_name, search_term, max_results);
 		
+		## Create a variable like [{'my_col': value1}, {'my_col': value2}, ...]
 		uniques_as_list_of_dicts = dataframe.query_results(query)[0]
 		
- 		## uniques_as_list_of_dicts lookst like [{'my_col': value1}, {'my_col': value2}, ...]
-		## but we need [value1, value2, ...]
-		uniques_as_list = [item[column_name] for item in uniques_as_list_of_dicts]
-		if len(uniques_as_list) == max_results:
-			uniques_as_list[max_results-1] = "..."
-
-		return HttpResponse(json.dumps(uniques_as_list))
+		## Doing something a little weird here with setting hte id to the text, helpful in getting the .select2('val') to work but seems like a hack
+		# uniques_as_list_of_dicts_with_ids = [{'id': idx, 'text': item[column_name]} for idx, item in enumerate(uniques_as_list_of_dicts)]
+		uniques_as_list_of_dicts_with_ids = [{'id': item[column_name], 'text': item[column_name] } for item in uniques_as_list_of_dicts]
+		
+		return HttpResponse(json.dumps(uniques_as_list_of_dicts_with_ids))
 		

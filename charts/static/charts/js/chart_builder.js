@@ -6,10 +6,10 @@ $(document).ready(function(){
 	$(".connectedSortable").sortable({
 		connectWith: ".connectedSortable",
 		scroll : false,
-// 		helper: 'clone',
-// 		start: function (e, ui) { 
-// 			ui.item.show();
-// 		},
+		// 	helper: 'clone',
+		// 	start: function (e, ui) { 
+		// 		ui.item.show();
+		// 	},
 
 	}).disableSelection();
 
@@ -27,16 +27,31 @@ $(document).ready(function(){
 	
 	//////////////// Filter - Popover ////////////////
 	
-	$( "#report-filters" ).on( "sortreceive", function( event, ui ) {
-		filter_item = $(ui.item).clone();
-		$(ui.sender).prepend(filter_item);
+	$( "#report-filters" ).on( "sortreceive", function(event, ui){
+		// Clone the pill and send the clone back to where the original came from
+		$(ui.sender).prepend( $(ui.item).clone() );
+		
+		// Create a 'filter-clause' data attribute
+		$(ui.item).attr("data-filter_clause", null);
+		
+		// Call the function that will load and show the popover
+		show_filter_popover(event, ui);
+
+		// Create an event to open the popover on click
+		$(ui.item).on('click', function(){ 
+			$(ui.item).removeAttr("data-filter_clause");			
+			show_filter_popover(event, ui);
+		});
+	});
+	
+	function show_filter_popover( event, ui ) {
 
 		$.ajax({
 		  	type: "GET",
 		  	url: "/charts/autofilter",
 		  	dataType: "html",
 		  	async: false,
-			data: {"dataframe_id": dataframe_id, "column_name": filter_item.attr('id')},
+			data: {"dataframe_id": dataframe_id, "column_name": $(ui.item).attr('id')},
 			success : function(data) {
 				var popover_content = "<div class='popover_wrapper' data-parent_id='" + $(ui.item).attr("id") + "'>" + data + "</div>";
 
@@ -47,10 +62,10 @@ $(document).ready(function(){
 					content: popover_content
 				});
 			}
-		});	
+		});
 		
 		$(ui.item).popover('show');
-	});
+	}
 	
 	$("#report-filters").on("sortstart", {distance: 10}, function( event, ui ) {
 		// When something is dragged from filters, delete it
@@ -64,22 +79,6 @@ $(document).ready(function(){
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal()
 	}
-	
-// 	$(".typeahead").typeahead({
-// 		name: 'column_values_1',
-// 		local: ['timtrueman', 'JakeHarding', 'vskarich'],
-// 		remote: 'http://127.0.0.1:8889/data/frame/31/forest_firescsv/month/unique_values.json?q=%QUERY',
-// // 		prefetch: {url: 'http://127.0.0.1:8889/data/frame/31/forest_firescsv/month/unique_values.json', ttl: 1},
-// 		limit: 20
-// 	});
-	
-	
-	// Fix typeahead bootstrap issue
-// 	$('.typeahead.input-sm').siblings('input.tt-hint').addClass('hint-small');
-// 	$('.typeahead.input-lg').siblings('input.tt-hint').addClass('hint-large');
-// 	
-
-	
 });
 
 /////////////// Update Chart ///////////////
@@ -88,7 +87,6 @@ function update_chart(){
 
 // 	$("#report-area").hide();
 // 	$("#chart_loading").toggle('fade');
-	
 	
 	// Get rownames from row sortable area 		
 	var row_names = new Array();
@@ -116,10 +114,8 @@ function update_chart(){
 	
 	var filter_clauses = new Array();
 	$("#report-filters").children().each(function(){
-		filter_clauses.push($(this).data('filter_clause')); 
+		filter_clauses.push($(this).data('filter_clause'));
 	});
-
-	console.debug(filter_clauses);
 
 	// Collect input to chart builder input into dictionary
 	// Should replace this hard coded url later with something from django
