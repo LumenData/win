@@ -144,9 +144,6 @@ INSTALLED_APPS = (
     'south',
     'data',
     'charts',
-    #'debug_toolbar',
-    #'googlecharts',
-    #'django_autoslug',
 )
 
 # A sample logging configuration. The only tangible logging
