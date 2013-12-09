@@ -14,6 +14,8 @@ import json
 from decimal import Decimal
 import datetime
 
+import numpy
+import scipy
 
 class CustomJSONEncoder(json.JSONEncoder):
 	## Testing copying this function rather than including it for aws reasons
