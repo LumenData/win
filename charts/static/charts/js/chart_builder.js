@@ -25,6 +25,56 @@ $(document).ready(function(){
 			update_chart();
 	});
 	
+	//////////////// Predictions ////////////////
+	
+	$( "#report-predictions" ).on( "sortreceive", function(event, ui){
+		// Clone the pill and send the clone back to where the original came from
+		$(ui.sender).prepend( $(ui.item).clone() );
+		
+		$(ui.item).removeClass("btn-default");
+		$(ui.item).addClass("btn-danger");
+
+		// Call the function that will load and show the popover
+		show_prediction_popover(event, ui);
+
+		// Create a 'filter-clause' data attribute
+		$(ui.item).attr("data-target_column", null);
+	});
+	
+	// Start prediction popover
+	function show_prediction_popover( event, ui ) {
+
+		$.ajax({
+		  	type: "GET",
+		  	url: "/charts/prediction_popover",
+		  	dataType: "html",
+		  	async: false,
+			data: {"dataframe_id": dataframe_id, "column_name": $(ui.item).attr('id')},
+			success : function(data) {
+				var popover_content = "<div class='popover_wrapper' data-parent_id='" + $(ui.item).attr("id") + "'>" + data + "</div>";
+
+				$(ui.item).popover({
+					placement: 'left',
+					html : true,
+					container: 'body',
+					content: popover_content
+				});
+			}
+		});
+		
+		$(ui.item).popover('show');
+	}
+	
+	// Destroy when dragged out
+	$("#report-predictions").on("sortstart", {distance: 10}, function( event, ui ) {
+		// When something is dragged from filters, delete it
+		$(ui.item).popover("hide");
+		$(ui.item).toggle( "highlight", complete = function(){
+			$(ui.item).remove();
+			update_chart();
+		});
+	});
+
 	//////////////// Filter - Popover ////////////////
 	
 	$( "#report-filters" ).on( "sortreceive", function(event, ui){
@@ -75,6 +125,8 @@ $(document).ready(function(){
 			update_chart();
 		});
 	});
+	
+	
 
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal()

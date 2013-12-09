@@ -1,0 +1,51 @@
+<script>
+	// May need a $(document).ready() wrapper	
+
+	var column_name = $(".popover_wrapper").data("parent_id");
+	var remote_url = '/data/frame/' + dataframe_id + '/' + column_name + '/unique_values.json';
+	
+	$('#training-precent').slider({
+		min: 0,
+		max: 100,
+		step: 1,
+		value: 75,
+		handle: 'round',
+		
+	});
+	
+	$('#training-precent').on('slide', function(ev){
+		//console.debug($(this).val());
+		$("#training-percent").html($(this).val());
+		$("#test-percent").html(100 - $(this).val());
+	});
+	
+	
+	// Apply Button
+	$("#apply_prediction").on("click",function(event){
+		var prediction_form = $(this).closest(".popover_wrapper");
+		var column_name = prediction_form.data("parent_id");
+		var prediction_item = $("#report-predictions").find("#" + column_name)
+
+		// Close the popup
+		prediction_item.popover('destroy');
+		
+		// Refresh the chart
+		update_chart();
+	});
+	
+	// Cancel Button
+	$("#cancel_predictions").on("click",function(event){
+		$("#report-predictions").find("div").popover('destroy');
+	});
+
+</script>
+
+<b>Data Split</b><br>
+<input id="training-precent" type="text" class="span2"></input><br>
+Training: <span id="training-percent">75</span>%   / 
+Test: <span id="test-percent">25</span>%<br>
+
+<br><br>
+
+<button id="apply_predictions" class="btn btn-sm btn-primary">Predict</button>
+<button id="cancel_predictions" class="btn btn-sm btn-default">Cancel</button>

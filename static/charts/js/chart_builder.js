@@ -6,10 +6,10 @@ $(document).ready(function(){
 	$(".connectedSortable").sortable({
 		connectWith: ".connectedSortable",
 		scroll : false,
-// 		helper: 'clone',
-// 		start: function (e, ui) { 
-// 			ui.item.show();
-// 		},
+		// 	helper: 'clone',
+		// 	start: function (e, ui) { 
+		// 		ui.item.show();
+		// 	},
 
 	}).disableSelection();
 
@@ -25,18 +25,31 @@ $(document).ready(function(){
 			update_chart();
 	});
 	
-	//////////////// Filter - Popover ////////////////
+	//////////////// Predictions ////////////////
 	
-	$( "#report-filters" ).on( "sortreceive", function( event, ui ) {
-		filter_item = $(ui.item).clone();
-		$(ui.sender).prepend(filter_item);
+	$( "#report-predictions" ).on( "sortreceive", function(event, ui){
+		// Clone the pill and send the clone back to where the original came from
+		$(ui.sender).prepend( $(ui.item).clone() );
+		
+		$(ui.item).removeClass("btn-default");
+		$(ui.item).addClass("btn-danger");
+
+		// Call the function that will load and show the popover
+		show_prediction_popover(event, ui);
+
+		// Create a 'filter-clause' data attribute
+		$(ui.item).attr("data-target_column", null);
+	});
+	
+	// Start prediction popover
+	function show_prediction_popover( event, ui ) {
 
 		$.ajax({
 		  	type: "GET",
-		  	url: "/charts/autofilter",
+		  	url: "/charts/prediction_popover",
 		  	dataType: "html",
 		  	async: false,
-			data: {"dataframe_id": dataframe_id, "column_name": filter_item.attr('id')},
+			data: {"dataframe_id": dataframe_id, "column_name": $(ui.item).attr('id')},
 			success : function(data) {
 				var popover_content = "<div class='popover_wrapper' data-parent_id='" + $(ui.item).attr("id") + "'>" + data + "</div>";
 
@@ -47,10 +60,62 @@ $(document).ready(function(){
 					content: popover_content
 				});
 			}
-		});	
+		});
 		
 		$(ui.item).popover('show');
+	}
+	
+	// Destroy when dragged out
+	$("#report-predictions").on("sortstart", {distance: 10}, function( event, ui ) {
+		// When something is dragged from filters, delete it
+		$(ui.item).popover("hide");
+		$(ui.item).toggle( "highlight", complete = function(){
+			$(ui.item).remove();
+			update_chart();
+		});
 	});
+
+	//////////////// Filter - Popover ////////////////
+	
+	$( "#report-filters" ).on( "sortreceive", function(event, ui){
+		// Clone the pill and send the clone back to where the original came from
+		$(ui.sender).prepend( $(ui.item).clone() );
+		
+		// Create a 'filter-clause' data attribute
+		$(ui.item).attr("data-filter_clause", null);
+		
+		// Call the function that will load and show the popover
+		show_filter_popover(event, ui);
+
+		// Create an event to open the popover on click
+		$(ui.item).on('click', function(){ 
+			$(ui.item).removeAttr("data-filter_clause");			
+			show_filter_popover(event, ui);
+		});
+	});
+	
+	function show_filter_popover( event, ui ) {
+
+		$.ajax({
+		  	type: "GET",
+		  	url: "/charts/autofilter",
+		  	dataType: "html",
+		  	async: false,
+			data: {"dataframe_id": dataframe_id, "column_name": $(ui.item).attr('id')},
+			success : function(data) {
+				var popover_content = "<div class='popover_wrapper' data-parent_id='" + $(ui.item).attr("id") + "'>" + data + "</div>";
+
+				$(ui.item).popover({
+					placement: 'left',
+					html : true,
+					container: 'body',
+					content: popover_content
+				});
+			}
+		});
+		
+		$(ui.item).popover('show');
+	}
 	
 	$("#report-filters").on("sortstart", {distance: 10}, function( event, ui ) {
 		// When something is dragged from filters, delete it
@@ -60,14 +125,12 @@ $(document).ready(function(){
 			update_chart();
 		});
 	});
+	
+	
 
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal()
 	}
-	
-	var mysource = ["Red", "Green", "Blue", "Black", "Yellow", "Orange"];
-	$(".typeahead").typeahead({source: mysource});
-	
 });
 
 /////////////// Update Chart ///////////////
@@ -76,7 +139,6 @@ function update_chart(){
 
 // 	$("#report-area").hide();
 // 	$("#chart_loading").toggle('fade');
-	
 	
 	// Get rownames from row sortable area 		
 	var row_names = new Array();
@@ -104,10 +166,8 @@ function update_chart(){
 	
 	var filter_clauses = new Array();
 	$("#report-filters").children().each(function(){
-		filter_clauses.push($(this).data('filter_clause')); 
+		filter_clauses.push($(this).data('filter_clause'));
 	});
-
-	console.debug(filter_clauses);
 
 	// Collect input to chart builder input into dictionary
 	// Should replace this hard coded url later with something from django

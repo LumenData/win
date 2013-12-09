@@ -49,19 +49,17 @@
 				return {results: data};
 			}
 		},
-		multiple: true
+		multiple: true,
+		width: 'element'
 	});
 
 	$("#filter-exact-value").select2('open');
 </script>
 
 Value: 
-<!-- <input id="filter-exact-value" type="text" class="typeahead form-control input-sm" autocomplete="off"> -->
-<input id="filter-exact-value""></input>
+<input id="filter-exact-value"></input>
 
+<br><br>
 
-<br>
-
-<br>
 <button id="apply_filters" class="btn btn-sm btn-primary">Apply</button>
 <button id="cancel_filters" class="btn btn-sm btn-default">Close</button>
