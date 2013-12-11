@@ -1,4 +1,8 @@
 <script>
+	var dataframe_row = {{ dataframe_nrow }}
+</script>
+
+<script>
 	// May need a $(document).ready() wrapper	
 
 	var column_name = $(".popover_wrapper").data("parent_id");
@@ -10,16 +14,21 @@
 		step: 1,
 		value: 75,
 		handle: 'round',
-		
 	});
-	
+
 	$('#training-precent').on('slide', function(ev){
-		//console.debug($(this).val());
+		console.debug($(this));
 		$("#training-percent").html($(this).val());
 		$("#test-percent").html(100 - $(this).val());
+		
+		var training_rows = Math.floor(dataframe_row * $(this).val() / 100);
+		var test_rows = dataframe_row - training_rows;
+		$("#training-rows").html(training_rows);
+		$("#test-rows").html(test_rows);
 	});
-	
-	
+
+	$('#training-precent').trigger('slide');
+
 	// Apply Button
 	$("#apply_prediction").on("click",function(event){
 		var prediction_form = $(this).closest(".popover_wrapper");
@@ -35,17 +44,51 @@
 	
 	// Cancel Button
 	$("#cancel_predictions").on("click",function(event){
-		$("#report-predictions").find("div").popover('destroy');
+		$("#report-predictions").find("div").popover('hide');
 	});
 
 </script>
 
+<style>
+	.slider_info{
+		display: inline;
+		float: left;
+	}
+	
+	.slider_info.left{
+		float: left;
+	}
+	
+	.slider_info.right{
+		float: right;
+	}
+</style>
+
+
 <b>Data Split</b><br>
-<input id="training-precent" type="text" class="span2"></input><br>
-Training: <span id="training-percent">75</span>%   / 
-Test: <span id="test-percent">25</span>%<br>
+<span class="slider_info">
+	Test<br>
+</span>
 
-<br><br>
+<span class="slider_info right">
+	Training<br>
+</span>
+<p>
 
-<button id="apply_predictions" class="btn btn-sm btn-primary">Predict</button>
-<button id="cancel_predictions" class="btn btn-sm btn-default">Cancel</button>
+<input id="training-precent" type="text" class="span2" value=75></input><br>
+<span class="slider_info">
+	<span id="test-percent">25</span>%<br>
+	<span id="test-rows"></span> rows
+</span>
+
+<span class="slider_info right">
+	<span id="training-percent">75</span>%<br> 
+	<span id="training-rows"></span> rows
+</span>
+
+<br><br><br><p>
+
+<div style:"display: block; height: 100px">
+	<button id="apply_predictions" class="btn btn-sm btn-primary">Predict</button>
+	<button id="cancel_predictions" class="btn btn-sm btn-default">Cancel</button>
+</div>

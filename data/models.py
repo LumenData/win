@@ -189,6 +189,10 @@ class DataFrame(models.Model):
 
 		return newDict
 
+	@property
+	def nrow(self):
+		nrow = self.query_results("SELECT COUNT(*) nrow FROM %s" % self.db_table_name)
+		return nrow[0][0]['nrow']
 
 	@models.permalink
 	def get_absolute_url(self):

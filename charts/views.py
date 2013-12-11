@@ -115,7 +115,31 @@ class AutoFilterView(TemplateView):
 			template_name = 'autofilter-date.html'
 
 		return render(request, template_name, context)
+
+####################### View - Prediction Popover #######################
+
+class PredictionPopoverView(TemplateView):
+	# Placeholder template name, should be overwritten with appropriate name later
+
+	def get(self, request, *args, **kwargs):
+		template_name = 'prediction_popover.html'
+		context = super(PredictionPopoverView, self).get_context_data(**kwargs)
+		
+		# Get input values from URL params
+		dataframe_id = request.GET.get("dataframe_id")
+		column_name = request.GET.get("column_name")
 	
+		# Get the dataframe from the ID passed in the url
+		try:
+			dataframe = DataFrame.objects.get(pk = dataframe_id)
+		except Exception,e:
+			context['debug'] = str(e)
+			return self.render_to_response(context)
+
+		context['dataframe_nrow'] = dataframe.nrow
+
+		return render(request, template_name, context)
+
 ####################### Chart Selector #######################
 
 def chart_selector(dataframe, chart_builder_input):

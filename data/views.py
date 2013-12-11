@@ -14,10 +14,9 @@ import json
 from decimal import Decimal
 import datetime
 
-import numpy
-import scipy
-
-print scipy.poly1d([3,4,6])
+# import numpy
+# import scipy
+# print scipy.poly1d([3,4,6])
 
 class CustomJSONEncoder(json.JSONEncoder):
 	## Testing copying this function rather than including it for aws reasons

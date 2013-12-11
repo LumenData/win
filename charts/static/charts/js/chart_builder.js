@@ -3,6 +3,9 @@
 $(document).ready(function(){
 	console.log("Document Loaded");
 	
+	//////////////// Set up Sortables ////////////////
+	
+	// Initialize Sortable areas
 	$(".connectedSortable").sortable({
 		connectWith: ".connectedSortable",
 		scroll : false,
@@ -12,38 +15,39 @@ $(document).ready(function(){
 		// 	},
 
 	}).disableSelection();
-
-	//////////////// Set up Sortables ////////////////
-
+	
+	// Any time a pill is dragged to a new location
 	$(".connectedSortable").on( "sortreceive", function( event, ui ) {
-		// Any time a pill is dragged to a new location, update chart
-		// Unless the pill was dragged from filters in which case delete the element
 		
-		if($(ui.sender).attr('id') == "report-filters")
+		// If it came from filters or predictions dropzones, delete it
+		if(($(ui.sender).attr('id') == "report-filters") || ($(ui.sender).attr('id') == "report-predictions"))
 			$(ui.item).remove()
-		if($(this).attr('id') != "report-filters")
+			
+		// If it is dropped into anything except filters or predictions, update the chart
+		if(($(this).attr('id') != "report-filters") && ($(this).attr('id') != "report-predictions"))
 			update_chart();
 	});
 	
 	//////////////// Predictions ////////////////
 	
+	// When pill is dropped into Predictions dropzone
 	$( "#report-predictions" ).on( "sortreceive", function(event, ui){
 		// Clone the pill and send the clone back to where the original came from
 		$(ui.sender).prepend( $(ui.item).clone() );
 		
+		// Change the style to show emphasis
 		$(ui.item).removeClass("btn-default");
 		$(ui.item).addClass("btn-danger");
 
 		// Call the function that will load and show the popover
 		show_prediction_popover(event, ui);
 
-		// Create a 'filter-clause' data attribute
-		$(ui.item).attr("data-target_column", null);
+		// Create a 'training_percent' data attribute
+		$(ui.item).attr("data-training_percent", null);
 	});
-	
+
 	// Start prediction popover
 	function show_prediction_popover( event, ui ) {
-
 		$.ajax({
 		  	type: "GET",
 		  	url: "/charts/prediction_popover",
@@ -64,19 +68,10 @@ $(document).ready(function(){
 		
 		$(ui.item).popover('show');
 	}
-	
-	// Destroy when dragged out
-	$("#report-predictions").on("sortstart", {distance: 10}, function( event, ui ) {
-		// When something is dragged from filters, delete it
-		$(ui.item).popover("hide");
-		$(ui.item).toggle( "highlight", complete = function(){
-			$(ui.item).remove();
-			update_chart();
-		});
-	});
 
 	//////////////// Filter - Popover ////////////////
 	
+	// When pill dropped into filter dropzone
 	$( "#report-filters" ).on( "sortreceive", function(event, ui){
 		// Clone the pill and send the clone back to where the original came from
 		$(ui.sender).prepend( $(ui.item).clone() );
@@ -94,8 +89,8 @@ $(document).ready(function(){
 		});
 	});
 	
+	// Show Filter Popover
 	function show_filter_popover( event, ui ) {
-
 		$.ajax({
 		  	type: "GET",
 		  	url: "/charts/autofilter",
@@ -117,7 +112,9 @@ $(document).ready(function(){
 		$(ui.item).popover('show');
 	}
 	
-	$("#report-filters").on("sortstart", {distance: 10}, function( event, ui ) {
+	
+	// Remove item when dragged out of predictions or filters dropzones
+	$("#report-filters, #report-predictions").on("sortstart", {distance: 10}, function( event, ui ) {
 		// When something is dragged from filters, delete it
 		$(ui.item).popover("hide");
 		$(ui.item).toggle( "highlight", complete = function(){
@@ -125,9 +122,8 @@ $(document).ready(function(){
 			update_chart();
 		});
 	});
-	
-	
 
+	// Show modal if no DataFrame is selected
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal()
 	}
