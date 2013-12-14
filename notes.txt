@@ -1,5 +1,8 @@
 # AWS SSH & MySQL
+(prod)
 ssh -i ~/.ssh/eb-keypair1.pem ec2-user@ec2-174-129-110-88.compute-1.amazonaws.com
+(dev)
+ssh -i ~/.ssh/eb-keypair1.pem ec2-user@174.129.219.231 
 mysql -h aai7xdxbr0xqv8.cpwo5ko0pnju.us-east-1.rds.amazonaws.com -P 3306 -u ebroot -p
 
 # Vagrant restart networking

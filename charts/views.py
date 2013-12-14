@@ -11,9 +11,6 @@ import pprint
 import sys
 from django.utils import timezone
 
-import numpy
-import scipy
-
 ####################### View - Chart Builder #######################
 
 class ChartBuilderView(TemplateView):

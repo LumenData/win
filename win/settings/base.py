@@ -144,6 +144,7 @@ INSTALLED_APPS = (
     'south',
     'data',
     'charts',
+    'predictions',
 )
 
 # A sample logging configuration. The only tangible logging

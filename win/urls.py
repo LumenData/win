@@ -4,8 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
-print("URLS")
-
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -15,6 +13,7 @@ urlpatterns = patterns('',
 	url(r'^$', TemplateView.as_view(template_name = "index.html"), name="home"),
 	url(r'^data/', include("data.urls",namespace="data")),
 	url(r'^charts/', include("charts.urls",namespace="charts")),	
+	url(r'^predictions/', include("predictions.urls",namespace="predictions")),	
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

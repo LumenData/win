@@ -1,5 +1,5 @@
 <script>
-	var dataframe_row = {{ dataframe_nrow }}
+	var dataframe_nrow = {{ dataframe_nrow }}
 </script>
 
 <script>
@@ -8,6 +8,7 @@
 	var column_name = $(".popover_wrapper").data("parent_id");
 	var remote_url = '/data/frame/' + dataframe_id + '/' + column_name + '/unique_values.json';
 	
+	// Initialize training/test slider
 	$('#training-precent').slider({
 		min: 0,
 		max: 100,
@@ -16,12 +17,13 @@
 		handle: 'round',
 	});
 
+	// Training/test slider action (update the numbers below the slider)
 	$('#training-precent').on('slide', function(ev){
 		$("#training-percent").html($(this).val());
 		$("#test-percent").html(100 - $(this).val());
 		
-		var training_rows = Math.floor(dataframe_row * $(this).val() / 100);
-		var test_rows = dataframe_row - training_rows;
+		var training_rows = Math.floor(dataframe_nrow * $(this).val() / 100);
+		var test_rows = dataframe_nrow - training_rows;
 		$("#training-rows").html(training_rows);
 		$("#test-rows").html(test_rows);
 	});
@@ -36,13 +38,14 @@
 
 		// Get the slider value and set it as an attribute on the DOM (so that it can get picked up by the update_chart function)
 		var training_percent = $('#training-precent').val();
-		prediction_item.attr("data-training_percent", training_percent);
+		var training_nrow = Math.floor(training_percent * dataframe_nrow / 100);
+		prediction_item.attr("data-training_nrow", training_nrow);
 		
 		// Close the popup
-		prediction_item.popover('destroy');
+		prediction_item.popover('hide');
 		
-		// Refresh the chart
-		update_chart();
+		// Refresh the predictions
+		update_predictions();
 	});
 	
 	// Cancel Button

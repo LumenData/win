@@ -43,7 +43,7 @@ $(document).ready(function(){
 		show_prediction_popover(event, ui);
 
 		// Create a 'training_percent' data attribute
-		$(ui.item).attr("data-training_percent", null);
+		$(ui.item).attr("data-training_nrow", null);
 	});
 
 	// Start prediction popover
@@ -168,7 +168,6 @@ function update_chart(){
 	// Collect input to chart builder input into dictionary
 	// Should replace this hard coded url later with something from django
 	chart_builder_input = {
-		"chart_builder_url": "/charts/autochart",
 		"dataframe_id": dataframe_id, 
 		"row_names": row_names, 
 		"column_names": col_names,
@@ -178,7 +177,7 @@ function update_chart(){
 	};
 
 	var request = $.ajax({
-		url: chart_builder_input["chart_builder_url"],
+		url: "/charts/autochart",
 		type: "GET",
 		data: {"chart_builder_input": JSON.stringify(chart_builder_input)},
 		dataType: "html"
@@ -189,3 +188,30 @@ function update_chart(){
 
 	});
 }
+
+/////////////// Update Predictions ///////////////
+
+function update_predictions(){
+	
+	// Get rownames from row sortable area 		
+	var target_name = $("#report-predictions .mypill:first-child").attr('id');
+	var training_nrow = $("#report-predictions .mypill:first-child").data('training_nrow');
+
+	// Collect input to chart builder input into dictionary
+	// Should replace this hard coded url later with something from django
+	prediction_builder_input = {
+		"dataframe_id": dataframe_id, 
+		"target_name": target_name, 
+		"training_nrow": training_nrow
+	};
+
+	var request = $.ajax({
+		url: "/predictions",
+		type: "GET",
+		data: prediction_builder_input,
+		dataType: "html"
+	}).done(function(response) {
+		console.debug(response);
+	});
+}
+
