@@ -134,7 +134,6 @@ $(document).ready(function(){
 			if($(this).attr("id") == "report-predictions"){
 				$(".prediction_output").addClass("hidden");
 				$("#report-predictions").append($(".prediction_output"));
-				
 				update_chart();
 			}
 		}

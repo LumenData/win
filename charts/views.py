@@ -55,6 +55,9 @@ class AutoChartView(TemplateView):
 		# Choose a Chart Type
 		chart_type = chart_selector(dataframe, chart_builder_input)
 
+		print "CHART TYPE"
+		print chart_type
+
 		if(chart_type is None):
 			return self.render_to_response(context)
 		
@@ -248,8 +251,10 @@ def get_chart_data(dataframe, query_results, chart_builder_input):
 			# Populate the array element with a new element, a dict of x/y or x/y/size pairs	
 			
 			if(size_names and row_names and column_names):
+				y_key = row_names[0]
 				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict[y_key], 'size': dict['size']})
 			elif(row_names and column_names):
+				y_key = row_names[0]
 				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict[y_key]})
 			else:
 				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
