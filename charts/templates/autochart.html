@@ -5,7 +5,7 @@
 <script src="/static/nvd3/js/d3.v3.js"></script>
 <script src="/static/nvd3/js/nv.d3.js"></script>
 
-<svg id="mainChart" ></svg>
+<svg id="mainChart"></svg>
 
 <script>
 	var chart_data = {{ chart_data|safe }};
@@ -44,6 +44,8 @@
 	<script src='/static/charts/js/scatterchart.js' type='text/javascript'> </script>
 {% elif chart_type == "barChart" %}
 	<script src='/static/charts/js/barchart.js' type='text/javascript'> </script>
+{% elif chart_type == "sunburstChart" %}
+	<script src='/static/charts/js/sunburstchart.js' type='text/javascript'> </script>
 {% endif %}
 
 

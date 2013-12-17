@@ -127,6 +127,37 @@ class DataFrame(models.Model):
 		db.close()
 		return query_results, column_names
 
+	def add_columns(self, column_names, column_types):
+		db = self.get_db()
+		cursor = db.cursor()
+		
+		alter_string_fragments = [column_names[i] + ' ' + column_types[i] for i, junk in enumerate(column_names)]
+		alter_string = '(' + ','.join(alter_string_fragments) + ')'
+
+		try:
+			cursor.execute("ALTER TABLE %s ADD %s" % (self.db_table_name, alter_string))
+		except Exception,e:
+			# Return error as both query_result and column_name so that page still loads
+			return str(e), str(e)
+	
+		cursor.close
+		db.close()
+		
+	def drop_columns(self, column_names):
+		db = self.get_db()
+		cursor = db.cursor()
+		
+		query = "ALTER TABLE %s %s" % (self.db_table_name, ','.join(['DROP ' + i for i in column_names]))
+		
+		try:
+			cursor.execute(query)
+		except Exception,e:
+			# Return error as both query_result and column_name so that page still loads
+			return str(e), str(e)
+	
+		cursor.close
+		db.close()	
+
 	def query_results(self, query):
 		db = self.get_db(cursorclass= MySQLdb.cursors.DictCursor)
 		cursor = db.cursor()

@@ -4,6 +4,7 @@
 
 #main_panel{ 
 	position: relative;
+	height: 100%;
 }
 
 #left_panel{ 
@@ -21,7 +22,8 @@
 }
 
 #middle_panel{ 
-	margin: 0 170px; 
+	margin: 0 170px;
+	height: 100%;
 }
 
 /*********** Left Side  ************/
@@ -57,22 +59,8 @@
 /* 	position: fixed; */
 }
 
-.mypill-helper{
-	height: 20px;
-	width: 138px;
-	margin: 4px 0px 0px 5px;
-	padding: 0 0 0 6px;
-	border-width: 5px;
-	border-radius:3px;
-	border-color: #C47000;
-	background-color: #FBF7D9;
-	
-}
-
-#calendar_icon{
-	width: 10px;
-	height: 10px;
-	margin: -2px 0 0 0;
+i{
+	padding-top: 3px;
 }
 
 .dropzone{
@@ -110,7 +98,7 @@
 }
 
 #report-area{
-	height: 400px;
+	height: 500px;
 	width: auto;
 	overflow:hidden;
 	margin-top: 10px;

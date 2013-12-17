@@ -5,7 +5,7 @@ $(document).ready(function(){
 	
 	//////////////// Set up Sortables ////////////////
 	
-	// Initialize Sortable areas
+	// Initialize: Sortable areas
 	$(".connectedSortable").sortable({
 		connectWith: ".connectedSortable",
 		scroll : false,
@@ -16,13 +16,16 @@ $(document).ready(function(){
 
 	}).disableSelection();
 	
-	// Any time a pill is dragged to a new location
+	// Event: Any time a pill is dragged to a new location
 	$(".connectedSortable").on( "sortreceive", function( event, ui ) {
 		
 		// If it came from filters or predictions dropzones, delete it
-		if(($(ui.sender).attr('id') == "report-filters") || ($(ui.sender).attr('id') == "report-predictions"))
-			$(ui.item).remove()
-			
+		if(($(ui.sender).attr('id') == "report-filters") || ($(ui.sender).attr('id') == "report-predictions")){
+			if($(ui.item).hasClass("clone")){
+				$(ui.item).remove();
+			}
+		}
+
 		// If it is dropped into anything except filters or predictions, update the chart
 		if(($(this).attr('id') != "report-filters") && ($(this).attr('id') != "report-predictions"))
 			update_chart();
@@ -30,14 +33,15 @@ $(document).ready(function(){
 	
 	//////////////// Predictions ////////////////
 	
-	// When pill is dropped into Predictions dropzone
+	// Event: When pill is dropped into Predictions dropzone
 	$( "#report-predictions" ).on( "sortreceive", function(event, ui){
 		// Clone the pill and send the clone back to where the original came from
 		$(ui.sender).prepend( $(ui.item).clone() );
-		
+
 		// Change the style to show emphasis
 		$(ui.item).removeClass("btn-default");
 		$(ui.item).addClass("btn-danger");
+		$(ui.item).addClass("clone");
 
 		// Call the function that will load and show the popover
 		show_prediction_popover(event, ui);
@@ -46,7 +50,7 @@ $(document).ready(function(){
 		$(ui.item).attr("data-training_nrow", null);
 	});
 
-	// Start prediction popover
+	// Function: Start prediction popover
 	function show_prediction_popover( event, ui ) {
 		$.ajax({
 		  	type: "GET",
@@ -71,14 +75,19 @@ $(document).ready(function(){
 
 	//////////////// Filter - Popover ////////////////
 	
-	// When pill dropped into filter dropzone
+	// Event: When pill dropped into filter dropzone
 	$( "#report-filters" ).on( "sortreceive", function(event, ui){
 		// Clone the pill and send the clone back to where the original came from
 		$(ui.sender).prepend( $(ui.item).clone() );
 		
 		// Create a 'filter-clause' data attribute
 		$(ui.item).attr("data-filter_clause", null);
+		$(ui.item).addClass("clone");
 		
+		// Replace icon with filter icon
+		$(ui.item).children("i").removeClass().html("");
+		$(ui.item).children("i").addClass("glyphicon glyphicon-filter");
+
 		// Call the function that will load and show the popover
 		show_filter_popover(event, ui);
 
@@ -89,7 +98,7 @@ $(document).ready(function(){
 		});
 	});
 	
-	// Show Filter Popover
+	// Function: Show Filter Popover
 	function show_filter_popover( event, ui ) {
 		$.ajax({
 		  	type: "GET",
@@ -111,16 +120,25 @@ $(document).ready(function(){
 		
 		$(ui.item).popover('show');
 	}
-	
-	
-	// Remove item when dragged out of predictions or filters dropzones
+
+	// Event: When clone draged out of Predictions dropzone
 	$("#report-filters, #report-predictions").on("sortstart", {distance: 10}, function( event, ui ) {
-		// When something is dragged from filters, delete it
-		$(ui.item).popover("hide");
-		$(ui.item).toggle( "highlight", complete = function(){
-			$(ui.item).remove();
-			update_chart();
-		});
+		// Hide and remove it, update the chart
+		if($(ui.item).hasClass("clone")){
+			$(ui.item).popover("hide");
+			$(ui.item).toggle( "highlight", complete = function(){
+				$(ui.item).remove();
+				update_chart();
+			});
+
+			if($(this).attr("id") == "report-predictions"){
+				$("#prediction").addClass("hidden");
+				$("#report-predictions").append($("#prediction"));
+				update_chart();
+			}
+		}
+		
+
 	});
 
 	// Show modal if no DataFrame is selected
@@ -212,6 +230,8 @@ function update_predictions(){
 		dataType: "html"
 	}).done(function(response) {
 		console.debug(response);
+		$("#prediction").removeClass("hidden")
+		
 	});
 }
 

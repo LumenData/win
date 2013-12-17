@@ -101,7 +101,7 @@
 					{% if column.role == "measure" %}
 						<div class="btn btn-xs btn-default mypill" id="{{ column_name }}" title="{{ column.display_name }}" data-name="{{ column_name }}" data-type="{{ column.type }}">
 							{% if "numeric" in column.type_category %}
-								<span class="hashicon">#</span> 
+								<i class="hashicon">#</i> 
 							{% else %}
 								{{ column.type }}
 							{% endif %}
@@ -127,11 +127,13 @@
 		</div>
 
 		{# Progress Bar	#}
+<!-- 
 		<div id="chart_loading">
-			<!--	<img id="chart_loading_bar" src="/static/charts/images/ajax-loader.gif"> -->
+			<img id="chart_loading_bar" src="/static/charts/images/ajax-loader.gif">
 		</div>
+ -->
 
-		<div id="report-area"></div>
+		<div id="report-area"> </div>
 	</div>
 
 	<div id="right_panel">
@@ -139,7 +141,12 @@
 		<!-- Predictions -->
 		<div class="panel panel-danger column-frame">
 			<span class="panel-heading column-title">Predictions</span>
-			<ul id="report-predictions" class="connectedSortable dropzone dropzone-tall"></ul>
+			<ul id="report-predictions" class="connectedSortable dropzone dropzone-tall">
+				<div class="btn btn-xs btn-default mypill hidden" id="prediction" title="Prediction" data-name="prediction" data-type="varchar">
+					<i class="glyphicon glyphicon-font"> </i>
+					Prediction
+				</div>
+			</ul>
 		</div>
 
 		<!-- Filter -->

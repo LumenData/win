@@ -11,6 +11,8 @@ import pprint
 import sys
 from django.utils import timezone
 
+####################### VIEWS #######################
+
 ####################### View - Chart Builder #######################
 
 class ChartBuilderView(TemplateView):
@@ -25,6 +27,9 @@ class ChartBuilderView(TemplateView):
 			context['no_dataframe'] = True
 			context['object_list'] = DataFrame.objects.all()			
 			return self.render_to_response(context)
+			
+		column_names_with_prediction = [i for i in dataframe.columns if "prediction" in i]
+		dataframe.drop_columns(column_names_with_prediction)
 
 		context['dataframe'] = dataframe
 		return self.render_to_response(context)
@@ -49,7 +54,7 @@ class AutoChartView(TemplateView):
 
 		# Choose a Chart Type
 		chart_type = chart_selector(dataframe, chart_builder_input)
-		
+
 		if(chart_type is None):
 			return self.render_to_response(context)
 		
@@ -64,7 +69,7 @@ class AutoChartView(TemplateView):
 			query_results, tmp = dataframe.query_results(query);	
 			chart_data = list(query_results)
 			chart_options = {}
-		elif(chart_type in ("lineChart", "scatterChart", "barChart")):
+		elif(chart_type in ("lineChart", "scatterChart", "barChart", "sunburstChart")):
 			query_results, query_headings = dataframe.query_results(query)
 			chart_data, chart_options = get_chart_data(dataframe, query_results, chart_builder_input)
 		else:
@@ -75,12 +80,12 @@ class AutoChartView(TemplateView):
 		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
 		context['chart_options'] = json.dumps(chart_options) if chart_options else {}
 
-		print("\n\nChart Data: ")
-		pprint.pprint(chart_data)
-		print("\n\nChart Query: ")
-		pprint.pprint(query)
-		print("\n\nChart Options: ")
-		pprint.pprint(chart_options)
+# 		print("\n\nChart Data: ")
+# 		pprint.pprint(chart_data)
+# 		print("\n\nChart Query: ")
+# 		pprint.pprint(query)
+# 		print("\n\nChart Options: ")
+# 		pprint.pprint(chart_options)
 		
 		return self.render_to_response(context)
 
@@ -139,27 +144,34 @@ class PredictionPopoverView(TemplateView):
 
 		return render(request, template_name, context)
 
+
+####################### FUNCTIONS #######################
+
 ####################### Chart Selector #######################
 
 def chart_selector(dataframe, chart_builder_input):
 	ncols = len(chart_builder_input["column_names"])
 	nrows = len(chart_builder_input["row_names"])
+	ngroup = len(chart_builder_input["group_names"])
 	
 	datacols = dataframe.columns;
 
 	## Get xaxis and yaxis data types (note: assumes only one x and one y)
-
 	col_datatype = datacols[chart_builder_input["column_names"][0]]["type_category"]	if(ncols > 0) else ""
 	row_datatype = datacols[chart_builder_input["row_names"][0]]["type_category"] 	if(nrows > 0) else ""
+	group_datatype = datacols[chart_builder_input["group_names"][0]]["type_category"] 	if(ngroup > 0) else ""
 
-	if (ncols + nrows) == 1:
+	if (ncols + nrows + ngroup) == 1:
 		return "pieChart"  
 	elif (ncols == 1) and (nrows >= 1) and (col_datatype == "time") and (row_datatype == "numeric"):
 		return "lineChart"
 	elif (ncols ==1) and (nrows == 1) and (col_datatype == "character") and (row_datatype == "numeric"):
 		return "barChart"
 	elif (ncols == 1) and (nrows == 1) and (col_datatype == "numeric") and (row_datatype == "numeric"):
-		return "scatterChart"  
+		return "scatterChart"	
+	elif (ncols == 1) and (nrows == 0) and (ngroup == 1) and (col_datatype == "character") and (group_datatype == "character"):
+		return "sunburstChart"
+		
 	else:
 		return None
 
@@ -182,14 +194,16 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	# Query Aggregate Functions & Groups
 	query_group_by = ""
 
-	if(chart_type in "pieChart"):
+	if(chart_type == "pieChart"):
 		column_names = column_names if column_names else row_names		
 		return "SELECT %s `key`, count(*) y FROM %s %s GROUP BY 1 ORDER BY 2 LIMIT 20" % (column_names[0], dataframe.db_table_name, query_where)
+	elif(chart_type == "sunburstChart"):
+		return "SELECT %s g, %s x, COUNT(*) y FROM %s %s GROUP BY 1, 2 ORDER BY 1" % (group_names[0], column_names[0], dataframe.db_table_name, query_where)
 	elif(chart_type in ("lineChart", "barChart")):
 		row_aggregate_functions = ['avg'] * len(row_names)
 		query_group_by = "GROUP BY %s " % column_names[0]
 		query_group_by += ", %s " % group_names[0] if group_names else ""
-	elif(chart_type == "scatterChart"):
+	else:
 		row_aggregate_functions = [''] * len(row_names)
 	
 	# Query Select
@@ -215,7 +229,7 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 def get_chart_data(dataframe, query_results, chart_builder_input):
 
 	column_names = chart_builder_input["column_names"]
-	row_names = chart_builder_input["row_names"]
+	row_names = chart_builder_input["row_names"] if chart_builder_input["row_names"] else None
 	group_names = chart_builder_input["group_names"]
 	size_names = chart_builder_input["size_names"][0] if chart_builder_input["size_names"] else None
 
@@ -232,11 +246,13 @@ def get_chart_data(dataframe, query_results, chart_builder_input):
 				query_results_group_dict[dict['g']] = []
 
 			# Populate the array element with a new element, a dict of x/y or x/y/size pairs	
-			y_key = row_names[0]
-			if(size_names):
+			
+			if(size_names and row_names and column_names):
 				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict[y_key], 'size': dict['size']})
-			else:
+			elif(row_names and column_names):
 				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict[y_key]})
+			else:
+				query_results_group_dict[dict['g']].append({'x': dict['x'], 'y': dict['y']})
 
 	else:
 		query_results_group_dict = {}
@@ -262,7 +278,7 @@ def get_chart_data(dataframe, query_results, chart_builder_input):
 	chart_options = {
 		"xaxis_label": column_names[0],
 		"xaxis_type": dataframe.columns[column_names[0]]["type"],
-		"yaxis_label": "avg(" + row_names[0] + ")",
+		"yaxis_label": "avg(" + row_names[0] + ")" if row_names else None,
 		"size_label": size_names if size_names else "",
 		"group_label": group_names[0] if group_names else "",
 		"show_legend": len(chart_data) < 15

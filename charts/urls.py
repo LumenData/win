@@ -8,5 +8,6 @@ urlpatterns = patterns('',
 	url(r'^autofilter$', AutoFilterView.as_view(), name="autofilter"),
 # 	url(r'^prediction_popover$', TemplateView.as_view(template_name="prediction_popover.html"), name="prediction_popover"),
 	url(r'^prediction_popover$', PredictionPopoverView.as_view(), name="prediction_popover"),
-
+	url(r'^test$', TemplateView.as_view(template_name="test.html"), name="test"),
+	url(r'^flare.json$', TemplateView.as_view(template_name="flare.json"), name="flare.json"),
 )
