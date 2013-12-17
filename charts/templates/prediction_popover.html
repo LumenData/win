@@ -35,6 +35,11 @@
 		var prediction_form = $(this).closest(".popover_wrapper");
 		var column_name = prediction_form.data("parent_id");
 		var prediction_item = $("#report-predictions").find("#" + column_name)
+		
+		console.debug("prediction_form", prediction_form)
+		console.debug("column_name", column_name)
+		console.debug("prediction_item", prediction_item)
+		
 
 		// Get the slider value and set it as an attribute on the DOM (so that it can get picked up by the update_chart function)
 		var training_percent = $('#training-precent').val();

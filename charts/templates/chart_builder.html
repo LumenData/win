@@ -142,10 +142,21 @@
 		<div class="panel panel-danger column-frame">
 			<span class="panel-heading column-title">Predictions</span>
 			<ul id="report-predictions" class="connectedSortable dropzone dropzone-tall">
-				<div class="btn btn-xs btn-default mypill hidden" id="prediction" title="Prediction" data-name="prediction" data-type="varchar">
+				<div class="btn btn-xs btn-default mypill prediction_output hidden" id="prediction" title="Prediction" data-name="prediction" data-type="varchar">
 					<i class="glyphicon glyphicon-font"> </i>
 					Prediction
 				</div>
+				<div class="btn btn-xs btn-default mypill prediction_output hidden" id="prediction_confidence" title="Prediction Confidence" data-name="prediction_confidence" data-type="double">
+					<i class="hashicon">#</i> 
+					Prediction Confidence
+				</div>
+				<div class="btn btn-xs btn-default mypill prediction_output hidden" id="prediction_accurate" title="Prediction Accurate" data-name="prediction_accurate" data-type="varchar">
+					<i class="glyphicon glyphicon-font"> </i>
+					Prediction Accurate
+				</div>
+
+
+				
 			</ul>
 		</div>
 

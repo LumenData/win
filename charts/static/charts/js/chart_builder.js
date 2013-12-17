@@ -132,8 +132,9 @@ $(document).ready(function(){
 			});
 
 			if($(this).attr("id") == "report-predictions"){
-				$("#prediction").addClass("hidden");
-				$("#report-predictions").append($("#prediction"));
+				$(".prediction_output").addClass("hidden");
+				$("#report-predictions").append($(".prediction_output"));
+				
 				update_chart();
 			}
 		}
@@ -212,8 +213,8 @@ function update_chart(){
 function update_predictions(){
 	
 	// Get rownames from row sortable area 		
-	var target_name = $("#report-predictions .mypill:first-child").attr('id');
-	var training_nrow = $("#report-predictions .mypill:first-child").data('training_nrow');
+	var target_name = $("#report-predictions").children(".clone").attr('id');
+	var training_nrow = $("#report-predictions").children(".clone").data('training_nrow');
 
 	// Collect input to chart builder input into dictionary
 	// Should replace this hard coded url later with something from django
@@ -230,8 +231,9 @@ function update_predictions(){
 		dataType: "html"
 	}).done(function(response) {
 		console.debug(response);
-		$("#prediction").removeClass("hidden")
-		
+// 		$("#prediction").removeClass("hidden");
+// 		$("#prediction_confidence").removeClass("hidden")		
+		$(".prediction_output").removeClass("hidden");
 	});
 }
 
