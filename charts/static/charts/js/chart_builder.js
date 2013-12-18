@@ -49,6 +49,10 @@ $(document).ready(function(){
 			$(ui.item).removeClass("btn-default");
 			$(ui.item).addClass("btn-danger");
 			$(ui.item).addClass("clone");
+			
+			// Change the icon to a target
+			$(ui.item).children("i").removeClass().html("");
+			$(ui.item).children("i").addClass("glyphicon glyphicon-screenshot");
 
 			// Call the function that will load and show the popover
 			show_prediction_popover(event, ui);
@@ -238,9 +242,11 @@ function update_predictions(){
 		dataType: "html"
 	}).done(function(response) {
 		console.debug(response);
-// 		$("#prediction").removeClass("hidden");
-// 		$("#prediction_confidence").removeClass("hidden")		
+		
+		// Unhide other elements and move the target pill to the top of the list
 		$(".prediction_output").removeClass("hidden");
+		$("#report-predictions").children(".clone").prependTo("#report-predictions");
+		
 	});
 }
 

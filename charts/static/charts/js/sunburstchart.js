@@ -11,7 +11,7 @@ function sunburst_adjust(obj){
 	return children;
 }
 
-var adjusted_chart_data = {'name': 'sunburst', 'children': []}; 
+var adjusted_chart_data = {'name': ' ', 'children': []}; 
 for(i in chart_data) {
 	adjusted_chart_data['children'][i] = {
 		'name': chart_data[i]['key'],

@@ -60,7 +60,7 @@ class PredictionsView(TemplateView):
 		X_test = X[test_indexes, :]
 		y_test = y[test_indexes]
 
-		clf = RandomForestClassifier(n_estimators=1)
+		clf = RandomForestClassifier(n_estimators=50)
 		clf = clf.fit(X_train, y_train)
 
 		predictions = clf.predict(X)
@@ -69,17 +69,23 @@ class PredictionsView(TemplateView):
 		predictions_proba_classes = list(clf.classes_)
 		predictions_confidence = np.sort(predictions_proba)[:,-1]
 
+		# Create an array of values that all say "Training" then replace the right rows with "Training"
+		predictions_role = np.repeat("Training",len(predictions))
+		predictions_role[test_indexes] = "Testing"
+	
+		print(predictions_role)
+		
 # 		score_train = clf.score(X_train, y_train)
 # 		score_test = clf.score(X_test, y_test)
 
-		predictions_array = np.column_stack((ids, predictions, predictions_confidence, predictions_accurate, predictions_proba))
-		predictions_array_column_names = ['id', 'prediction', 'prediction_confidence', 'prediction_accurate'] # + [i + "_probability" for i in predictions_proba_classes]
-		predictions_array_types = ['int(11) NOT NULL PRIMARY KEY', 'varchar(255)', 'double', 'varchar(5)'] # ['double'] * len(predictions_proba_classes)
+		predictions_array = np.column_stack((ids, predictions, predictions_confidence, predictions_accurate, predictions_role, predictions_proba))
+		predictions_array_column_names = ['id', 'prediction', 'prediction_confidence', 'prediction_accurate', 'prediction_role'] # + [i + "_probability" for i in predictions_proba_classes]
+		predictions_array_types = ['int(11) NOT NULL PRIMARY KEY', 'varchar(255)', 'double', 'varchar(5)', 'varchar(8)'] # ['double'] * len(predictions_proba_classes)
 
 		df.add_columns(predictions_array_column_names[1:], predictions_array_types[1:])
 
 		db_tmp_table_name = df.db_table_name + '_tmp'
-		db_tmp_table_data = predictions_array[:,0:4]
+		db_tmp_table_data = predictions_array[:,0:5]
 		
 		create_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, predictions_array_types)
 		insert_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, db_tmp_table_data.tolist())
@@ -133,7 +139,7 @@ def insert_table(db, table_name, column_names, table_data):
 
 def merge_tables(db, table_a, table_b, join_column):
 	cursor = db.cursor()
-	query = "UPDATE %s a JOIN %s b ON a.%s = b.%s SET a.prediction = b.prediction, a.prediction_confidence = b.prediction_confidence, a.prediction_accurate = b.prediction_accurate" % (table_a, table_b, join_column, join_column)
+	query = "UPDATE %s a JOIN %s b ON a.%s = b.%s SET a.prediction = b.prediction, a.prediction_confidence = b.prediction_confidence, a.prediction_accurate = b.prediction_accurate, a.prediction_role = b.prediction_role" % (table_a, table_b, join_column, join_column)
 	cursor.execute(query)
 	cursor.close()
 

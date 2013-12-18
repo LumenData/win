@@ -174,7 +174,6 @@ def chart_selector(dataframe, chart_builder_input):
 		return "scatterChart"	
 	elif (ncols == 1) and (nrows == 0) and (ngroup == 1) and (col_datatype == "character") and (group_datatype == "character"):
 		return "sunburstChart"
-		
 	else:
 		return None
 
