@@ -27,27 +27,35 @@ $(document).ready(function(){
 		}
 
 		// If it is dropped into anything except filters or predictions, update the chart
-		if(($(this).attr('id') != "report-filters") && ($(this).attr('id') != "report-predictions"))
-			update_chart();
+		sortable_area_id = $(this).attr('id');
+		if(sortable_area_id != "report-filters")
+			if(sortable_area_id == "report-predictions"){
+				if($("#report-predictions").children(".clone").size() > 0)
+					update_chart();
+			}
+			else
+				update_chart();
 	});
 	
 	//////////////// Predictions ////////////////
 	
 	// Event: When pill is dropped into Predictions dropzone
 	$( "#report-predictions" ).on( "sortreceive", function(event, ui){
-		// Clone the pill and send the clone back to where the original came from
-		$(ui.sender).prepend( $(ui.item).clone() );
+		if($("#report-predictions").children(".clone").size() == 0){
+			// Clone the pill and send the clone back to where the original came from
+			$(ui.sender).prepend( $(ui.item).clone() );
 
-		// Change the style to show emphasis
-		$(ui.item).removeClass("btn-default");
-		$(ui.item).addClass("btn-danger");
-		$(ui.item).addClass("clone");
+			// Change the style to show emphasis
+			$(ui.item).removeClass("btn-default");
+			$(ui.item).addClass("btn-danger");
+			$(ui.item).addClass("clone");
 
-		// Call the function that will load and show the popover
-		show_prediction_popover(event, ui);
+			// Call the function that will load and show the popover
+			show_prediction_popover(event, ui);
 
-		// Create a 'training_percent' data attribute
-		$(ui.item).attr("data-training_nrow", null);
+			// Create a 'training_percent' data attribute
+			$(ui.item).attr("data-training_nrow", null);
+		}
 	});
 
 	// Function: Start prediction popover
