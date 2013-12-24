@@ -115,7 +115,7 @@ def mysql2numpy(db, table_name, columns):
 	np_array = np.array(cursor.fetchall())
 	return np_array
 
-def create_table(db, table_name, column_names, column_types)db =:
+def create_table(db, table_name, column_names, column_types):
 	cursor = db.cursor()
 	column_definition_fragments = [column_names[i] + ' ' + column_types[i] for i, junk in enumerate(column_names)]
 	column_definition = '(' + ','.join(column_definition_fragments) + ')'
