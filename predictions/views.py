@@ -164,6 +164,7 @@ def drop_columns(db, table_name, column_names):
 	cursor = db.cursor()
 	query = "ALTER TABLE %s %s" % (table_name, ','.join(['DROP ' + i for i in column_names]))
 	cursor.execute(query)
+	db.commit()
 	cursor.close()
 
 
