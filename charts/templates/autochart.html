@@ -17,23 +17,24 @@
 	var xaxis_type = chart_options["xaxis_type"];
 	var size_label = chart_options["size_label"];
 	var show_legend = chart_options["show_legend"];
-
+	
+ 	console.debug("chart_data original: ", JSON.parse(JSON.stringify(chart_data)));
 
 	// Django had to pass dates as strings, converting them back
 	// Loop through each group which is one list in chart_data
 	// Loop through each dictionary with a x & y keys and convert the x formats to date
-	if(chart_options["xaxis_type"] == "date"){
-		for(var i = 0; i < chart_data.length; i++){
-			for (var j=0; j < chart_data[i]["values"].length; j++){
-				chart_data[i]["values"][j]["x"] = new Date(x_value = chart_data[i]["values"][j]["x"])
+ 	if(chart_options["xaxis_type"] == "date"){
+ 		for(var i = 0; i < chart_data.length; i++){
+ 			for (var j=0; j < chart_data[i]["values"].length; j++){
+ 				date_formatted_value = new Date(x_value = chart_data[i]["values"][j]["x"]);
+ 				chart_data[i]["values"][j]["x"] = date_formatted_value
 			}
-		}
-	}
-	
-	console.debug("chart_options");
-	console.debug(chart_options);
-// 	console.debug(chart_data);
-// 	console.debug(JSON.stringify(chart_data));
+ 		}
+ 	}
+
+	console.debug("chart_options", chart_options);
+	console.debug("chart_data after date formatting: ", JSON.parse(JSON.stringify(chart_data)));
+
 </script>
 
 {% if chart_type == "pieChart" %}
@@ -47,8 +48,6 @@
 {% elif chart_type == "sunburstChart" %}
 	<script src='/static/charts/js/sunburstchart.js' type='text/javascript'> </script>
 {% endif %}
-
-
 
 
 

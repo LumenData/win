@@ -168,7 +168,9 @@ def chart_selector(dataframe, chart_builder_input):
 		return "pieChart"  
 	elif (ncols == 1) and (nrows >= 1) and (col_datatype == "time") and (row_datatype == "numeric"):
 		return "lineChart"
-	elif (ncols ==1) and (nrows == 1) and (col_datatype == "character") and (row_datatype == "numeric"):
+	elif (ncols == 1) and (nrows == 1) and (col_datatype == "character") and (row_datatype == "numeric"):
+		return "barChart"
+	elif (ncols == 1) and (ngroup == 1) and (col_datatype == "time") and (group_datatype == "character"):
 		return "barChart"
 	elif (ncols == 1) and (nrows == 1) and (col_datatype == "numeric") and (row_datatype == "numeric"):
 		return "scatterChart"	
@@ -202,7 +204,10 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	elif(chart_type == "sunburstChart"):
 		return "SELECT %s g, %s x, COUNT(*) y FROM %s %s GROUP BY 1, 2 ORDER BY 1" % (group_names[0], column_names[0], dataframe.db_table_name, query_where)
 	elif(chart_type in ("lineChart", "barChart")):
-		row_aggregate_functions = ['avg'] * len(row_names)
+		if not row_names:
+			row_aggregate_functions = ['count']
+		else:	
+			row_aggregate_functions = ['avg'] * len(row_names)
 		query_group_by = "GROUP BY %s " % column_names[0]
 		query_group_by += ", %s " % group_names[0] if group_names else ""
 	else:
@@ -212,9 +217,12 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	query_select = "SELECT "
 	query_select += "%s g, " % group_names[0] if group_names else ""
 	query_select += "%s size, " % size_names if size_names else ""
+	if row_aggregate_functions == ['count']:
+		query_select += "count(*) y, "
 	
 	for row_name in row_names:
 		query_select += "%s(%s) %s, " % (row_aggregate_functions.pop(), row_name, row_name)
+
 	query_select += "%s x " % column_names[0] if column_names else ""
 
 	# Query From

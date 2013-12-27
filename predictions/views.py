@@ -6,8 +6,10 @@ import numpy as np
 import scipy as sp
 import sklearn as sk
 import random
+
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction import DictVectorizer
 
 
 ####################### View - Predictions #######################
@@ -31,34 +33,49 @@ class PredictionsView(TemplateView):
 		columns = df.columns.keys()
 		column_pk_name = 'id'
 
-		column_names_with_prediction = [i for i in columns if "prediction" in i]
+		column_names_with_prediction = [key for key in columns if "prediction" in key]
 		drop_columns(df.get_db(), df.db_table_name, column_names_with_prediction)
-		
+
 		# Refresh column names after the prediction columns have been removed
-		columns = df.columns.keys()
-		
+		# Also remove any date type columns
+		columns = [key for key in df.columns if "date" not in df.columns[key]['type']]
+
 		# Ensure column order starts like [id, target, feature1, feature2, ...]
 		columns.remove(column_pk_name)
 		columns.remove(target_name)
 		columns.insert(0, column_pk_name)
 		columns.insert(1, target_name)
 
-		np_array = mysql2numpy(df.get_db(), df.db_table_name, columns)
+#		tmpnp = mysql2numpy(df.get_db(), df.db_table_name, columns)
+		#ids = np_array[:, 0]
+		#X = np_array[:, 2:6] (old)
+		#y = np_array[:, 1]
 
-		nrow = len(np_array)
+		query = "SELECT %s, %s FROM %s" % (column_pk_name, target_name, df.db_table_name);
+		y_and_ids_as_dicts, column_names = df.query_results(query)
+		y = [v[target_name] for v in y_and_ids_as_dicts]
+		ids = [v[column_pk_name] for v in y_and_ids_as_dicts]
+
+		query = "SELECT %s FROM %s" % (','.join(columns[2:]), df.db_table_name);
+		X_as_dicts, column_names = df.query_results(query)
+
+		nrow = len(y)
 		indexes = range(nrow)
 		training_indexes = random.sample(range(nrow), training_nrow)
 		test_indexes = [x for x in indexes if x not in training_indexes]
 
-		ids = np_array[:, 0]
-		y = np_array[:, 1]
-		X = np_array[:, 2:5]
+		vec = DictVectorizer()
+		X = vec.fit_transform(X_as_dicts).toarray()
+		# vec.get_feature_names()
+
+		##
+
 
 		X_train = X[training_indexes, :]
-		y_train = y[training_indexes]
+		y_train = np.array(y)[training_indexes]
 
 		X_test = X[test_indexes, :]
-		y_test = y[test_indexes]
+		y_test = np.array(y)[test_indexes]
 
 		clf = RandomForestClassifier(n_estimators=50)
 		clf = clf.fit(X_train, y_train)
@@ -72,7 +89,7 @@ class PredictionsView(TemplateView):
 		# Create an array of values that all say "Training" then replace the right rows with "Training"
 		predictions_role = np.repeat("Training",len(predictions))
 		predictions_role[test_indexes] = "Testing"
-			
+
 # 		score_train = clf.score(X_train, y_train)
 # 		score_test = clf.score(X_test, y_test)
 
