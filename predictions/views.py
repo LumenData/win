@@ -157,6 +157,7 @@ def merge_tables(db, table_a, table_b, join_column):
 	cursor = db.cursor()
 	query = "UPDATE %s a JOIN %s b ON a.%s = b.%s SET a.prediction = b.prediction, a.prediction_confidence = b.prediction_confidence, a.prediction_accurate = b.prediction_accurate, a.prediction_role = b.prediction_role" % (table_a, table_b, join_column, join_column)
 	cursor.execute(query)
+	db.commit()
 	cursor.close()
 
 def drop_columns(db, table_name, column_names):
