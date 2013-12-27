@@ -247,6 +247,24 @@ function update_predictions(){
 		$(".prediction_output").removeClass("hidden");
 		$("#report-predictions").children(".clone").prependTo("#report-predictions");
 		
+		if($("#report-predictions").children(".clone").data("type") == 'varchar'){
+			$("#report-predictions").children("#prediction, #prediction_accurate").data("type", "varchar");			
+			$("#report-predictions").children("#prediction, #prediction_accurate").children("i")
+				.removeClass()
+				.addClass("glyphicon glyphicon-font")
+				.html("");	
+		}
+		else{
+			$("#report-predictions").children("#prediction, #prediction_accurate").data("type", "int");
+			$("#report-predictions").children("#prediction, #prediction_accurate").children("i")
+				.removeClass()
+				.addClass("hashicon")
+				.html("#");
+				
+				
+			
+		}
+		
 	});
 }
 

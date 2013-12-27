@@ -32,6 +32,7 @@ class PredictionsView(TemplateView):
 
 		columns = df.columns.keys()
 		column_pk_name = 'id'
+		target_role = df.columns[target_name]['role']
 
 		column_names_with_prediction = [key for key in columns if "prediction" in key]
 		drop_columns(df.get_db(), df.db_table_name, column_names_with_prediction)
@@ -68,9 +69,6 @@ class PredictionsView(TemplateView):
 		X = vec.fit_transform(X_as_dicts).toarray()
 		# vec.get_feature_names()
 
-		##
-
-
 		X_train = X[training_indexes, :]
 		y_train = np.array(y)[training_indexes]
 
@@ -80,28 +78,40 @@ class PredictionsView(TemplateView):
 		clf = RandomForestClassifier(n_estimators=50)
 		clf = clf.fit(X_train, y_train)
 
+		# Create an array of values that all say "Training" then replace the right rows with "Training"
+		predictions_role = np.repeat("Training",len(X))
+		predictions_role[test_indexes] = "Testing"
+
 		predictions = clf.predict(X)
-		predictions_accurate = predictions == y
 		predictions_proba = clf.predict_proba(X)
 		predictions_proba_classes = list(clf.classes_)
 		predictions_confidence = np.sort(predictions_proba)[:,-1]
 
-		# Create an array of values that all say "Training" then replace the right rows with "Training"
-		predictions_role = np.repeat("Training",len(predictions))
-		predictions_role[test_indexes] = "Testing"
+		#score_train = clf.score(X_train, y_train)
+		#score_test = clf.score(X_test, y_test)
 
-# 		score_train = clf.score(X_train, y_train)
-# 		score_test = clf.score(X_test, y_test)
+		if target_role == "dimension":
+			predictions_accurate = predictions == y
+	
+			predictions_array = np.column_stack((ids, predictions, predictions_confidence, predictions_accurate, predictions_role)) # not including predictions_proba for class probabilities
+			predictions_array_column_names = ['id', 'prediction', 'prediction_confidence', 'prediction_accurate', 'prediction_role'] # + [i + "_probability" for i in predictions_proba_classes]
+			predictions_array_types = ['int(11) NOT NULL PRIMARY KEY', 'varchar(255)', 'double', 'varchar(5)', 'varchar(8)'] # ['double'] * len(predictions_proba_classes)
 
-		predictions_array = np.column_stack((ids, predictions, predictions_confidence, predictions_accurate, predictions_role, predictions_proba))
-		predictions_array_column_names = ['id', 'prediction', 'prediction_confidence', 'prediction_accurate', 'prediction_role'] # + [i + "_probability" for i in predictions_proba_classes]
-		predictions_array_types = ['int(11) NOT NULL PRIMARY KEY', 'varchar(255)', 'double', 'varchar(5)', 'varchar(8)'] # ['double'] * len(predictions_proba_classes)
+			df.add_columns(predictions_array_column_names[1:], predictions_array_types[1:])
+			predictions_array = np.column_stack((ids, predictions, predictions_confidence, predictions_accurate, predictions_role)) # not including predictions_proba for class probabilities
+			predictions_array_column_names = ['id', 'prediction', 'prediction_confidence', 'prediction_accurate', 'prediction_role'] # + [i + "_probability" for i in predictions_proba_classes]
+
+		elif target_role == "measure":
+			prediction_accurate = predictions - y
+			predictions_array = np.column_stack((ids, predictions, predictions_confidence, prediction_accurate, predictions_role))
+			predictions_array_column_names = ['id', 'prediction', 'prediction_confidence', 'prediction_accurate', 'prediction_role']
+			predictions_array_types = ['int(11) NOT NULL PRIMARY KEY', 'int(11)', 'double', 'int(11)', 'varchar(8)']
 
 		df.add_columns(predictions_array_column_names[1:], predictions_array_types[1:])
 
 		db_tmp_table_name = df.db_table_name + '_tmp'
 		db_tmp_table_data = predictions_array[:,0:5]
-		
+
 		create_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, predictions_array_types)
 		insert_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, db_tmp_table_data.tolist())
 		merge_tables(df.get_db(), df.db_table_name, db_tmp_table_name, 'id')
@@ -142,6 +152,7 @@ def create_table(db, table_name, column_names, column_types):
 def drop_table(db, table_name):
 	cursor = db.cursor()
 	cursor.execute("DROP TABLE %s" % table_name)
+	db.commit()
 	cursor.close()
 
 def insert_table(db, table_name, column_names, table_data):
