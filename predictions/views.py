@@ -150,6 +150,7 @@ def insert_table(db, table_name, column_names, table_data):
 	column_placeholders_string = '(' + ','.join(['%s'] * len(column_names)) + ')'
 	query = "INSERT INTO %s %s VALUES %s" % (table_name, column_names_string, column_placeholders_string)
 	cursor.executemany(query , table_data)
+	db.commit()
 	cursor.close()
 
 def merge_tables(db, table_a, table_b, join_column):

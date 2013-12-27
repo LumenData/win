@@ -101,7 +101,7 @@ else{
 
 		d3.select('#mainChart').datum(chart_data).transition().duration(500).call(chart);
 		nv.utils.windowResize(chart.update);
- 
+
 		return chart;
 	});
 }
