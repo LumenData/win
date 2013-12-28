@@ -1,12 +1,13 @@
 <script>
-	var dataframe_nrow = {{ dataframe_nrow }}
+	var dataframe_nrow = {{ dataframe_nrow }};
+ 	var dataframe_columns = {{ dataframe_columns|safe }};
+ 	
 </script>
 
 <script>
 	// May need a $(document).ready() wrapper	
 
 	var column_name = $(".popover_wrapper").data("parent_id");
-	var remote_url = '/data/frame/' + dataframe_id + '/' + column_name + '/unique_values.json';
 	
 	// Initialize training/test slider
 	$('#training-precent').slider({
@@ -29,6 +30,33 @@
 	});
 
 	$('#training-precent').trigger('slide');
+	
+	// Exclude Columns selector //
+	
+	// Don't include the target name or 'prediction' columns since they obviously should be excluded
+	dataframe_columns.splice(dataframe_columns.indexOf( column_name ),1);
+	dataframe_columns.splice(dataframe_columns.indexOf( 'id' ),1);
+	for(var i in dataframe_columns){
+    	if(dataframe_columns[i].match(/^prediction/g)){
+        	dataframe_columns.splice(i,1);
+        }
+	}
+	
+	var dataframe_column_selector = [];
+ 	for(var i = 0; i < dataframe_columns.length; i++){
+ 		var dict = {'id': i, 'text': dataframe_columns[i]};
+ 		dataframe_column_selector[i] = dict;
+ 	}
+
+	$("#columns_to_exclude").select2({
+		placeholder: "Click for list...",
+		allowClear: true,
+		data: dataframe_column_selector,
+		multiple: true,
+		width: 'element'
+	});
+	
+	
 
 	// Apply Button
 	$("#apply_predictions").on("click",function(event){
@@ -36,15 +64,24 @@
 		var column_name = prediction_form.data("parent_id");
 		var prediction_item = $("#report-predictions").find("#" + column_name)
 		
-		console.debug("prediction_form", prediction_form)
-		console.debug("column_name", column_name)
-		console.debug("prediction_item", prediction_item)
+		//console.debug("prediction_form", prediction_form)
+		//console.debug("column_name", column_name)
+		//console.debug("prediction_item", prediction_item)
 		
-
 		// Get the slider value and set it as an attribute on the DOM (so that it can get picked up by the update_chart function)
 		var training_percent = $('#training-precent').val();
 		var training_nrow = Math.floor(training_percent * dataframe_nrow / 100);
 		prediction_item.attr("data-training_nrow", training_nrow);
+		
+		// Exclude Columns
+		var columns_to_exclude_dict = $("#columns_to_exclude").select2("data")
+		
+		columns_to_exclude = [];
+		for(var i in columns_to_exclude_dict){
+			columns_to_exclude[i] = columns_to_exclude_dict[i].text;
+		}
+		prediction_item.attr("data-column_exclusions", columns_to_exclude);
+		
 		
 		// Close the popup
 		prediction_item.popover('hide');
@@ -52,7 +89,7 @@
 		// Refresh the predictions
 		update_predictions();
 	});
-	
+
 	// Cancel Button
 	$("#cancel_predictions").on("click",function(event){
 		$("#report-predictions").find("div").popover('hide');
@@ -73,29 +110,45 @@
 	.slider_info.right{
 		float: right;
 	}
+	
+	#slider_well{
+		height: 100px;
+		width: auto;
+		padding: 10px;
+		margin-top: 5px;
+	}
+	
+	#columns_to_exclude{
+		margin-top: 5px;
+	}
 </style>
 
+	<b>Data Split</b><br>
+	<div class="well" id="slider_well">
+		<span class="slider_info">
+			Testing<br>
+		</span>
+		<span class="slider_info right">
+			Training<br>
+		</span>
+		<p>
+			<input id="training-precent" type="text" class="span2" value=75></input><br>
+			<span class="slider_info">
+				<span id="test-percent">25</span>%<br>
+				<span id="test-rows"></span> rows
+			</span>
 
-<b>Data Split</b><br>
-<span class="slider_info">
-	Test<br>
-</span>
+			<span class="slider_info right">
+				<span id="training-percent">75</span>%<br> 
+				<span id="training-rows"></span> rows
+			</span>
+		</p>
+	</div>
 
-<span class="slider_info right">
-	Training<br>
-</span>
 <p>
-
-<input id="training-precent" type="text" class="span2" value=75></input><br>
-<span class="slider_info">
-	<span id="test-percent">25</span>%<br>
-	<span id="test-rows"></span> rows
-</span>
-
-<span class="slider_info right">
-	<span id="training-percent">75</span>%<br> 
-	<span id="training-rows"></span> rows
-</span>
+	<b>Fields to Exclude</b><br>
+	<input id="columns_to_exclude"></input>
+</p>
 
 <br><br><br><p>
 

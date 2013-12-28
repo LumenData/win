@@ -23,7 +23,8 @@ class PredictionsView(TemplateView):
 		dataframe_id = request.GET.get('dataframe_id')
 		target_name = request.GET.get('target_name')
 		training_nrow = int( request.GET.get('training_nrow') )
-		
+		column_exclusions = request.GET.get('column_exclusions').split(',')
+	
 		try:
 			df = DataFrame.objects.get(pk = dataframe_id)
 		except Exception,e:
@@ -40,6 +41,7 @@ class PredictionsView(TemplateView):
 		# Refresh column names after the prediction columns have been removed
 		# Also remove any date type columns
 		columns = [key for key in df.columns if "date" not in df.columns[key]['type']]
+ 		columns = list( set(columns) -  set(column_exclusions) )
 
 		# Ensure column order starts like [id, target, feature1, feature2, ...]
 		columns.remove(column_pk_name)
@@ -75,7 +77,7 @@ class PredictionsView(TemplateView):
 		X_test = X[test_indexes, :]
 		y_test = np.array(y)[test_indexes]
 
-		clf = RandomForestClassifier(n_estimators=50)
+		clf = RandomForestClassifier(n_estimators=500)
 		clf = clf.fit(X_train, y_train)
 
 		# Create an array of values that all say "Training" then replace the right rows with "Training"

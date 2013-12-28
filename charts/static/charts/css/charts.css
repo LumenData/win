@@ -123,15 +123,18 @@ i{
 
 /************  Right Area  ************/
 
-/* Fix this later so that it doesn't rely on !important */
+
 /* 
-.popover{
-	top: 110px !important;
+
+#prediction_popover{
+	top: 10px !important;
+	position: absolute;
 }
 
 .arrow{
 	top: 70px !important;
 }
+ */
  */
 
 

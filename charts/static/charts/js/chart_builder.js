@@ -40,16 +40,16 @@ $(document).ready(function(){
 	//////////////// Predictions ////////////////
 	
 	// Event: When pill is dropped into Predictions dropzone
-	$( "#report-predictions" ).on( "sortreceive", function(event, ui){
+	$("#report-predictions").on("sortreceive", function(event, ui){
 		if($("#report-predictions").children(".clone").size() == 0){
 			// Clone the pill and send the clone back to where the original came from
 			$(ui.sender).prepend( $(ui.item).clone() );
-
+		
 			// Change the style to show emphasis
 			$(ui.item).removeClass("btn-default");
 			$(ui.item).addClass("btn-danger");
 			$(ui.item).addClass("clone");
-			
+
 			// Change the icon to a target
 			$(ui.item).children("i").removeClass().html("");
 			$(ui.item).children("i").addClass("glyphicon glyphicon-screenshot");
@@ -69,20 +69,28 @@ $(document).ready(function(){
 		  	url: "/charts/prediction_popover",
 		  	dataType: "html",
 		  	async: false,
-			data: {"dataframe_id": dataframe_id, "column_name": $(ui.item).attr('id')},
+			data: {
+				"dataframe_id": dataframe_id, 
+				"column_name": $(ui.item).attr('id')
+			},
 			success : function(data) {
 				var popover_content = "<div class='popover_wrapper' data-parent_id='" + $(ui.item).attr("id") + "'>" + data + "</div>";
 
 				$(ui.item).popover({
 					placement: 'left',
 					html : true,
-					container: 'body',
+					container: '#right_panel',
 					content: popover_content
 				});
 			}
 		});
 		
 		$(ui.item).popover('show');
+		
+		var item_top_px = $("#report-predictions").offset().top;
+		$(".popover").css("top", item_top_px - 90);
+		$(".arrow").css("top", item_top_px + 15);
+
 	}
 
 	//////////////// Filter - Popover ////////////////
@@ -91,11 +99,11 @@ $(document).ready(function(){
 	$( "#report-filters" ).on( "sortreceive", function(event, ui){
 		// Clone the pill and send the clone back to where the original came from
 		$(ui.sender).prepend( $(ui.item).clone() );
-		
+
 		// Create a 'filter-clause' data attribute
 		$(ui.item).attr("data-filter_clause", null);
 		$(ui.item).addClass("clone");
-		
+
 		// Replace icon with filter icon
 		$(ui.item).children("i").removeClass().html("");
 		$(ui.item).children("i").addClass("glyphicon glyphicon-filter");
@@ -109,7 +117,7 @@ $(document).ready(function(){
 			show_filter_popover(event, ui);
 		});
 	});
-	
+
 	// Function: Show Filter Popover
 	function show_filter_popover( event, ui ) {
 		$.ajax({
@@ -129,7 +137,7 @@ $(document).ready(function(){
 				});
 			}
 		});
-		
+
 		$(ui.item).popover('show');
 	}
 
@@ -149,14 +157,20 @@ $(document).ready(function(){
 				update_chart();
 			}
 		}
-		
-
 	});
 
 	// Show modal if no DataFrame is selected
 	if(typeof(dataframe_id) == "undefined"){
 		$('#myModal').modal()
 	}
+	
+	// Dev only
+	var item = $("#area_category");
+	var sender = $("#column-list-dims");
+	$("#report-predictions").append(item);
+	$("#report-predictions").trigger("sortreceive", {'item':  item, 'sender': sender});
+
+
 });
 
 /////////////// Update Chart ///////////////
@@ -226,13 +240,15 @@ function update_predictions(){
 	// Get rownames from row sortable area 		
 	var target_name = $("#report-predictions").children(".clone").attr('id');
 	var training_nrow = $("#report-predictions").children(".clone").data('training_nrow');
+	var column_exclusions = $("#report-predictions").children(".clone").data('column_exclusions');
 
 	// Collect input to chart builder input into dictionary
 	// Should replace this hard coded url later with something from django
 	prediction_builder_input = {
 		"dataframe_id": dataframe_id, 
 		"target_name": target_name, 
-		"training_nrow": training_nrow
+		"training_nrow": training_nrow,
+		"column_exclusions": column_exclusions
 	};
 
 	var request = $.ajax({
@@ -260,11 +276,7 @@ function update_predictions(){
 				.removeClass()
 				.addClass("hashicon")
 				.html("#");
-				
-				
-			
 		}
-		
 	});
 }
 

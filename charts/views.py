@@ -144,6 +144,7 @@ class PredictionPopoverView(TemplateView):
 			return self.render_to_response(context)
 
 		context['dataframe_nrow'] = dataframe.nrow
+		context['dataframe_columns'] = dataframe.columns.keys()
 
 		return render(request, template_name, context)
 
