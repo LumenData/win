@@ -164,11 +164,11 @@ $(document).ready(function(){
 		$('#myModal').modal()
 	}
 	
-	// Dev only
-	var item = $("#area_category");
-	var sender = $("#column-list-dims");
-	$("#report-predictions").append(item);
-	$("#report-predictions").trigger("sortreceive", {'item':  item, 'sender': sender});
+	// Dev only //
+	//var item = $("#area_category");
+	//var sender = $("#column-list-dims");
+	//$("#report-predictions").append(item);
+	//$("#report-predictions").trigger("sortreceive", {'item':  item, 'sender': sender});
 
 
 });
