@@ -70,9 +70,8 @@
 		
 		// Get the slider value and set it as an attribute on the DOM (so that it can get picked up by the update_chart function)
 		var training_percent = $('#training-precent').val();
-		var training_nrow = Math.floor(training_percent * dataframe_nrow / 100);
-		prediction_item.attr("data-training_nrow", training_nrow);
-		
+		prediction_item.attr("data-training_percent", training_percent);
+
 		// Exclude Columns
 		var columns_to_exclude_dict = $("#columns_to_exclude").select2("data")
 		

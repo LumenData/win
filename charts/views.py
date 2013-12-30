@@ -27,7 +27,8 @@ class ChartBuilderView(TemplateView):
 			context['no_dataframe'] = True
 			context['object_list'] = DataFrame.objects.all()			
 			return self.render_to_response(context)
-			
+		
+		# Drop any columns with "Prediction" in them (hack for now to clean up old prediction columns)
 		column_names_with_prediction = [i for i in dataframe.columns if "prediction" in i]
 		dataframe.drop_columns(column_names_with_prediction)
 
@@ -41,6 +42,10 @@ class AutoChartView(TemplateView):
 
 	def get(self, request, *args, **kwargs):
 		context = super(AutoChartView, self).get_context_data(**kwargs)
+		
+# 		print("request.GET")
+# 		print(request.GET)
+
 
 		# Get the state of the chart builder app "chart_builder_input"
 		chart_builder_input = json.loads(request.GET.get("chart_builder_input"))
@@ -55,14 +60,14 @@ class AutoChartView(TemplateView):
 		# Choose a Chart Type
 		chart_type = chart_selector(dataframe, chart_builder_input)
 
-		print "CHART TYPE"
-		print chart_type
-
 		if(chart_type is None):
 			return self.render_to_response(context)
 		
 		# Generate a Query
 		query = query_builder(dataframe, chart_type, chart_builder_input)
+
+ 		print("\n\nChart Query: ")
+ 		pprint.pprint(query)
 
 		# Create chart data & chart options to pass to javascript
 		if(chart_type == "none"):
@@ -83,12 +88,12 @@ class AutoChartView(TemplateView):
 		context['chart_data'] = json.dumps(chart_data, cls=CustomJSONEncoder)
 		context['chart_options'] = json.dumps(chart_options) if chart_options else {}
 
-# 		print("\n\nChart Data: ")
-# 		pprint.pprint(chart_data)
-# 		print("\n\nChart Query: ")
-# 		pprint.pprint(query)
-# 		print("\n\nChart Options: ")
-# 		pprint.pprint(chart_options)
+ 		print("\n\nChart Data: ")
+ 		pprint.pprint(chart_data)
+ 		print("\n\nChart Query: ")
+ 		pprint.pprint(query)
+ 		print("\n\nChart Options: ")
+ 		pprint.pprint(chart_options)
 		
 		return self.render_to_response(context)
 
@@ -192,7 +197,7 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 
 	# Query Where
 	if(filter_clauses):
-		query_where = "WHERE " + 'AND '.join(filter_clauses) + " "
+		query_where = "WHERE " + ' AND '.join(filter_clauses) + " "
 	else:
 		query_where = ""
 
@@ -232,7 +237,6 @@ def query_builder(dataframe, chart_type, chart_builder_input):
 	# Query 
 	query = query_select + query_from + query_where + query_group_by
 
-	print query
 	return query
 
 ####################### Generate Query & Chart Options #######################

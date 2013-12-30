@@ -2,6 +2,7 @@ from django.views.generic import TemplateView
 from data.models import DataFrame
 
 import MySQLdb
+import warnings
 import numpy as np
 import scipy as sp
 import sklearn as sk
@@ -22,9 +23,13 @@ class PredictionsView(TemplateView):
 		
 		dataframe_id = request.GET.get('dataframe_id')
 		target_name = request.GET.get('target_name')
-		training_nrow = int( request.GET.get('training_nrow') )
+# 		training_nrow = int( request.GET.get('training_nrow') )
+		training_percent = int(request.GET.get('training_percent'))
 		column_exclusions = request.GET.get('column_exclusions').split(',')
-	
+		filter_clauses = request.GET.getlist('filter_clauses[]')
+
+		query_where = "WHERE " + 'AND '.join(filter_clauses) if filter_clauses else ""
+		
 		try:
 			df = DataFrame.objects.get(pk = dataframe_id)
 		except Exception,e:
@@ -50,23 +55,22 @@ class PredictionsView(TemplateView):
 		columns.insert(1, target_name)
 
 #		tmpnp = mysql2numpy(df.get_db(), df.db_table_name, columns)
-		#ids = np_array[:, 0]
-		#X = np_array[:, 2:6] (old)
-		#y = np_array[:, 1]
 
-		query = "SELECT %s, %s FROM %s" % (column_pk_name, target_name, df.db_table_name);
+		query = "SELECT %s, %s FROM %s %s" % (column_pk_name, target_name, df.db_table_name, query_where);
 		y_and_ids_as_dicts, column_names = df.query_results(query)
 		y = [v[target_name] for v in y_and_ids_as_dicts]
 		ids = [v[column_pk_name] for v in y_and_ids_as_dicts]
 
-		query = "SELECT %s FROM %s" % (','.join(columns[2:]), df.db_table_name);
+		query = "SELECT %s FROM %s %s" % (','.join(columns[2:]), df.db_table_name, query_where);
 		X_as_dicts, column_names = df.query_results(query)
 
 		nrow = len(y)
+		training_nrow = int(nrow * training_percent / 100)
 		indexes = range(nrow)
 		training_indexes = random.sample(range(nrow), training_nrow)
-		test_indexes = [x for x in indexes if x not in training_indexes]
-
+		test_indexes = list(set(indexes) - set(training_indexes))
+		#test_indexes = [x for x in indexes if x not in training_indexes] < The old way was very inefficient
+		
 		vec = DictVectorizer()
 		X = vec.fit_transform(X_as_dicts).toarray()
 		# vec.get_feature_names()
@@ -114,6 +118,7 @@ class PredictionsView(TemplateView):
 		db_tmp_table_name = df.db_table_name + '_tmp'
 		db_tmp_table_data = predictions_array[:,0:5]
 
+		drop_table(df.get_db(), db_tmp_table_name)
 		create_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, predictions_array_types)
 		insert_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, db_tmp_table_data.tolist())
 		merge_tables(df.get_db(), df.db_table_name, db_tmp_table_name, 'id')
@@ -153,7 +158,8 @@ def create_table(db, table_name, column_names, column_types):
 
 def drop_table(db, table_name):
 	cursor = db.cursor()
-	cursor.execute("DROP TABLE %s" % table_name)
+	warnings.filterwarnings('ignore', 'Unknown table .*')
+	cursor.execute("DROP TABLE IF EXISTS %s" % table_name)
 	db.commit()
 	cursor.close()
 

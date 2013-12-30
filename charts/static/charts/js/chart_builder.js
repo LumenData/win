@@ -57,8 +57,6 @@ $(document).ready(function(){
 			// Call the function that will load and show the popover
 			show_prediction_popover(event, ui);
 
-			// Create a 'training_percent' data attribute
-			$(ui.item).attr("data-training_nrow", null);
 		}
 	});
 
@@ -239,16 +237,21 @@ function update_predictions(){
 	
 	// Get rownames from row sortable area 		
 	var target_name = $("#report-predictions").children(".clone").attr('id');
-	var training_nrow = $("#report-predictions").children(".clone").data('training_nrow');
+	var training_percent = $("#report-predictions").children(".clone").data('training_percent');
 	var column_exclusions = $("#report-predictions").children(".clone").data('column_exclusions');
+	var filter_clauses = new Array();
+	$("#report-filters").children().each(function(){
+		filter_clauses.push($(this).data('filter_clause'));
+	});
 
 	// Collect input to chart builder input into dictionary
 	// Should replace this hard coded url later with something from django
 	prediction_builder_input = {
 		"dataframe_id": dataframe_id, 
 		"target_name": target_name, 
-		"training_nrow": training_nrow,
-		"column_exclusions": column_exclusions
+		"training_percent": training_percent,
+		"column_exclusions": column_exclusions,
+		"filter_clauses": filter_clauses
 	};
 
 	var request = $.ajax({
@@ -258,25 +261,28 @@ function update_predictions(){
 		dataType: "html"
 	}).done(function(response) {
 		console.debug(response);
-		
-		// Unhide other elements and move the target pill to the top of the list
-		$(".prediction_output").removeClass("hidden");
-		$("#report-predictions").children(".clone").prependTo("#report-predictions");
-		
-		if($("#report-predictions").children(".clone").data("type") == 'varchar'){
-			$("#report-predictions").children("#prediction, #prediction_accurate").data("type", "varchar");			
-			$("#report-predictions").children("#prediction, #prediction_accurate").children("i")
-				.removeClass()
-				.addClass("glyphicon glyphicon-font")
-				.html("");	
-		}
-		else{
-			$("#report-predictions").children("#prediction, #prediction_accurate").data("type", "int");
-			$("#report-predictions").children("#prediction, #prediction_accurate").children("i")
-				.removeClass()
-				.addClass("hashicon")
-				.html("#");
-		}
+		$(".prediction_output").removeClass("disabled");
 	});
+
+	// Unhide other elements and move the target pill to the top of the list
+	$(".prediction_output").addClass("disabled");
+	$(".prediction_output").removeClass("hidden");
+	$("#report-predictions").children(".clone").prependTo("#report-predictions");
+	
+	if($("#report-predictions").children(".clone").data("type") == 'varchar'){
+		$("#report-predictions").children("#prediction, #prediction_accurate").data("type", "varchar");			
+		$("#report-predictions").children("#prediction, #prediction_accurate").children("i")
+			.removeClass()
+			.addClass("glyphicon glyphicon-font")
+			.html("");	
+	}
+	else{
+		$("#report-predictions").children("#prediction, #prediction_accurate").data("type", "int");
+		$("#report-predictions").children("#prediction, #prediction_accurate").children("i")
+			.removeClass()
+			.addClass("hashicon")
+			.html("#");
+	}
+
 }
 
