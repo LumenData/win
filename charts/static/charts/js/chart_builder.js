@@ -24,6 +24,8 @@ $(document).ready(function(){
 			if($(ui.item).hasClass("clone")){
 				$(ui.item).remove();
 			}
+			
+			update_chart();
 		}
 
 		// If it is dropped into anything except filters or predictions, update the chart
@@ -44,7 +46,7 @@ $(document).ready(function(){
 		if($("#report-predictions").children(".clone").size() == 0){
 			// Clone the pill and send the clone back to where the original came from
 			$(ui.sender).prepend( $(ui.item).clone() );
-		
+
 			// Change the style to show emphasis
 			$(ui.item).removeClass("btn-default");
 			$(ui.item).addClass("btn-danger");
@@ -58,6 +60,14 @@ $(document).ready(function(){
 			show_prediction_popover(event, ui);
 
 		}
+		else{
+			console.debug("Error: trying to predict while theres already a target set");
+		}
+		
+		// Create an event to open the popover on click
+		$(ui.item).on('click', function(){ 
+			show_prediction_popover(event, ui);
+		});
 	});
 
 	// Function: Start prediction popover
@@ -84,12 +94,32 @@ $(document).ready(function(){
 		});
 		
 		$(ui.item).popover('show');
-		
+
+		//Fix Prediction Popover spacing issue
 		var item_top_px = $("#report-predictions").offset().top;
 		$(".popover").css("top", item_top_px - 90);
 		$(".arrow").css("top", item_top_px + 15);
-
 	}
+	
+	
+	// Event: When clone draged out of Predictions or Filters dropzone
+	$("#report-filters, #report-predictions").on("sortstart", {distance: 10}, function( event, ui ) {
+		// Hide and remove it, update the chart
+		if($(ui.item).hasClass("clone")){
+			$(ui.item).popover("hide");
+			$(ui.item).toggle( "highlight", complete = function(){
+				$(ui.item).remove();
+				update_chart();
+			});
+
+			if($(this).attr("id") == "report-predictions"){
+				$(".prediction_output").addClass("hidden");
+				$("#report-predictions").append($(".prediction_output"));
+				update_chart();
+			}
+		}
+	});
+
 
 	//////////////// Filter - Popover ////////////////
 	
@@ -138,24 +168,6 @@ $(document).ready(function(){
 
 		$(ui.item).popover('show');
 	}
-
-	// Event: When clone draged out of Predictions dropzone
-	$("#report-filters, #report-predictions").on("sortstart", {distance: 10}, function( event, ui ) {
-		// Hide and remove it, update the chart
-		if($(ui.item).hasClass("clone")){
-			$(ui.item).popover("hide");
-			$(ui.item).toggle( "highlight", complete = function(){
-				$(ui.item).remove();
-				update_chart();
-			});
-
-			if($(this).attr("id") == "report-predictions"){
-				$(".prediction_output").addClass("hidden");
-				$("#report-predictions").append($(".prediction_output"));
-				update_chart();
-			}
-		}
-	});
 
 	// Show modal if no DataFrame is selected
 	if(typeof(dataframe_id) == "undefined"){
@@ -266,7 +278,17 @@ function update_predictions(){
 
 	// Unhide other elements and move the target pill to the top of the list
 	$(".prediction_output").addClass("disabled");
+
+	// Show prediction pills
 	$(".prediction_output").removeClass("hidden");
+	
+	// Hide prediction_confidence pill if it's a regression problem (whether it's a regression is approximated here by whether it has character-type target)
+	if($("#report-predictions").children(".clone").data("type") != "varchar"){
+		$("#prediction_confidence").addClass("hidden");
+	}
+	
+	
+	// Move the target to the top of the list
 	$("#report-predictions").children(".clone").prependTo("#report-predictions");
 	
 	if($("#report-predictions").children(".clone").data("type") == 'varchar'){

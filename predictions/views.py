@@ -10,6 +10,7 @@ import random
 
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_extraction import DictVectorizer
 
 
@@ -62,7 +63,11 @@ class PredictionsView(TemplateView):
 		ids = [v[column_pk_name] for v in y_and_ids_as_dicts]
 
 		query = "SELECT %s FROM %s %s" % (','.join(columns[2:]), df.db_table_name, query_where);
-		X_as_dicts, column_names = df.query_results(query)
+		# X_as_dicts, column_names = df.query_results(query)  (older way, doing in two steps instead)
+		X_as_tuples, column_names = df.query_results(query, "tuples")
+		print("finished retrieving as tuples");
+		X_as_dicts = [dict(zip(column_names, x_tuple)) for x_tuple in X_as_tuples]
+		print("finished converting to dicts");
 
 		nrow = len(y)
 		training_nrow = int(nrow * training_percent / 100)
@@ -74,6 +79,7 @@ class PredictionsView(TemplateView):
 		vec = DictVectorizer()
 		X = vec.fit_transform(X_as_dicts).toarray()
 		# vec.get_feature_names()
+		print("finished vectorizing");
 
 		X_train = X[training_indexes, :]
 		y_train = np.array(y)[training_indexes]
@@ -81,17 +87,27 @@ class PredictionsView(TemplateView):
 		X_test = X[test_indexes, :]
 		y_test = np.array(y)[test_indexes]
 
-		clf = RandomForestClassifier(n_estimators=500)
-		clf = clf.fit(X_train, y_train)
-
 		# Create an array of values that all say "Training" then replace the right rows with "Training"
 		predictions_role = np.repeat("Training",len(X))
 		predictions_role[test_indexes] = "Testing"
 
-		predictions = clf.predict(X)
-		predictions_proba = clf.predict_proba(X)
-		predictions_proba_classes = list(clf.classes_)
-		predictions_confidence = np.sort(predictions_proba)[:,-1]
+		if target_role == "dimension":
+			print("starting fit classification model");
+			clf = RandomForestClassifier(n_estimators=500, n_jobs = -1, verbose=1, bootstrap=False)
+			clf = clf.fit(X_train, y_train)
+			predictions = clf.predict(X)
+			predictions_proba = clf.predict_proba(X)
+			predictions_proba_classes = list(clf.classes_)
+			predictions_confidence = np.sort(predictions_proba)[:,-1]
+		elif target_role == "measure":
+			print("starting fit regression model");
+			clf = RandomForestRegressor(n_estimators=500, n_jobs = -1, verbose=1)
+			clf = clf.fit(X_train, y_train)
+			predictions = clf.predict(X)
+			predictions_confidence = np.repeat(.5,len(X))
+
+		print("finished fitting model")
+		feature_importances = dict(zip(column_names, clf.feature_importances_))
 
 		#score_train = clf.score(X_train, y_train)
 		#score_test = clf.score(X_test, y_test)
@@ -117,13 +133,20 @@ class PredictionsView(TemplateView):
 
 		db_tmp_table_name = df.db_table_name + '_tmp'
 		db_tmp_table_data = predictions_array[:,0:5]
+		
+		# Increase size for large writes
+		df.query_results("set global net_buffer_length=1000000")
+		df.query_results("set global max_allowed_packet=1000000000")
+
 
 		drop_table(df.get_db(), db_tmp_table_name)
 		create_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, predictions_array_types)
 		insert_table(df.get_db(), db_tmp_table_name, predictions_array_column_names, db_tmp_table_data.tolist())
 		merge_tables(df.get_db(), df.db_table_name, db_tmp_table_name, 'id')
 		drop_table(df.get_db(), db_tmp_table_name)
-
+		print("finished database operations");
+		
+		
 # 		context['debug'] = X_train
 		return self.render_to_response(context)
 		

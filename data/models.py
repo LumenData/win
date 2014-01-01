@@ -158,13 +158,19 @@ class DataFrame(models.Model):
 		cursor.close
 		db.close()	
 
-	def query_results(self, query):
-		db = self.get_db(cursorclass= MySQLdb.cursors.DictCursor)
+	def query_results(self, query, data_format = "dicts"):
+		if data_format == "dicts":
+			db = self.get_db(cursorclass= MySQLdb.cursors.DictCursor)
+		elif data_format == "tuples":
+			db = self.get_db()
 		cursor = db.cursor()
 		cursor.execute(query)
 		query_results = cursor.fetchall()
 		# There seems to be a problem with column_names
-		column_names = tuple([i[0] for i in cursor.description])
+		if query_results:
+			column_names = tuple([i[0] for i in cursor.description])
+		else:
+			column_names = ()
 		cursor.close
 		db.close()
 		return query_results, column_names
